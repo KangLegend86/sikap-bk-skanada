@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  GURU_BK
+  GURU_PJR
+}
+
+enum JenisKelamin {
+  L
+  P
+}
+
+enum StatusKasus {
+  DALAM_PROSES
+  SELESAI
+}
+
+model Pegawai {
+  id            String        @id @default(cuid())
+  nip_nik       String?       @unique
+  nama_lengkap  String
+  gelar         String?
+  jenis_kelamin JenisKelamin
+  no_whatsapp   String?
+  akun          UserAccount[]
+  jurnal_dibuat JurnalBk[]    @relation("KonselorJurnal")
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+}
+
+model UserAccount {
+  id             String        @id @default(cuid())
+  username       String        @unique
+  password_hash  String
+  role           Role
+  is_active      Boolean       @default(true)
+  pegawai_id     String
+  pegawai        Pegawai       @relation(fields: [pegawai_id], references: [id], onDelete: Cascade)
+  ruang_kelas_id String?       // Khusus role GURU_PJR
+  ruang_kelas    RuangKelas?   @relation(fields: [ruang_kelas_id], references: [id], onDelete: SetNull)
+  feedback_pjr   PjrFeedback[]
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+}
+
+model Jurusan {
+  id           String   @id @default(cuid())
+  kode         String   @unique // TKR, TSM, TKJ, DKV, BISDIG, DPB
+  nama_lengkap String
+  is_active    Boolean  @default(true)
+  siswa        Siswa[]
+}
+
+model RuangKelas {
+  id         String        @id @default(cuid())
+  nama_ruang String        @unique // X-A s/d XII-E
+  tingkat    String        // X, XI, XII
+  is_active  Boolean       @default(true)
+  siswa      Siswa[]
+  akun_pjr   UserAccount[]
+}
+
+model Siswa {
+  id             String       @id @default(cuid())
+  no_absen       Int?
+  nama_lengkap   String
+  jenis_kelamin  JenisKelamin
+  jurusan_id     String
+  jurusan        Jurusan      @relation(fields: [jurusan_id], references: [id])
+  ruang_kelas_id String
+  ruang_kelas    RuangKelas   @relation(fields: [ruang_kelas_id], references: [id])
+  nama_wali      String?
+  no_hp_ortu     String?
+  is_active      Boolean      @default(true)
+  jurnal         JurnalBk[]
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+}
+
+model KategoriBk {
+  id            String           @id @default(cuid())
+  nama_kategori String           @unique
+  is_active     Boolean          @default(true)
+  jurnal        JurnalKategori[]
+}
+
+model JurnalBk {
+  id                 String           @id @default(cuid())
+  tanggal_konseling  DateTime         @default(now())
+  siswa_id           String
+  siswa              Siswa            @relation(fields: [siswa_id], references: [id], onDelete: Cascade)
+  guru_bk_id         String
+  guru_bk            Pegawai          @relation("KonselorJurnal", fields: [guru_bk_id], references: [id])
+  snapshot_ruang     String
+  snapshot_pjr       String?
+  kategori           JurnalKategori[]
+  permasalahan       String           @db.Text
+  kendala            String?          @db.Text
+  solusi             String?          @db.Text
+  tindak_lanjut      String           @db.Text
+  catatan            String?          @db.Text // Ikut tampil ke PJR jika is_shared_with_pjr = true
+  status             StatusKasus      @default(DALAM_PROSES)
+  keterangan_status  String?          @db.Text
+  is_shared_with_pjr Boolean          @default(false)
+  feedback           PjrFeedback[]
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+}
+
+model JurnalKategori {
+  jurnal_id   String
+  kategori_id String
+  jurnal      JurnalBk   @relation(fields: [jurnal_id], references: [id], onDelete: Cascade)
+  kategori    KategoriBk @relation(fields: [kategori_id], references: [id], onDelete: Restrict)
+
+  @@id([jurnal_id, kategori_id])
+}
+
+model PjrFeedback {
+  id             String      @id @default(cuid())
+  jurnal_id      String
+  jurnal         JurnalBk    @relation(fields: [jurnal_id], references: [id], onDelete: Cascade)
+  user_pjr_id    String
+  user_pjr       UserAccount @relation(fields: [user_pjr_id], references: [id])
+  pesan_pantauan String      @db.Text
+  created_at     DateTime    @default(now())
+}
+
