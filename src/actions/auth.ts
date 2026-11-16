@@ -16,14 +16,10 @@ export async function loginGuruAction(
 ): Promise<AuthActionState> {
   const username = String(formData.get('username') ?? '').trim().toLowerCase();
   const password = String(formData.get('password') ?? '');
-  const selectedRole = String(formData.get('role') ?? '');
+  const remember = formData.get('remember') === 'on';
 
   if (!username || !password) {
     return { error: 'Username dan password wajib diisi.' };
-  }
-
-  if (selectedRole !== 'GURU_BK' && selectedRole !== 'GURU_PJR') {
-    return { error: 'Silakan pilih peran masuk (Guru BK atau Guru PJR).' };
   }
 
   const account = await prisma.userAccount.findUnique({
@@ -47,22 +43,20 @@ export async function loginGuruAction(
     return { error: 'Akun Administrator silakan masuk melalui halaman login Admin.' };
   }
 
-  if (account.role !== selectedRole) {
-    const labelAsli = account.role === 'GURU_BK' ? 'Guru BK' : 'Guru PJR';
-    return { error: `Akun ini terdaftar sebagai ${labelAsli}. Silakan pilih tab ${labelAsli}.` };
-  }
-
-  await setSessionCookie({
-    userId: account.id,
-    pegawaiId: account.pegawai.id,
-    username: account.username,
-    namaLengkap: account.pegawai.nama_lengkap,
-    gelar: account.pegawai.gelar,
-    jenisKelamin: account.pegawai.jenis_kelamin,
-    role: account.role,
-    ruangKelasId: account.ruang_kelas_id,
-    namaRuang: account.ruang_kelas?.nama_ruang ?? null,
-  });
+  await setSessionCookie(
+    {
+      userId: account.id,
+      pegawaiId: account.pegawai.id,
+      username: account.username,
+      namaLengkap: account.pegawai.nama_lengkap,
+      gelar: account.pegawai.gelar,
+      jenisKelamin: account.pegawai.jenis_kelamin,
+      role: account.role,
+      ruangKelasId: account.ruang_kelas_id,
+      namaRuang: account.ruang_kelas?.nama_ruang ?? null,
+    },
+    remember
+  );
 
   if (account.role === 'GURU_PJR') {
     redirect('/pjr');

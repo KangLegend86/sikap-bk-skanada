@@ -52,10 +52,16 @@ async function importHmacKey(): Promise<CryptoKey> {
   );
 }
 
-export async function signSessionToken(payload: Omit<SessionPayload, 'exp'>): Promise<string> {
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+export async function signSessionToken(
+  payload: Omit<SessionPayload, 'exp'>,
+  ttlMs: number = THIRTY_DAYS_MS
+): Promise<string> {
   const fullPayload: SessionPayload = {
     ...payload,
-    exp: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 hari
+    exp: Date.now() + ttlMs,
   };
   const encodedPayload = toBase64Url(JSON.stringify(fullPayload));
   const key = await importHmacKey();
@@ -116,15 +122,19 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifySessionToken(token);
 }
 
-export async function setSessionCookie(payload: Omit<SessionPayload, 'exp'>): Promise<void> {
-  const token = await signSessionToken(payload);
+export async function setSessionCookie(
+  payload: Omit<SessionPayload, 'exp'>,
+  remember: boolean = true
+): Promise<void> {
+  const ttlMs = remember ? THIRTY_DAYS_MS : ONE_DAY_MS;
+  const token = await signSessionToken(payload, ttlMs);
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 30 * 24 * 60 * 60, // 30 hari
+    ...(remember ? { maxAge: 30 * 24 * 60 * 60 } : {}),
   });
 }
 
