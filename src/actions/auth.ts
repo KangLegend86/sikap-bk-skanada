@@ -40,7 +40,21 @@ export async function loginGuruAction(
   }
 
   if (account.role === 'ADMIN') {
-    return { error: 'Akun Administrator silakan masuk melalui halaman login Admin.' };
+    await setSessionCookie(
+      {
+        userId: account.id,
+        pegawaiId: account.pegawai.id,
+        username: account.username,
+        namaLengkap: account.pegawai.nama_lengkap,
+        gelar: account.pegawai.gelar,
+        jenisKelamin: account.pegawai.jenis_kelamin,
+        role: account.role,
+        ruangKelasId: null,
+        namaRuang: null,
+      },
+      remember
+    );
+    redirect('/admin');
   }
 
   await setSessionCookie(
@@ -105,11 +119,7 @@ export async function loginAdminAction(
 }
 
 export async function logoutAction() {
-  const session = await getSession();
   await clearSessionCookie();
-  if (session?.role === 'ADMIN') {
-    redirect('/admin/login');
-  }
   redirect('/login');
 }
 

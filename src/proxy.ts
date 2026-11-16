@@ -19,7 +19,16 @@ export async function proxy(request: NextRequest) {
   const session = await verifySessionToken(token);
 
   // 1. Halaman Login Publik
-  if (pathname === '/login' || pathname === '/admin/login') {
+  if (pathname === '/admin/login') {
+    if (session) {
+      if (session.role === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
+      if (session.role === 'GURU_PJR') return NextResponse.redirect(new URL('/pjr', request.url));
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  if (pathname === '/login') {
     if (session) {
       if (session.role === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
       if (session.role === 'GURU_PJR') return NextResponse.redirect(new URL('/pjr', request.url));
@@ -28,11 +37,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Belum Login -> Arahkan ke gerbang login masing-masing
+  // 2. Belum Login -> Arahkan ke halaman login tunggal
   if (!session) {
-    if (pathname.startsWith('/admin')) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

@@ -1,7 +1,16 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import Link from 'next/link';
+import { useActionState, useState, type KeyboardEvent } from 'react';
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Info,
+  Loader2,
+  Lock,
+  LogIn,
+  User,
+} from 'lucide-react';
 import { loginGuruAction, type AuthActionState } from '@/actions/auth';
 
 const initialState: AuthActionState = {};
@@ -12,11 +21,16 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotHint, setShowForgotHint] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
 
   const [state, formAction, isPending] = useActionState(
     loginGuruAction,
     initialState
   );
+
+  function handlePasswordKeyEvent(e: KeyboardEvent<HTMLInputElement>) {
+    setCapsLockOn(e.getModifierState('CapsLock'));
+  }
 
   return (
     <>
@@ -50,22 +64,27 @@ export default function LoginPage() {
 
         .login-checkbox {
           appearance: none;
-          width: 15px;
-          height: 15px;
+          width: 16px;
+          height: 16px;
           flex-shrink: 0;
-          border-radius: 4px;
-          border: 1px solid #c9d6cc;
+          border-radius: 5px;
+          border: 1.5px solid #b9cbbd;
           background-color: #fff;
           background-repeat: no-repeat;
           background-position: center;
           background-size: 11px 11px;
           cursor: pointer;
+          transition: all 150ms ease;
+        }
+
+        .login-checkbox:hover {
+          border-color: #045a19;
         }
 
         .login-checkbox:checked {
           border-color: #045a19;
           background-color: #045a19;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5l2.5 2.5 4.5-5.5'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.5l2.5 2.5 4.5-5.5'/%3E%3C/svg%3E");
         }
       `}</style>
 
@@ -180,39 +199,29 @@ export default function LoginPage() {
           </header>
 
           {/* Login Form */}
-          <div className="mt-[31px] flex w-full justify-center">
+          <div className="mt-[28px] flex w-full justify-center">
             <form
-              className="flex w-full max-w-[318px] flex-col gap-[15px]"
+              className="flex w-full max-w-[324px] flex-col gap-3.5"
               action={formAction}
             >
               {state.error && (
                 <div
                   role="alert"
-                  className="rounded-[10px] border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-700"
+                  className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50/95 px-3.5 py-2.5 text-xs font-medium leading-relaxed text-rose-700 shadow-xs"
                 >
-                  {state.error}
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+                  <span>{state.error}</span>
                 </div>
               )}
 
-              <div className="flex h-[50px] items-center rounded-[10px] border border-[#C9D6CC] bg-white pl-4 focus-within:border-[#045A19]">
-                <svg
-                  className="shrink-0"
-                  width="16"
-                  height="20"
-                  viewBox="0 0 16 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+              {/* Username Input */}
+              <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-3 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12">
+                <User
+                  className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#045A19]"
+                  strokeWidth={2}
                   aria-hidden="true"
-                >
-                  <path
-                    d="M0 20V17C0 10 16 10 16 17V20M12 4C12 5.06087 11.5786 6.07828 10.8284 6.82843C10.0783 7.57857 9.06087 8 8 8C6.93913 8 5.92172 7.57857 5.17157 6.82843C4.42143 6.07828 4 5.06087 4 4C4 2.93913 4.42143 1.92172 5.17157 1.17157C5.92172 0.421427 6.93913 0 8 0C9.06087 0 10.0783 0.421427 10.8284 1.17157C11.5786 1.92172 12 2.93913 12 4Z"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    stroke="#5A5A5A"
-                  />
-                </svg>
-                <span className="ml-[15px] h-[22px] w-px shrink-0 bg-[#D4DED6]" />
+                />
+                <span className="mx-3 h-[22px] w-px shrink-0 bg-[#DCE6DE] transition-colors group-focus-within:bg-[#045A19]/25" />
                 <input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -225,76 +234,57 @@ export default function LoginPage() {
                   spellCheck={false}
                   placeholder="Username"
                   aria-label="Username"
-                  className="ml-[13px] h-full min-w-0 flex-1 bg-transparent pr-4 text-sm leading-5 text-[#1E3A28] outline-none placeholder:text-[#5A5A5A]"
+                  className="h-full min-w-0 flex-1 bg-transparent text-sm font-medium leading-5 text-[#17331E] outline-none placeholder:font-normal placeholder:text-[#6D8272]"
                 />
               </div>
 
-              <div className="flex h-[50px] items-center rounded-[10px] border border-[#C9D6CC] bg-white pl-4 focus-within:border-[#045A19]">
-                <svg
-                  className="mr-0.5 shrink-0"
-                  width="14"
-                  height="20"
-                  viewBox="0 0 14 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8.5V4.5C2 -1.5 12 -1.5 12 4.5V8.5M7 12.5V15.5M0 8.5H14V19.5H0V8.5Z"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    stroke="#5A5A5A"
-                  />
-                </svg>
-                <span className="ml-[15px] h-[22px] w-px shrink-0 bg-[#D4DED6]" />
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  required
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  aria-label="Password"
-                  className="ml-[13px] h-full min-w-0 flex-1 bg-transparent text-sm leading-5 text-[#1E3A28] outline-none placeholder:text-[#5A5A5A]"
-                />
-                <button
-                  type="button"
-                  className="mr-px h-12 w-11 shrink-0 cursor-pointer"
-                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                  aria-pressed={showPassword}
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  <svg
-                    width="44"
-                    height="48"
-                    viewBox="0 0 44 48"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+              {/* Password Input */}
+              <div className="flex flex-col gap-1.5">
+                <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-1.5 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12">
+                  <Lock
+                    className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#045A19]"
+                    strokeWidth={2}
                     aria-hidden="true"
+                  />
+                  <span className="mx-3 h-[22px] w-px shrink-0 bg-[#DCE6DE] transition-colors group-focus-within:bg-[#045A19]/25" />
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyUp={handlePasswordKeyEvent}
+                    onKeyDown={handlePasswordKeyEvent}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    required
+                    autoComplete="current-password"
+                    placeholder="Password"
+                    aria-label="Password"
+                    className="h-full min-w-0 flex-1 bg-transparent text-sm font-medium leading-5 text-[#17331E] outline-none placeholder:font-normal placeholder:text-[#6D8272]"
+                  />
+                  <button
+                    type="button"
+                    className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#5C7362] transition-colors hover:bg-[#045A19]/8 hover:text-[#045A19]"
+                    aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                    aria-pressed={showPassword}
+                    onClick={() => setShowPassword((prev) => !prev)}
                   >
-                    <path
-                      d="M12 23.75C17 14.75 27 14.75 32 23.75C27 32.75 17 32.75 12 23.75ZM25 23.75C25 24.5456 24.6839 25.3087 24.1213 25.8713C23.5587 26.4339 22.7956 26.75 22 26.75C21.2044 26.75 20.4413 26.4339 19.8787 25.8713C19.3161 25.3087 19 24.5456 19 23.75C19 22.9544 19.3161 22.1913 19.8787 21.6287C20.4413 21.0661 21.2044 20.75 22 20.75C22.7956 20.75 23.5587 21.0661 24.1213 21.6287C24.6839 22.1913 25 22.9544 25 23.75Z"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      stroke="#5A5A5A"
-                    />
-                    {showPassword && (
-                      <path
-                        d="M14 31L30 16.5"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        stroke="#5A5A5A"
-                      />
+                    {showPassword ? (
+                      <EyeOff className="h-[18px] w-[18px]" strokeWidth={2} />
+                    ) : (
+                      <Eye className="h-[18px] w-[18px]" strokeWidth={2} />
                     )}
-                  </svg>
-                </button>
+                  </button>
+                </div>
+
+                {capsLockOn && (
+                  <p className="px-1 text-[11px] font-medium text-amber-700">
+                    Caps Lock sedang aktif
+                  </p>
+                )}
               </div>
 
-              <div className="flex h-5 items-center justify-between">
-                <label className="flex cursor-pointer items-center gap-2 text-xs leading-5 text-[#5A5A5A]">
+              {/* Remember & Forgot Password */}
+              <div className="flex h-5 items-center justify-between px-0.5">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-medium leading-5 text-[#495E4E] select-none">
                   <input
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
@@ -307,42 +297,39 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowForgotHint((prev) => !prev)}
-                  className="cursor-pointer text-xs font-medium leading-5 text-[#045A19] hover:underline"
+                  className="cursor-pointer text-xs font-semibold leading-5 text-[#045A19] transition-colors hover:text-[#034212] hover:underline"
                 >
-                  Lupa Password
+                  Lupa Password?
                 </button>
               </div>
 
               {showForgotHint && (
-                <div className="rounded-[10px] border border-[#C9D6CC] bg-white/95 px-3.5 py-2.5 text-xs leading-relaxed text-[#3B5240]">
-                  Silakan hubungi <strong>Koordinator BK / Administrator</strong>{' '}
-                  untuk mereset password akun Anda.
+                <div className="flex items-start gap-2.5 rounded-xl border border-[#C9D6CC] bg-white/95 px-3.5 py-2.5 text-xs leading-relaxed text-[#3B5240] shadow-xs">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#045A19]" />
+                  <span>
+                    Silakan hubungi <strong>Koordinator BK</strong> atau{' '}
+                    <strong>Administrator</strong> sekolah untuk mereset password akun Anda.
+                  </span>
                 </div>
               )}
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-[10px] bg-[#045A19] py-3.5 text-sm font-semibold leading-5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-0.5 flex h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-linear-to-r from-[#045A19] to-[#157A2E] text-sm font-semibold tracking-wide text-white shadow-[0_6px_16px_rgba(4,90,25,0.25)] transition-all hover:brightness-105 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65"
               >
-                <svg
-                  className="shrink-0 self-center"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M11 0H18V18H11M0 9H12M7 14L12 9L7 4"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    stroke="white"
-                  />
-                </svg>
-                {isPending ? 'Memverifikasi...' : 'Login'}
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-[18px] w-[18px] animate-spin" strokeWidth={2.2} />
+                    <span>Memverifikasi...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                    <span>Masuk</span>
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -442,13 +429,7 @@ export default function LoginPage() {
             Aplikasi Penilaian Sikap &amp; Bimbingan Konseling
           </p>
           <p className="self-stretch text-center text-[11px] font-normal leading-4 text-[#4D6452]">
-            ©2026 Copyright Skanada •{' '}
-            <Link
-              href="/admin/login"
-              className="font-semibold text-[#045A19] hover:underline"
-            >
-              Panel Admin
-            </Link>
+            ©2026 Copyright Skanada
           </p>
         </footer>
       </div>
