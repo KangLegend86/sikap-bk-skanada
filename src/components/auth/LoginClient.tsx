@@ -48,7 +48,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
         backgroundPosition: 'center, 18.2% 0',
       }}
     >
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-10">
+      <main className="flex flex-1 flex-col items-center justify-center px-4 pt-6 pb-0 sm:px-6 sm:pt-10 sm:pb-0">
         <div className="flex w-full max-w-[360px] flex-col items-center sm:max-w-[430px] sm:rounded-3xl sm:border sm:border-white/80 sm:bg-white/85 sm:px-9 sm:py-8 sm:shadow-[0_24px_60px_rgba(4,90,25,0.12)] sm:backdrop-blur-md">
           {/* Brand Header */}
           <header className="flex w-full flex-col items-center">
@@ -61,9 +61,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               />
             </div>
 
-            <div className="relative mt-2 h-[42px] w-full max-w-[292px]">
+            <div className="relative mt-2 h-[40px] w-full max-w-[292px] sm:h-[43px]">
               <svg
-                className="pointer-events-none absolute left-1/2 top-6 z-0 block h-[29px] w-[239px] max-w-[85%] -translate-x-1/2"
+                className="pointer-events-none absolute left-1/2 top-[21px] z-0 block h-[27px] w-[223px] -translate-x-1/2 sm:top-6 sm:h-[29px] sm:w-[239px]"
                 viewBox="0 0 239 29"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,9 +74,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                   fill="#FCD20B"
                 />
               </svg>
-              <div className="relative z-10 flex h-[34px] w-full items-center justify-center px-2">
+              <div className="relative z-10 flex h-[32px] w-full items-center justify-center px-2 sm:h-[34px]">
                 <h1
-                  className={`${fontScriptClass} whitespace-nowrap text-[26px] font-normal leading-none text-[#045A19] sm:text-[30px]`}
+                  className={`${fontScriptClass} whitespace-nowrap text-[28px] font-normal leading-none text-[#045A19] sm:text-[30px]`}
                 >
                   Selamat Datang di Portal
                 </h1>
@@ -84,7 +84,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
             </div>
 
             {/* Brand Lockup */}
-            <div className="mt-2.5 flex w-full max-w-[328px] flex-col items-center gap-1.5">
+            <div className="mt-2 flex w-full max-w-[328px] flex-col items-center gap-1.5">
               <div className="relative flex w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -156,7 +156,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               </div>
             </div>
 
-            <div className="mt-3 flex w-full max-w-[328px] items-center justify-center gap-3">
+            <div className="mt-2 flex w-full max-w-[328px] items-center justify-center gap-3">
               <span className="h-0.5 flex-1 bg-[#035526]" />
               <span className="whitespace-nowrap text-center text-sm font-extrabold italic leading-none text-[#004C15] sm:text-base">
                 SMKS NU 2 Kedungpring
@@ -168,7 +168,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
           {/* Login Form */}
           <section className="mt-6 w-full" aria-label="Formulir Masuk">
             <form
-              className="flex w-full flex-col gap-3.5"
+              className="flex w-full flex-col gap-3"
               action={formAction}
               noValidate={false}
             >
@@ -336,7 +336,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
           </section>
 
           {/* Quote Banner */}
-          <div className="mt-4 flex w-full justify-center">
+          <div className="mt-3 flex w-full justify-center">
             <svg
               className="block h-auto w-full max-w-[290px] sm:max-w-[300px]"
               viewBox="0 0 300 100"
