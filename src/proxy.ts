@@ -9,6 +9,7 @@ export async function proxy(request: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/icons') ||
+    pathname.startsWith('/images') ||
     pathname === '/manifest.json' ||
     pathname === '/favicon.ico'
   ) {
@@ -70,6 +71,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|images|icons|favicon.ico).*)'],
 };
 

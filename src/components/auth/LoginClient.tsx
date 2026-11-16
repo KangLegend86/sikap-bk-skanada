@@ -44,7 +44,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
       style={{
         backgroundColor: '#eef3ef',
         backgroundImage:
-          "linear-gradient(0deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.86) 100%), url('https://cdn.builder.io/api/v1/image/assets%2Feddcb334c2104c49b949190797eb874d%2F5ccf65637adb4b63b35d488cfd87cdcb')",
+          "linear-gradient(0deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.86) 100%), url('/images/login-bg.webp')",
         backgroundPosition: 'center, 18.2% 0',
       }}
     >
@@ -55,9 +55,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
             <div className="flex h-24 w-24 items-center justify-center p-1.5 sm:h-[108px] sm:w-[108px] sm:p-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://api.builder.io/api/v1/image/assets/TEMP/d84d979da903b0f176fc038b00d0a972feb44cb2?width=190"
+                src="/images/logo-maarif.jpg"
                 alt="Logo LP Ma'arif"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain mix-blend-multiply"
               />
             </div>
 
@@ -88,9 +88,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               <div className="relative flex w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://api.builder.io/api/v1/image/assets/TEMP/076bccc1085a6f92989eec78b0f76f738eb5810e?width=160"
-                  alt="Logo SKANADA"
-                  className="absolute left-0 top-0 h-[58px] w-[64px] object-contain sm:h-[68px] sm:w-[76px]"
+                  src="/images/logo-sikap-bk.svg"
+                  alt="Logo SiKAP BK Skanada"
+                  className="absolute left-0 top-1/2 aspect-square h-[68px] w-[68px] -translate-y-1/2 object-contain sm:h-[76px] sm:w-[76px]"
                 />
                 <div className="flex flex-col items-center gap-1.5">
                   <div
@@ -170,7 +170,6 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
             <form
               className="flex w-full flex-col gap-3"
               action={formAction}
-              noValidate={false}
             >
               {state.error && (
                 <div
