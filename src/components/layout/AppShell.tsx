@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  BookText,
   ChevronLeft,
   ClipboardList,
   Database,
@@ -92,11 +91,16 @@ export function AppShell({
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-zinc-200 z-40">
         <div className="p-5 border-b border-zinc-100 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#0D6A37] flex items-center justify-center shrink-0">
-            <BookText className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-sikap-bk.svg"
+              alt="Logo SiKAP BK Skanada"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-bold text-zinc-900 truncate">eJurnal BK Skanada</div>
+            <div className="text-sm font-bold text-zinc-900 truncate">SiKAP BK Skanada</div>
             <div className="text-[11px] text-zinc-500 font-medium truncate">SMKS NU 2 Kedungpring</div>
           </div>
         </div>
@@ -156,12 +160,17 @@ export function AppShell({
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
             )}
-            <div className="w-[34px] h-[34px] rounded-[10px] bg-[#ECFDF5] border border-[#A7F3D0] text-[#0D6A37] flex items-center justify-center shrink-0">
-              <BookText className="w-[18px] h-[18px]" />
+            <div className="w-[34px] h-[34px] rounded-[10px] bg-[#ECFDF5] border border-[#A7F3D0] p-1 flex items-center justify-center shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-sikap-bk.svg"
+                alt="Logo SiKAP BK Skanada"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="min-w-0">
               <h1 className="text-[16px] font-bold text-zinc-900 leading-tight tracking-tight truncate">
-                {title || 'eJurnal BK Skanada'}
+                {title || 'SiKAP BK Skanada'}
               </h1>
               <p className="text-[11px] text-zinc-500 font-medium truncate">
                 {subtitle || `${fullName} • ${roleBadge}`}
@@ -196,7 +205,7 @@ export function AppShell({
             )}
             <div>
               <h1 className="text-lg font-bold text-zinc-900">
-                {title || 'eJurnal BK Skanada'}
+                {title || 'SiKAP BK Skanada'}
               </h1>
               {subtitle && (
                 <p className="text-xs text-zinc-500 font-medium">{subtitle}</p>

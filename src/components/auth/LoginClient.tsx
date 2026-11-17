@@ -48,11 +48,12 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
         backgroundPosition: 'center, 18.2% 0',
       }}
     >
-      <main className="flex flex-1 flex-col items-center justify-center px-4 pt-6 pb-0 sm:px-6 sm:pt-10 sm:pb-0">
-        <div className="flex w-full max-w-[360px] flex-col items-center sm:max-w-[430px] sm:rounded-3xl sm:border sm:border-white/80 sm:bg-white/85 sm:px-9 sm:py-8 sm:shadow-[0_24px_60px_rgba(4,90,25,0.12)] sm:backdrop-blur-md">
+      <main className="flex flex-1 flex-col items-center justify-center px-4 pt-6 pb-4 sm:px-6 sm:py-3">
+        <div className="flex w-full max-w-[360px] flex-1 flex-col items-center sm:max-w-[420px] sm:flex-none sm:rounded-3xl sm:border sm:border-white/80 sm:bg-white/85 sm:px-8 sm:py-4 sm:shadow-[0_24px_60px_rgba(4,90,25,0.12)] sm:backdrop-blur-md">
+          <div className="my-auto flex w-full flex-col items-center sm:my-0">
           {/* Brand Header */}
           <header className="flex w-full flex-col items-center">
-            <div className="flex h-24 w-24 items-center justify-center p-1.5 sm:h-[108px] sm:w-[108px] sm:p-2">
+            <div className="flex h-24 w-24 items-center justify-center p-1.5 sm:h-[68px] sm:w-[68px] sm:p-0.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo-maarif.jpg"
@@ -166,9 +167,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
           </header>
 
           {/* Login Form */}
-          <section className="mt-6 w-full" aria-label="Formulir Masuk">
+          <section className="mt-6 w-full sm:mt-4" aria-label="Formulir Masuk">
             <form
-              className="flex w-full flex-col gap-3"
+              className="flex w-full flex-col gap-3 sm:gap-2.5"
               action={formAction}
             >
               {state.error && (
@@ -188,7 +189,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                 <label htmlFor="login-username" className="sr-only">
                   Username
                 </label>
-                <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-3 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12">
+                <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-3 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12 sm:h-[44px]">
                   <User
                     className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#045A19]"
                     strokeWidth={2}
@@ -219,7 +220,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                 <label htmlFor="login-password" className="sr-only">
                   Password
                 </label>
-                <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-1.5 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12">
+                <div className="group flex h-[52px] items-center rounded-xl border border-[#C9D6CC] bg-white/95 pl-3.5 pr-1.5 shadow-[0_2px_8px_rgba(4,90,25,0.04)] transition-all focus-within:border-[#045A19] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#045A19]/12 sm:h-[44px]">
                   <Lock
                     className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#045A19]"
                     strokeWidth={2}
@@ -274,8 +275,8 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               </div>
 
               {/* Remember & Forgot Password */}
-              <div className="flex min-h-[36px] items-center justify-between px-0.5">
-                <label className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 text-xs font-medium text-[#495E4E] select-none">
+              <div className="flex min-h-[36px] items-center justify-between px-0.5 sm:min-h-[28px]">
+                <label className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 text-xs font-medium text-[#495E4E] select-none sm:min-h-[28px]">
                   <span className="relative flex h-4 w-4 items-center justify-center">
                     <input
                       checked={remember}
@@ -317,7 +318,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               <button
                 type="submit"
                 disabled={isPending}
-                className="mt-0.5 flex h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-linear-to-r from-[#045A19] to-[#157A2E] text-sm font-semibold tracking-wide text-white shadow-[0_6px_16px_rgba(4,90,25,0.25)] transition-all hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#045A19] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65"
+                className="mt-0.5 flex h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-linear-to-r from-[#045A19] to-[#157A2E] text-sm font-semibold tracking-wide text-white shadow-[0_6px_16px_rgba(4,90,25,0.25)] transition-all hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#045A19] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65 sm:h-[44px]"
               >
                 {isPending ? (
                   <>
@@ -335,9 +336,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
           </section>
 
           {/* Quote Banner */}
-          <div className="mt-3 flex w-full justify-center">
+          <div className="mt-3 flex w-full justify-center sm:mt-2">
             <svg
-              className="block h-auto w-full max-w-[290px] sm:max-w-[300px]"
+              className="block h-auto w-full max-w-[290px] sm:max-w-[215px]"
               viewBox="0 0 300 100"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -414,23 +415,24 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               </defs>
             </svg>
           </div>
+          </div>
+
+          {/* App Footer */}
+          <footer className="mt-auto flex w-full flex-col items-center justify-center gap-1 pt-4 sm:mt-2 sm:pt-1">
+            <div className="flex h-2 w-[72px] items-start py-1" aria-hidden="true">
+              <span className="h-0.5 w-7 shrink-0 bg-[#045A19]" />
+              <span className="h-0.5 w-4 shrink-0 bg-[#FFCC00]" />
+              <span className="h-0.5 w-7 shrink-0 bg-[#045A19]" />
+            </div>
+            <p className="text-center text-xs font-medium leading-[18px] text-[#045A19]">
+              Aplikasi Penilaian Sikap &amp; Bimbingan Konseling
+            </p>
+            <p className="text-center text-[11px] font-normal leading-4 text-[#4D6452]">
+              ©2026 Copyright Skanada
+            </p>
+          </footer>
         </div>
       </main>
-
-      {/* App Footer */}
-      <footer className="flex w-full flex-col items-center justify-center gap-1.5 px-6 pb-5 pt-1">
-        <div className="flex h-2 w-[72px] items-start py-1" aria-hidden="true">
-          <span className="h-0.5 w-7 shrink-0 bg-[#045A19]" />
-          <span className="h-0.5 w-4 shrink-0 bg-[#FFCC00]" />
-          <span className="h-0.5 w-7 shrink-0 bg-[#045A19]" />
-        </div>
-        <p className="text-center text-xs font-medium leading-[18px] text-[#045A19]">
-          Aplikasi Penilaian Sikap &amp; Bimbingan Konseling
-        </p>
-        <p className="text-center text-[11px] font-normal leading-4 text-[#4D6452]">
-          ©2026 Copyright Skanada
-        </p>
-      </footer>
     </div>
   );
 }

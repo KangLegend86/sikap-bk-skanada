@@ -1,7 +1,7 @@
 {
-  "name": "eJurnal BK Skanada",
-  "short_name": "eJurnal BK",
-  "description": "Aplikasi Jurnal Bimbingan Konseling SMKS NU 2 Kedungpring",
+  "name": "SiKAP BK Skanada",
+  "short_name": "SiKAP BK",
+  "description": "Aplikasi Penilaian Sikap & Bimbingan Konseling SMKS NU 2 Kedungpring",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F8FAFC",
@@ -9,13 +9,20 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-192.svg",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.svg",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-sikap-bk.svg",
+      "sizes": "any",
       "type": "image/svg+xml"
     }
   ]

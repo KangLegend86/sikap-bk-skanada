@@ -14,14 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "eJurnal BK Skanada — SMKS NU 2 Kedungpring",
+  title: "SiKAP BK Skanada — SMKS NU 2 Kedungpring",
   description:
-    "Aplikasi Digitalisasi Jurnal Bimbingan Konseling SMKS NU 2 Kedungpring (Skanada)",
+    "Aplikasi Penilaian Sikap & Bimbingan Konseling SMKS NU 2 Kedungpring (Skanada)",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/images/logo-sikap-bk.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "eJurnal BK Skanada",
+    title: "SiKAP BK Skanada",
   },
 };
 

@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-export const SESSION_COOKIE_NAME = 'ejurnal_skanada_session';
+export const SESSION_COOKIE_NAME = 'sikap_bk_skanada_session';
 
 export interface SessionPayload {
   userId: string;
@@ -16,7 +16,7 @@ export interface SessionPayload {
 }
 
 function getSecretKey(): string {
-  return process.env.SESSION_SECRET || 'ejurnal-bk-skanada-dev-secret-key-2026';
+  return process.env.SESSION_SECRET || 'sikap-bk-skanada-dev-secret-key-2026';
 }
 
 function toBase64Url(str: string): string {
