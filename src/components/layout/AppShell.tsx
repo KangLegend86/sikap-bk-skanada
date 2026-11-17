@@ -87,9 +87,9 @@ export function AppShell({
       : 'Guru BK';
 
   return (
-    <div className="min-h-screen bg-[#EEF3EF] lg:flex">
+    <div className="min-h-screen bg-[#FAFAFA] lg:flex">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white/95 backdrop-blur-md border-r border-[#DCE6DE] z-40">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-zinc-200/80 z-40">
         <div className="p-5 border-b border-[#DCE6DE]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#E9F2EB] border border-[#C9D6CC] p-1.5 flex items-center justify-center shrink-0">
@@ -109,11 +109,6 @@ export function AppShell({
               </div>
             </div>
           </div>
-          <div className="mt-3 flex h-0.5 w-16 overflow-hidden rounded-full" aria-hidden="true">
-            <span className="flex-1 bg-[#045A19]" />
-            <span className="w-4 bg-[#FFCC00]" />
-            <span className="flex-1 bg-[#045A19]" />
-          </div>
         </div>
 
         <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
@@ -126,10 +121,10 @@ export function AppShell({
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   item.isCenterAction
-                    ? 'bg-linear-to-r from-[#045A19] to-[#157A2E] text-white shadow-[0_6px_16px_rgba(4,90,25,0.22)] hover:brightness-105 my-1'
+                    ? 'bg-[#045A19] text-white hover:bg-[#034212] shadow-xs my-1'
                     : active
-                    ? 'bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] shadow-xs'
-                    : 'text-[#495E4E] hover:bg-[#EEF3EF] hover:text-[#17331E]'
+                    ? 'bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -153,9 +148,9 @@ export function AppShell({
       {/* Main Content Wrapper */}
       <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
         {/* Mobile Sticky Header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#DCE6DE] px-4 py-3.5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {backHref && (
+        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#DCE6DE] px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {backHref ? (
               <button
                 type="button"
                 onClick={() => {
@@ -166,32 +161,54 @@ export function AppShell({
                   }
                 }}
                 title="Kembali"
-                className="w-9 h-9 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-[#E9F2EB] border border-[#C9D6CC] p-1.5 flex items-center justify-center shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/logo-sikap-bk.svg"
+                  alt="Logo SiKAP BK Skanada"
+                  className="w-full h-full object-contain"
+                />
+              </div>
             )}
-            <div className="w-[34px] h-[34px] rounded-[10px] bg-[#E9F2EB] border border-[#C9D6CC] p-1 flex items-center justify-center shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/logo-sikap-bk.svg"
-                alt="Logo SiKAP BK Skanada"
-                className="w-full h-full object-contain"
-              />
-            </div>
             <div className="min-w-0">
-              <h1 className="text-[16px] font-bold text-[#17331E] leading-tight tracking-tight truncate">
-                {title || 'SiKAP BK Skanada'}
-              </h1>
-              <p className="text-[11px] text-[#495E4E] font-medium truncate">
-                {subtitle || `${fullName} • ${roleBadge}`}
-              </p>
+              {title ? (
+                <>
+                  <h1 className="text-[15px] font-extrabold text-[#17331E] leading-tight tracking-tight truncate">
+                    {title}
+                  </h1>
+                  <p className="text-[11px] text-[#495E4E] font-medium truncate mt-0.5">
+                    {subtitle || `${fullName} • ${roleBadge}`}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-[15px] font-extrabold text-[#17331E] leading-tight truncate">
+                    {fullName}
+                  </h1>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="px-2 py-0.5 rounded-[6px] bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] text-[11px] font-mono font-semibold uppercase shrink-0">
+                      {roleBadge}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
+
           {!backHref && (
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] shrink-0">
-              {roleBadge}
-            </span>
+            <Link
+              href="/akun"
+              aria-label="Profil Akun"
+              title="Pengaturan Akun"
+              className="w-10 h-10 rounded-xl bg-[#EEF3EF] hover:bg-[#DCE6DE] border border-[#DCE6DE] text-[#17331E] flex items-center justify-center shrink-0 transition-colors"
+            >
+              <User className="w-5 h-5" />
+            </Link>
           )}
         </header>
 
@@ -216,7 +233,7 @@ export function AppShell({
             )}
             <div>
               <h1 className="text-lg font-bold text-[#17331E]">
-                {title || 'SiKAP BK Skanada'}
+                {title || fullName}
               </h1>
               {subtitle && (
                 <p className="text-xs text-[#495E4E] font-medium">{subtitle}</p>
@@ -224,8 +241,10 @@ export function AppShell({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-[#495E4E]">{fullName}</span>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]">
+            {title && (
+              <span className="text-xs font-semibold text-[#495E4E]">{fullName}</span>
+            )}
+            <span className="text-xs font-mono font-bold uppercase px-3 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]">
               {roleBadge}
             </span>
           </div>
@@ -249,7 +268,7 @@ export function AppShell({
                   href={item.href}
                   className="flex flex-col items-center -mt-5"
                 >
-                  <span className="w-12 h-12 rounded-2xl bg-linear-to-r from-[#045A19] to-[#157A2E] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/30 border-4 border-white">
+                  <span className="w-12 h-12 rounded-2xl bg-[#045A19] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/25 border-4 border-white">
                     <Icon className="w-5 h-5" />
                   </span>
                   <span className="text-[10px] font-bold text-[#045A19] mt-0.5">

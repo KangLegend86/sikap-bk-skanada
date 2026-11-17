@@ -101,11 +101,11 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                         'linear-gradient(323deg, #045a19 -1.52%, #4c8d5e 98.48%)',
                     }}
                   >
-                    <span className="text-xs font-extrabold italic leading-none text-white sm:text-sm">
+                    <span className="text-xs font-extrabold leading-none text-white sm:text-sm">
                       Aplikasi
                     </span>
                   </div>
-                  <div className="text-[28px] font-extrabold italic leading-none tracking-tight text-[#045A19] sm:text-[32px]">
+                  <div className="text-[28px] font-extrabold leading-none tracking-tight text-[#045A19] sm:text-[32px]">
                     SiKAP BK
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                     </linearGradient>
                   </defs>
                 </svg>
-                <div className="relative flex h-full items-center justify-center text-[26px] font-extrabold italic leading-none text-white sm:text-[32px]">
+                <div className="relative flex h-full items-center justify-center text-[26px] font-extrabold leading-none text-white sm:text-[32px]">
                   SKANADA
                 </div>
               </div>
@@ -159,7 +159,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
 
             <div className="mt-2 flex w-full max-w-[328px] items-center justify-center gap-3">
               <span className="h-0.5 flex-1 bg-[#035526]" />
-              <span className="whitespace-nowrap text-center text-sm font-extrabold italic leading-none text-[#004C15] sm:text-base">
+              <span className="whitespace-nowrap text-center text-sm font-extrabold leading-none text-[#004C15] sm:text-base">
                 SMKS NU 2 Kedungpring
               </span>
               <span className="h-0.5 flex-1 bg-[#035526]" />
