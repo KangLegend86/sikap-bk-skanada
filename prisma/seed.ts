@@ -13,6 +13,8 @@ async function main() {
     { kode: 'TKJ', nama_lengkap: 'Teknik Komputer dan Jaringan' },
     { kode: 'DKV', nama_lengkap: 'Desain Komunikasi Visual' },
     { kode: 'BISDIG', nama_lengkap: 'Bisnis Digital' },
+    { kode: 'BISDIG 1', nama_lengkap: 'Bisnis Digital 1' },
+    { kode: 'BISDIG 2', nama_lengkap: 'Bisnis Digital 2' },
     { kode: 'DPB', nama_lengkap: 'Desain dan Produksi Busana' },
   ];
 

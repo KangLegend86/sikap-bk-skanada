@@ -22,6 +22,8 @@ export function getMajorBadgeClass(kode: string): string {
     TSM: 'bg-amber-100 text-amber-800 border-amber-200',
     DKV: 'bg-purple-100 text-purple-800 border-purple-200',
     BISDIG: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    'BISDIG 1': 'bg-green-100 text-green-800 border-green-200',
+    'BISDIG 2': 'bg-lime-100 text-lime-800 border-lime-200',
     DPB: 'bg-teal-100 text-teal-800 border-teal-200',
   };
   return map[kode.toUpperCase()] ?? 'bg-zinc-100 text-zinc-700 border-zinc-200';
