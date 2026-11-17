@@ -4,8 +4,8 @@
   "description": "Aplikasi Penilaian Sikap & Bimbingan Konseling SMKS NU 2 Kedungpring",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8FAFC",
-  "theme_color": "#0D6A37",
+  "background_color": "#EEF3EF",
+  "theme_color": "#045A19",
   "orientation": "portrait-primary",
   "icons": [
     {

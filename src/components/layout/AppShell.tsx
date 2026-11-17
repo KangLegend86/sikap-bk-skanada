@@ -87,21 +87,32 @@ export function AppShell({
       : 'Guru BK';
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7] lg:flex">
+    <div className="min-h-screen bg-[#EEF3EF] lg:flex">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-zinc-200 z-40">
-        <div className="p-5 border-b border-zinc-100 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo-sikap-bk.svg"
-              alt="Logo SiKAP BK Skanada"
-              className="w-full h-full object-contain"
-            />
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white/95 backdrop-blur-md border-r border-[#DCE6DE] z-40">
+        <div className="p-5 border-b border-[#DCE6DE]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#E9F2EB] border border-[#C9D6CC] p-1.5 flex items-center justify-center shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-sikap-bk.svg"
+                alt="Logo SiKAP BK Skanada"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-extrabold italic text-[#045A19] truncate">
+                SiKAP BK Skanada
+              </div>
+              <div className="text-[11px] text-[#495E4E] font-medium truncate">
+                SMKS NU 2 Kedungpring
+              </div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <div className="text-sm font-bold text-zinc-900 truncate">SiKAP BK Skanada</div>
-            <div className="text-[11px] text-zinc-500 font-medium truncate">SMKS NU 2 Kedungpring</div>
+          <div className="mt-3 flex h-0.5 w-16 overflow-hidden rounded-full" aria-hidden="true">
+            <span className="flex-1 bg-[#045A19]" />
+            <span className="w-4 bg-[#FFCC00]" />
+            <span className="flex-1 bg-[#045A19]" />
           </div>
         </div>
 
@@ -115,10 +126,10 @@ export function AppShell({
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   item.isCenterAction
-                    ? 'bg-[#0D6A37] text-white hover:bg-[#094D28] shadow-sm my-1'
+                    ? 'bg-linear-to-r from-[#045A19] to-[#157A2E] text-white shadow-[0_6px_16px_rgba(4,90,25,0.22)] hover:brightness-105 my-1'
                     : active
-                    ? 'bg-[#ECFDF5] text-[#0D6A37] border border-[#A7F3D0]'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
+                    ? 'bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] shadow-xs'
+                    : 'text-[#495E4E] hover:bg-[#EEF3EF] hover:text-[#17331E]'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -128,12 +139,12 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="p-4 border-t border-zinc-100 bg-zinc-50/70">
+        <div className="p-4 border-t border-[#DCE6DE] bg-[#EEF3EF]/60">
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#045A19] ring-2 ring-[#FFCC00]/50 shrink-0" />
             <div className="min-w-0">
-              <div className="text-xs font-bold text-zinc-900 truncate">{fullName}</div>
-              <div className="text-[11px] font-medium text-[#0D6A37]">{roleBadge}</div>
+              <div className="text-xs font-bold text-[#17331E] truncate">{fullName}</div>
+              <div className="text-[11px] font-semibold text-[#045A19]">{roleBadge}</div>
             </div>
           </div>
         </div>
@@ -142,7 +153,7 @@ export function AppShell({
       {/* Main Content Wrapper */}
       <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
         {/* Mobile Sticky Header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200 px-4 py-3.5 flex items-center justify-between gap-3">
+        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#DCE6DE] px-4 py-3.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             {backHref && (
               <button
@@ -155,12 +166,12 @@ export function AppShell({
                   }
                 }}
                 title="Kembali"
-                className="w-9 h-9 rounded-[11px] bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
             )}
-            <div className="w-[34px] h-[34px] rounded-[10px] bg-[#ECFDF5] border border-[#A7F3D0] p-1 flex items-center justify-center shrink-0">
+            <div className="w-[34px] h-[34px] rounded-[10px] bg-[#E9F2EB] border border-[#C9D6CC] p-1 flex items-center justify-center shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo-sikap-bk.svg"
@@ -169,23 +180,23 @@ export function AppShell({
               />
             </div>
             <div className="min-w-0">
-              <h1 className="text-[16px] font-bold text-zinc-900 leading-tight tracking-tight truncate">
+              <h1 className="text-[16px] font-bold text-[#17331E] leading-tight tracking-tight truncate">
                 {title || 'SiKAP BK Skanada'}
               </h1>
-              <p className="text-[11px] text-zinc-500 font-medium truncate">
+              <p className="text-[11px] text-[#495E4E] font-medium truncate">
                 {subtitle || `${fullName} • ${roleBadge}`}
               </p>
             </div>
           </div>
           {!backHref && (
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#ECFDF5] text-[#0D6A37] border border-[#A7F3D0] shrink-0">
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] shrink-0">
               {roleBadge}
             </span>
           )}
         </header>
 
         {/* Desktop Top Header */}
-        <header className="hidden lg:flex sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-zinc-200 px-8 py-4 items-center justify-between">
+        <header className="hidden lg:flex sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#DCE6DE] px-8 py-4 items-center justify-between">
           <div className="flex items-center gap-3">
             {backHref && (
               <button
@@ -198,23 +209,23 @@ export function AppShell({
                   }
                 }}
                 title="Kembali"
-                className="w-9 h-9 rounded-[11px] bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
             )}
             <div>
-              <h1 className="text-lg font-bold text-zinc-900">
+              <h1 className="text-lg font-bold text-[#17331E]">
                 {title || 'SiKAP BK Skanada'}
               </h1>
               {subtitle && (
-                <p className="text-xs text-zinc-500 font-medium">{subtitle}</p>
+                <p className="text-xs text-[#495E4E] font-medium">{subtitle}</p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-zinc-600">{fullName}</span>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#ECFDF5] text-[#0D6A37] border border-[#A7F3D0]">
+            <span className="text-xs font-semibold text-[#495E4E]">{fullName}</span>
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]">
               {roleBadge}
             </span>
           </div>
@@ -226,7 +237,7 @@ export function AppShell({
         </main>
 
         {/* Mobile Bottom Navigation Bar */}
-        <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DE] px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(4,90,25,0.06)]">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -238,10 +249,10 @@ export function AppShell({
                   href={item.href}
                   className="flex flex-col items-center -mt-5"
                 >
-                  <span className="w-12 h-12 rounded-2xl bg-[#0D6A37] text-white flex items-center justify-center shadow-lg shadow-[#0D6A37]/30 border-4 border-white">
+                  <span className="w-12 h-12 rounded-2xl bg-linear-to-r from-[#045A19] to-[#157A2E] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/30 border-4 border-white">
                     <Icon className="w-5 h-5" />
                   </span>
-                  <span className="text-[10px] font-bold text-[#0D6A37] mt-0.5">
+                  <span className="text-[10px] font-bold text-[#045A19] mt-0.5">
                     {item.label}
                   </span>
                 </Link>
@@ -253,7 +264,7 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
-                  active ? 'text-[#0D6A37]' : 'text-zinc-400 hover:text-zinc-700'
+                  active ? 'text-[#045A19]' : 'text-[#6D8272] hover:text-[#17331E]'
                 }`}
               >
                 <Icon className="w-5 h-5" />

@@ -1,18 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --nu-primary: #0D6A37;
-  --nu-primary-hover: #094D28;
-  --nu-primary-soft: #ECFDF5;
-  --nu-primary-border: #A7F3D0;
-  --background: #F2F4F7;
-  --foreground: #18181B;
+  --skanada-primary: #045A19;
+  --skanada-primary-mid: #157A2E;
+  --skanada-primary-soft: #E9F2EB;
+  --skanada-gold: #FFCC00;
+  --skanada-bg: #EEF3EF;
+  --skanada-surface: #FFFFFF;
+  --skanada-border: #C9D6CC;
+  --skanada-divider: #DCE6DE;
+  --skanada-ink: #17331E;
+  --skanada-ink-muted: #495E4E;
+  --skanada-ink-subtle: #6D8272;
+
+  /* Backward-compatible aliases */
+  --nu-primary: var(--skanada-primary);
+  --nu-primary-hover: #034212;
+  --nu-primary-soft: var(--skanada-primary-soft);
+  --nu-primary-border: var(--skanada-border);
+  --background: var(--skanada-bg);
+  --foreground: var(--skanada-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-nu: var(--nu-primary);
+  --color-nu: var(--skanada-primary);
+  --color-skanada: var(--skanada-primary);
+  --color-skanada-mid: var(--skanada-primary-mid);
+  --color-skanada-soft: var(--skanada-primary-soft);
+  --color-skanada-gold: var(--skanada-gold);
+  --color-skanada-bg: var(--skanada-bg);
+  --color-skanada-border: var(--skanada-border);
+  --color-skanada-divider: var(--skanada-divider);
+  --color-skanada-ink: var(--skanada-ink);
+  --color-skanada-muted: var(--skanada-ink-muted);
+  --color-skanada-subtle: var(--skanada-ink-subtle);
   --font-sans: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
@@ -22,8 +45,53 @@
 }
 
 body {
-  background-color: #F2F4F7;
-  color: #18181B;
+  background-color: var(--skanada-bg);
+  color: var(--skanada-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .skanada-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--skanada-divider);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(4, 90, 25, 0.05);
+  }
+
+  .skanada-btn-primary {
+    background-image: linear-gradient(to right, var(--skanada-primary), var(--skanada-primary-mid));
+    color: #ffffff;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(4, 90, 25, 0.22);
+    transition: all 150ms ease;
+  }
+
+  .skanada-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+
+  .skanada-btn-primary:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  .skanada-input {
+    border: 1px solid var(--skanada-border);
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--skanada-ink);
+    border-radius: 0.75rem;
+    transition: all 150ms ease;
+  }
+
+  .skanada-input::placeholder {
+    color: var(--skanada-ink-subtle);
+  }
+
+  .skanada-input:focus {
+    outline: none;
+    border-color: var(--skanada-primary);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(4, 90, 25, 0.12);
+  }
 }
