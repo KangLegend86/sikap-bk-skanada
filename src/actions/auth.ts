@@ -78,46 +78,6 @@ export async function loginGuruAction(
   redirect('/');
 }
 
-export async function loginAdminAction(
-  _prevState: AuthActionState,
-  formData: FormData
-): Promise<AuthActionState> {
-  const username = String(formData.get('username') ?? '').trim().toLowerCase();
-  const password = String(formData.get('password') ?? '');
-
-  if (!username || !password) {
-    return { error: 'Username dan password wajib diisi.' };
-  }
-
-  const account = await prisma.userAccount.findUnique({
-    where: { username },
-    include: { pegawai: true },
-  });
-
-  if (!account || !account.is_active || account.role !== 'ADMIN') {
-    return { error: 'Kredensial Admin tidak valid atau akun tidak aktif.' };
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, account.password_hash);
-  if (!isPasswordValid) {
-    return { error: 'Password Admin salah.' };
-  }
-
-  await setSessionCookie({
-    userId: account.id,
-    pegawaiId: account.pegawai.id,
-    username: account.username,
-    namaLengkap: account.pegawai.nama_lengkap,
-    gelar: account.pegawai.gelar,
-    jenisKelamin: account.pegawai.jenis_kelamin,
-    role: account.role,
-    ruangKelasId: null,
-    namaRuang: null,
-  });
-
-  redirect('/admin');
-}
-
 export async function logoutAction() {
   await clearSessionCookie();
   redirect('/login');
