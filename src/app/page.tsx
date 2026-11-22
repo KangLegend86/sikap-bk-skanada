@@ -178,7 +178,7 @@ export default async function HomePage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h3 className="truncate text-[15px] font-extrabold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
+                          <h3 className="truncate text-[15px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
                             {item.siswa.nama_lengkap}
                           </h3>
                           <p className="mt-1 truncate text-xs font-medium text-zinc-500">
@@ -272,7 +272,7 @@ export default async function HomePage() {
                       className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-sky-600/30 hover:shadow-[0_6px_18px_-4px_rgba(2,132,199,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
                       <div className="min-w-0">
-                        <h3 className="truncate text-[15px] font-extrabold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-sky-700">
+                        <h3 className="truncate text-[15px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-sky-700">
                           {fb.jurnal.siswa.nama_lengkap}
                         </h3>
                         <p className="mt-1 truncate text-xs font-medium text-zinc-500">
