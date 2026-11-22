@@ -26,7 +26,7 @@ export default async function AkunPage() {
         {/* Identity Summary */}
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
           <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-[#0D6A37]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-[#047857]">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
@@ -34,7 +34,7 @@ export default async function AkunPage() {
                 {formatNamaGuru(session.namaLengkap, session.gelar)}
               </h2>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-600">
-                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-semibold text-[#0D6A37]">
+                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-semibold text-[#047857]">
                   {ROLE_LABEL[session.role]}
                 </span>
                 {session.namaRuang && (

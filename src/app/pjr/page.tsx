@@ -90,7 +90,7 @@ export default async function PjrDashboardPage() {
         </div>
       ) : (
         <>
-          <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#0D6A37] to-[#084B26] p-5 text-white shadow-sm">
+          <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
             <p className="text-xs font-medium tracking-wider text-emerald-200 uppercase">
               Ruang Kelas {namaRuang}
             </p>
@@ -103,7 +103,7 @@ export default async function PjrDashboardPage() {
             <div className="mt-4">
               <Link
                 href="/pjr/kasus"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0D6A37] shadow-xs hover:bg-emerald-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#047857] shadow-xs hover:bg-emerald-50"
               >
                 <ClipboardList className="h-4 w-4" />
                 Buka Daftar Pantauan
@@ -118,7 +118,7 @@ export default async function PjrDashboardPage() {
                 <span className="text-xs font-medium text-zinc-500">
                   Siswa Kelas
                 </span>
-                <Users className="h-4 w-4 text-[#0D6A37]" />
+                <Users className="h-4 w-4 text-[#047857]" />
               </div>
               <p className="mt-2 text-2xl font-bold text-zinc-900">
                 {totalSiswa}
@@ -157,7 +157,7 @@ export default async function PjrDashboardPage() {
             </h3>
             <Link
               href="/pjr/kasus"
-              className="text-xs font-semibold text-[#0D6A37] hover:underline"
+              className="text-xs font-semibold text-[#047857] hover:underline"
             >
               Semua Pantauan →
             </Link>
@@ -176,7 +176,7 @@ export default async function PjrDashboardPage() {
                 <Link
                   key={item.id}
                   href={`/pjr/kasus#${item.id}`}
-                  className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#0D6A37]/40"
+                  className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export default async function PjrDashboardPage() {
                     <span className="font-semibold">Tindak Lanjut: </span>
                     {item.tindak_lanjut}
                   </p>
-                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#0D6A37]">
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#047857]">
                     <MessageSquare className="h-3.5 w-3.5" />
                     {item._count.feedback} catatan pantauan Anda
                   </div>

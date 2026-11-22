@@ -93,9 +93,9 @@ export function AppShell({
     <div className="min-h-screen bg-[#FAFAFA] lg:flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-zinc-200/80 z-40">
-        <div className="p-5 border-b border-[#DCE6DE]">
+        <div className="p-5 border-b border-[#D1FAE5]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#E9F2EB] border border-[#C9D6CC] p-1.5 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo-sikap-bk.svg"
@@ -104,7 +104,7 @@ export function AppShell({
               />
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-extrabold italic text-[#045A19] truncate">
+              <div className="text-sm font-extrabold italic text-[#047857] truncate">
                 SiKAP BK Skanada
               </div>
               <div className="text-[11px] text-[#495E4E] font-medium truncate">
@@ -124,9 +124,9 @@ export function AppShell({
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   item.isCenterAction
-                    ? 'bg-[#045A19] text-white hover:bg-[#034212] shadow-xs my-1'
+                    ? 'bg-[#047857] text-white hover:bg-[#065F46] shadow-xs my-1'
                     : active
-                    ? 'bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]'
+                    ? 'bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]'
                     : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                 }`}
               >
@@ -137,12 +137,12 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#DCE6DE] bg-[#EEF3EF]/60">
+        <div className="p-4 border-t border-[#D1FAE5] bg-[#ECFDF5]/60">
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#045A19] ring-2 ring-[#FFCC00]/50 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-[#047857] ring-2 ring-[#FFCC00]/50 shrink-0" />
             <div className="min-w-0">
               <div className="text-xs font-bold text-[#17331E] truncate">{fullName}</div>
-              <div className="text-[11px] font-semibold text-[#045A19]">{roleBadge}</div>
+              <div className="text-[11px] font-semibold text-[#047857]">{roleBadge}</div>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ export function AppShell({
       {/* Main Content Wrapper */}
       <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
         {/* Mobile Sticky Header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#DCE6DE] px-4 py-3 flex items-center justify-between gap-3">
+        <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#D1FAE5] px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             {backHref ? (
               <button
@@ -164,12 +164,12 @@ export function AppShell({
                   }
                 }}
                 title="Kembali"
-                className="w-10 h-10 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#17331E] hover:bg-[#D1FAE5] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-[#E9F2EB] border border-[#C9D6CC] p-1.5 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/logo-sikap-bk.svg"
@@ -194,7 +194,7 @@ export function AppShell({
                     {fullName}
                   </h1>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <span className="px-2 py-0.5 rounded-[6px] bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC] text-[11px] font-mono font-semibold uppercase shrink-0">
+                    <span className="px-2 py-0.5 rounded-[6px] bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] text-[11px] font-mono font-semibold uppercase shrink-0">
                       {roleBadge}
                     </span>
                   </div>
@@ -208,7 +208,7 @@ export function AppShell({
               href="/akun"
               aria-label="Profil Akun"
               title="Pengaturan Akun"
-              className="w-10 h-10 rounded-xl bg-[#EEF3EF] hover:bg-[#DCE6DE] border border-[#DCE6DE] text-[#17331E] flex items-center justify-center shrink-0 transition-colors"
+              className="w-10 h-10 rounded-xl bg-[#ECFDF5] hover:bg-[#D1FAE5] border border-[#D1FAE5] text-[#17331E] flex items-center justify-center shrink-0 transition-colors"
             >
               <User className="w-5 h-5" />
             </Link>
@@ -216,7 +216,7 @@ export function AppShell({
         </header>
 
         {/* Desktop Top Header */}
-        <header className="hidden lg:flex sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#DCE6DE] px-8 py-4 items-center justify-between">
+        <header className="hidden lg:flex sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-[#D1FAE5] px-8 py-4 items-center justify-between">
           <div className="flex items-center gap-3">
             {backHref && (
               <button
@@ -229,7 +229,7 @@ export function AppShell({
                   }
                 }}
                 title="Kembali"
-                className="w-9 h-9 rounded-xl bg-[#EEF3EF] border border-[#C9D6CC] text-[#17331E] hover:bg-[#DCE6DE] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#17331E] hover:bg-[#D1FAE5] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
               </button>
@@ -247,7 +247,7 @@ export function AppShell({
             {title && (
               <span className="text-xs font-semibold text-[#495E4E]">{fullName}</span>
             )}
-            <span className="text-xs font-mono font-bold uppercase px-3 py-1 rounded-full bg-[#E9F2EB] text-[#045A19] border border-[#C9D6CC]">
+            <span className="text-xs font-mono font-bold uppercase px-3 py-1 rounded-full bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]">
               {roleBadge}
             </span>
           </div>
@@ -264,7 +264,7 @@ export function AppShell({
             <BottomNav />
           </div>
         ) : (
-          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DE] px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(4,90,25,0.06)]">
+          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#D1FAE5] px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(4,120,87,0.06)]">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
@@ -276,10 +276,10 @@ export function AppShell({
                     href={item.href}
                     className="flex flex-col items-center -mt-5"
                   >
-                    <span className="w-12 h-12 rounded-2xl bg-[#045A19] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/25 border-4 border-white">
+                    <span className="w-12 h-12 rounded-2xl bg-[#047857] text-white flex items-center justify-center shadow-lg shadow-[#047857]/25 border-4 border-white">
                       <Icon className="w-5 h-5" />
                     </span>
-                    <span className="text-[10px] font-bold text-[#045A19] mt-0.5">
+                    <span className="text-[10px] font-bold text-[#047857] mt-0.5">
                       {item.label}
                     </span>
                   </Link>
@@ -291,7 +291,7 @@ export function AppShell({
                   key={item.href}
                   href={item.href}
                   className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
-                    active ? 'text-[#045A19]' : 'text-[#6D8272] hover:text-[#17331E]'
+                    active ? 'text-[#047857]' : 'text-[#6D8272] hover:text-[#17331E]'
                   }`}
                 >
                   <Icon className="w-5 h-5" />

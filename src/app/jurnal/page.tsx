@@ -100,14 +100,14 @@ export default async function JurnalListPage({
               name="q"
               defaultValue={q}
               placeholder="Cari nama siswa atau kata kunci kasus..."
-              className="w-full rounded-lg border border-zinc-300 py-2 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#0D6A37] focus:ring-1 focus:ring-[#0D6A37] focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 py-2 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
             />
           </div>
 
           <select
             name="status"
             defaultValue={statusFilter ?? ''}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#0D6A37] focus:outline-none"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
           >
             <option value="">Semua Status</option>
             <option value="DALAM_PROSES">Dalam Proses</option>
@@ -117,7 +117,7 @@ export default async function JurnalListPage({
           <select
             name="ruang"
             defaultValue={ruangFilter ?? ''}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#0D6A37] focus:outline-none"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
           >
             <option value="">Semua Ruang Kelas</option>
             {ruangList.map((r) => (
@@ -131,7 +131,7 @@ export default async function JurnalListPage({
             <select
               name="jurusan"
               defaultValue={jurusanFilter ?? ''}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#0D6A37] focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
             >
               <option value="">Semua Jurusan</option>
               {jurusanList.map((j) => (
@@ -143,7 +143,7 @@ export default async function JurnalListPage({
 
             <button
               type="submit"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#0D6A37] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#09532A]"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#047857] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#065F46]"
             >
               <Filter className="h-4 w-4" />
               Filter
@@ -166,7 +166,7 @@ export default async function JurnalListPage({
             )}
             <Link
               href="/jurnal/baru"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-[#0D6A37] hover:bg-emerald-100"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-[#047857] hover:bg-emerald-100"
             >
               <Plus className="h-3.5 w-3.5" />
               Catat Jurnal
@@ -192,7 +192,7 @@ export default async function JurnalListPage({
             <Link
               key={item.id}
               href={`/jurnal/${item.id}`}
-              className="flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#0D6A37]/40 hover:shadow-sm"
+              className="flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40 hover:shadow-sm"
             >
               <div>
                 <div className="flex flex-wrap items-start justify-between gap-2">
@@ -259,7 +259,7 @@ export default async function JurnalListPage({
                   ))}
                 </div>
                 {item._count.feedback > 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#0D6A37]">
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#047857]">
                     <MessageSquare className="h-3.5 w-3.5" />
                     {item._count.feedback}
                   </span>

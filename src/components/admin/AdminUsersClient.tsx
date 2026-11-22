@@ -105,7 +105,7 @@ export function AdminUsersClient({
         className="space-y-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-1"
       >
         <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-          <UserPlus className="h-4 w-4 text-[#0D6A37]" />
+          <UserPlus className="h-4 w-4 text-[#047857]" />
           Buat Akun Login Baru
         </h3>
         <p className="text-xs text-zinc-500">
@@ -208,7 +208,7 @@ export function AdminUsersClient({
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D6A37] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#09532A] disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#065F46] disabled:opacity-60"
         >
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -222,7 +222,7 @@ export function AdminUsersClient({
       {/* Account List */}
       <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-2">
         <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-zinc-900">
-          <Shield className="h-4 w-4 text-[#0D6A37]" />
+          <Shield className="h-4 w-4 text-[#047857]" />
           Daftar Akun Terdaftar ({users.length})
         </h3>
 

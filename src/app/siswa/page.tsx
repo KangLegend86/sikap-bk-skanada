@@ -68,14 +68,14 @@ export default async function SiswaDirectoryPage({
               name="q"
               defaultValue={q}
               placeholder="Cari nama siswa..."
-              className="w-full rounded-lg border border-zinc-300 py-2 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#0D6A37] focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 py-2 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:outline-none"
             />
           </div>
 
           <select
             name="ruang"
             defaultValue={ruangFilter ?? ''}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#0D6A37] focus:outline-none"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
           >
             <option value="">Semua Ruang Kelas</option>
             {ruangList.map((r) => (
@@ -89,7 +89,7 @@ export default async function SiswaDirectoryPage({
             <select
               name="jurusan"
               defaultValue={jurusanFilter ?? ''}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#0D6A37] focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
             >
               <option value="">Semua Jurusan</option>
               {jurusanList.map((j) => (
@@ -100,7 +100,7 @@ export default async function SiswaDirectoryPage({
             </select>
             <button
               type="submit"
-              className="rounded-lg bg-[#0D6A37] px-4 py-2 text-sm font-semibold text-white hover:bg-[#09532A]"
+              className="rounded-lg bg-[#047857] px-4 py-2 text-sm font-semibold text-white hover:bg-[#065F46]"
             >
               Cari
             </button>
@@ -121,7 +121,7 @@ export default async function SiswaDirectoryPage({
             <Link
               key={s.id}
               href={`/siswa/${s.id}`}
-              className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#0D6A37]/40 hover:shadow-sm"
+              className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40 hover:shadow-sm"
             >
               <div className="min-w-0">
                 <p className="truncate font-semibold text-zinc-900">
@@ -146,7 +146,7 @@ export default async function SiswaDirectoryPage({
               </div>
 
               <div className="ml-3 shrink-0 text-right">
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#0D6A37]">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#047857]">
                   <FileText className="h-3.5 w-3.5" />
                   {s._count.jurnal}
                 </span>

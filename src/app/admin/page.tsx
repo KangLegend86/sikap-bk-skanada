@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
       subtitle="Ringkasan Konseling Sekolah • SMKS NU 2 Kedungpring"
     >
       {/* Top Banner */}
-      <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#0D6A37] to-[#084B26] p-5 text-white shadow-sm">
+      <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-emerald-200 uppercase">
@@ -80,7 +80,7 @@ export default async function AdminDashboardPage() {
           </div>
           <Link
             href="/admin/rekap"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#0D6A37] shadow-xs hover:bg-emerald-50"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#047857] shadow-xs hover:bg-emerald-50"
           >
             <Printer className="h-4 w-4" />
             Buka Rekap & Cetak
@@ -93,7 +93,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-zinc-500">Total Kasus</span>
-            <FileText className="h-4 w-4 text-[#0D6A37]" />
+            <FileText className="h-4 w-4 text-[#047857]" />
           </div>
           <p className="mt-2 text-2xl font-bold text-zinc-900">{totalJurnal}</p>
         </div>
@@ -167,7 +167,7 @@ export default async function AdminDashboardPage() {
                   </div>
                   <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-zinc-100">
                     <div
-                      className="h-full rounded-full bg-[#0D6A37]"
+                      className="h-full rounded-full bg-[#047857]"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -184,7 +184,7 @@ export default async function AdminDashboardPage() {
             </h3>
             <Link
               href="/admin/rekap"
-              className="text-xs font-semibold text-[#0D6A37] hover:underline"
+              className="text-xs font-semibold text-[#047857] hover:underline"
             >
               Audit Lengkap →
             </Link>
@@ -242,7 +242,7 @@ export default async function AdminDashboardPage() {
               href="/admin/users"
               className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
             >
-              <Shield className="h-3.5 w-3.5 text-[#0D6A37]" />
+              <Shield className="h-3.5 w-3.5 text-[#047857]" />
               Kelola Akun Pengguna
             </Link>
           </div>

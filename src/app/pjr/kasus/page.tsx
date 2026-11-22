@@ -154,7 +154,7 @@ export default async function PjrKasusPage() {
               {/* Existing feedback + form */}
               <div className="mt-4 border-t border-zinc-100 pt-3">
                 <h3 className="flex items-center gap-1.5 text-xs font-bold text-zinc-700">
-                  <MessageSquare className="h-3.5 w-3.5 text-[#0D6A37]" />
+                  <MessageSquare className="h-3.5 w-3.5 text-[#047857]" />
                   Riwayat Pantauan PJR ({item.feedback.length})
                 </h3>
 

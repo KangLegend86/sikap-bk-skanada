@@ -6,9 +6,9 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 export function SkanadaAccentBar({ className = '' }: { className?: string }) {
   return (
     <div className={`flex h-0.5 w-[72px] items-center ${className}`} aria-hidden="true">
-      <span className="h-full w-7 shrink-0 rounded-l-full bg-[#045A19]" />
+      <span className="h-full w-7 shrink-0 rounded-l-full bg-[#047857]" />
       <span className="h-full w-4 shrink-0 bg-[#FFCC00]" />
-      <span className="h-full w-7 shrink-0 rounded-r-full bg-[#045A19]" />
+      <span className="h-full w-7 shrink-0 rounded-r-full bg-[#047857]" />
     </div>
   );
 }
@@ -33,9 +33,9 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 const buttonVariants: Record<ButtonVariant, string> = {
   primary: 'skanada-btn-primary',
   secondary:
-    'rounded-xl border border-[#C9D6CC] bg-white text-[#17331E] font-semibold hover:bg-[#E9F2EB] hover:border-[#045A19]/40 transition-colors',
+    'rounded-xl border border-[#A7F3D0] bg-white text-[#17331E] font-semibold hover:bg-[#ECFDF5] hover:border-[#047857]/40 transition-colors',
   ghost:
-    'rounded-xl text-[#045A19] font-semibold hover:bg-[#E9F2EB] transition-colors',
+    'rounded-xl text-[#047857] font-semibold hover:bg-[#ECFDF5] transition-colors',
   danger:
     'rounded-xl bg-rose-600 text-white font-semibold hover:bg-rose-700 shadow-xs transition-colors',
 };
@@ -65,9 +65,9 @@ export function SkanadaButton({
 type BadgeVariant = 'green' | 'gold' | 'neutral';
 
 const badgeVariants: Record<BadgeVariant, string> = {
-  green: 'bg-[#E9F2EB] text-[#045A19] border-[#C9D6CC]',
+  green: 'bg-[#ECFDF5] text-[#047857] border-[#A7F3D0]',
   gold: 'bg-[#FFF9DB] text-[#7A5900] border-[#FCD20B]/70',
-  neutral: 'bg-[#EEF3EF] text-[#495E4E] border-[#DCE6DE]',
+  neutral: 'bg-[#ECFDF5] text-[#495E4E] border-[#D1FAE5]',
 };
 
 /**

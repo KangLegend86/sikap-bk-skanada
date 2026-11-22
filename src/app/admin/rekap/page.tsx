@@ -138,7 +138,7 @@ export default async function AdminRekapPage({
           <div className="flex gap-2">
             <button
               type="submit"
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#0D6A37] px-3 py-2 text-sm font-semibold text-white hover:bg-[#09532A]"
+              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#047857] px-3 py-2 text-sm font-semibold text-white hover:bg-[#065F46]"
             >
               <Filter className="h-4 w-4" />
               Terapkan
@@ -188,7 +188,7 @@ export default async function AdminRekapPage({
                   <td className="px-3 py-3 align-top font-semibold text-zinc-900">
                     <Link
                       href={`/jurnal/${item.id}`}
-                      className="hover:text-[#0D6A37] hover:underline print:no-underline"
+                      className="hover:text-[#047857] hover:underline print:no-underline"
                     >
                       {item.siswa.nama_lengkap}
                     </Link>

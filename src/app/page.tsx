@@ -93,10 +93,10 @@ export default async function HomePage() {
         {/* Bar Tanggal Ringkas & Identitas */}
         <div className="flex items-center justify-between rounded-[10px] border border-zinc-200/80 bg-white px-3 py-2 text-xs">
           <div className="flex items-center gap-2 font-semibold text-zinc-600">
-            <Calendar className="h-4 w-4 shrink-0 text-[#045A19]" />
+            <Calendar className="h-4 w-4 shrink-0 text-[#047857]" />
             <span>{todayLabel}</span>
           </div>
-          <span className="rounded-[6px] border border-[#C9D6CC] bg-[#E9F2EB] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#045A19]">
+          <span className="rounded-[6px] border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#047857]">
             BK SKANADA
           </span>
         </div>
@@ -104,7 +104,7 @@ export default async function HomePage() {
         {/* Tombol Aksi Utama (CTA) */}
         <Link
           href="/jurnal/baru"
-          className="skanada-btn-primary flex w-full items-center justify-center gap-2 px-4 py-3.5 text-[15px]"
+          className="skanada-btn-primary flex w-full items-center justify-center gap-2 bg-emerald-700 px-4 py-3.5 text-[15px] hover:bg-emerald-800"
         >
           <FilePenLine className="h-5 w-5 shrink-0" />
           <span>Catat Jurnal BK Baru</span>
@@ -126,7 +126,7 @@ export default async function HomePage() {
           </div>
           <div className="rounded-[12px] border border-zinc-200/80 bg-white p-3">
             <div className="text-xs font-medium text-zinc-500">Selesai</div>
-            <div className="mt-0.5 text-xl font-extrabold text-[#045A19]">
+            <div className="mt-0.5 text-xl font-extrabold text-[#047857]">
               {selesaiCount}
             </div>
           </div>
@@ -138,7 +138,7 @@ export default async function HomePage() {
           <section className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border border-[#C9D6CC] bg-[#E9F2EB] text-[#045A19]">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">
                   <FileText className="h-4 w-4" />
                 </div>
                 <h2 className="text-[13px] font-extrabold tracking-wider text-zinc-700 uppercase">
@@ -147,7 +147,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href="/jurnal"
-                className="text-xs font-semibold text-[#045A19] hover:underline"
+                className="text-xs font-semibold text-[#047857] hover:underline"
               >
                 Lihat Semua
               </Link>
@@ -164,7 +164,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-3">
                 {recentJournals.map((item) => {
                   const kategoriLabel = item.kategori
                     .map((k) => k.kategori.nama_kategori)
@@ -174,20 +174,20 @@ export default async function HomePage() {
                     <Link
                       key={item.id}
                       href={`/jurnal/${item.id}`}
-                      className="flex flex-col justify-between gap-2 rounded-[12px] border border-zinc-200/80 bg-white p-3.5 transition-colors hover:bg-zinc-50/80"
+                      className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h3 className="truncate text-[14.5px] font-extrabold text-zinc-900">
+                          <h3 className="truncate text-[15px] font-extrabold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
                             {item.siswa.nama_lengkap}
                           </h3>
-                          <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
+                          <p className="mt-1 truncate text-xs font-medium text-zinc-500">
                             {item.snapshot_ruang} • {item.siswa.jurusan.kode}
                             {kategoriLabel && (
                               <>
                                 {' '}
                                 <span className="text-zinc-300">|</span>{' '}
-                                <span className="font-semibold text-[#045A19]">
+                                <span className="font-semibold text-[#047857]">
                                   {kategoriLabel}
                                 </span>
                               </>
@@ -207,9 +207,9 @@ export default async function HomePage() {
                               ? 'Dibagikan ke PJR'
                               : 'Privat Internal BK'
                           }
-                          className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border ${
+                          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
                             item.is_shared_with_pjr
-                              ? 'border-[#C9D6CC] bg-[#E9F2EB] text-[#045A19]'
+                              ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
                               : 'border-rose-200 bg-rose-50 text-rose-600'
                           }`}
                         >
@@ -221,11 +221,11 @@ export default async function HomePage() {
                         </span>
                       </div>
 
-                      <p className="line-clamp-2 text-sm leading-[1.45] text-zinc-600">
+                      <p className="line-clamp-1 text-[13.5px] leading-relaxed text-zinc-600">
                         {item.permasalahan}
                       </p>
 
-                      <div className="truncate border-t border-zinc-100 pt-1.5 text-[11.5px] font-medium text-zinc-400">
+                      <div className="truncate border-t border-zinc-100/90 pt-2 text-[11px] font-medium text-zinc-400">
                         {formatTanggalIndo(item.tanggal_konseling)}
                       </div>
                     </Link>
@@ -259,7 +259,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-3">
                 {recentFeedbacks.map((fb) => {
                   const namaRuang =
                     fb.user_pjr.ruang_kelas?.nama_ruang ??
@@ -269,13 +269,13 @@ export default async function HomePage() {
                     <Link
                       key={fb.id}
                       href={`/jurnal/${fb.jurnal_id}`}
-                      className="flex flex-col justify-between gap-2 rounded-[12px] border border-zinc-200/80 bg-white p-3.5 transition-colors hover:bg-zinc-50/80"
+                      className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-sky-600/30 hover:shadow-[0_6px_18px_-4px_rgba(2,132,199,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
                       <div className="min-w-0">
-                        <h3 className="truncate text-[14.5px] font-extrabold text-zinc-900">
+                        <h3 className="truncate text-[15px] font-extrabold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-sky-700">
                           {fb.jurnal.siswa.nama_lengkap}
                         </h3>
-                        <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
+                        <p className="mt-1 truncate text-xs font-medium text-zinc-500">
                           {namaRuang} • {fb.jurnal.siswa.jurusan.kode}{' '}
                           <span className="text-zinc-300">|</span>{' '}
                           <span className="font-semibold text-sky-700">
@@ -284,11 +284,11 @@ export default async function HomePage() {
                         </p>
                       </div>
 
-                      <p className="line-clamp-2 text-sm leading-[1.45] text-zinc-600">
+                      <p className="line-clamp-2 text-[13.5px] leading-relaxed text-zinc-600">
                         &ldquo;{fb.pesan_pantauan}&rdquo;
                       </p>
 
-                      <div className="truncate border-t border-zinc-100 pt-1.5 text-[11.5px] font-medium text-zinc-400">
+                      <div className="truncate border-t border-zinc-100/90 pt-2 text-[11px] font-medium text-zinc-400">
                         {formatTanggalIndo(fb.created_at)}
                       </div>
                     </Link>

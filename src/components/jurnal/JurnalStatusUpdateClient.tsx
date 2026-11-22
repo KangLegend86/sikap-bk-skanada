@@ -87,7 +87,7 @@ export function JurnalStatusUpdateClient({
           value={keterangan}
           onChange={(e) => setKeterangan(e.target.value)}
           placeholder="Contoh: Siswa sudah menunjukkan perbaikan kedisiplinan selama 2 minggu..."
-          className="w-full min-h-[96px] resize-y rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#0D6A37] focus:ring-1 focus:ring-[#0D6A37] focus:outline-none"
+          className="w-full min-h-[96px] resize-y rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
         />
       </div>
 
@@ -101,7 +101,7 @@ export function JurnalStatusUpdateClient({
       <button
         type="submit"
         disabled={saving}
-        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D6A37] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#09532A] disabled:opacity-60"
+        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#065F46] disabled:opacity-60"
       >
         {saving && <Loader2 className="h-4 w-4 animate-spin" />}
         Simpan Status

@@ -58,7 +58,7 @@ export default async function SiswaDetailPage({
         </Link>
         <Link
           href="/jurnal/baru"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D6A37] px-3 py-2 text-xs font-semibold text-white hover:bg-[#09532A]"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#047857] px-3 py-2 text-xs font-semibold text-white hover:bg-[#065F46]"
         >
           <Plus className="h-3.5 w-3.5" />
           Catat Jurnal
@@ -137,7 +137,7 @@ export default async function SiswaDetailPage({
             <Link
               key={item.id}
               href={`/jurnal/${item.id}`}
-              className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#0D6A37]/40"
+              className="block rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="text-xs text-zinc-500">

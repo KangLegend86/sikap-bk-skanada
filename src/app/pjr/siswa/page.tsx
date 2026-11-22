@@ -71,7 +71,7 @@ export default async function PjrSiswaPage() {
               </div>
 
               {s._count.jurnal > 0 && (
-                <span className="ml-2 shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#0D6A37]">
+                <span className="ml-2 shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#047857]">
                   {s._count.jurnal} kasus
                 </span>
               )}

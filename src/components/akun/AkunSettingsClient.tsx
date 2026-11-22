@@ -27,7 +27,7 @@ export function AkunSettingsClient({
         className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs"
       >
         <h3 className="flex items-center gap-2 text-base font-bold text-zinc-900">
-          <KeyRound className="h-4 w-4 text-[#0D6A37]" />
+          <KeyRound className="h-4 w-4 text-[#047857]" />
           Ubah Username & Password
         </h3>
         <p className="mt-1 text-xs text-zinc-500">
@@ -51,7 +51,7 @@ export function AkunSettingsClient({
                 required
                 minLength={3}
                 defaultValue={currentUsername}
-                className="w-full rounded-lg border border-zinc-300 py-2.5 pr-3 pl-9 text-sm text-zinc-900 focus:border-[#0D6A37] focus:ring-1 focus:ring-[#0D6A37] focus:outline-none"
+                className="w-full rounded-lg border border-zinc-300 py-2.5 pr-3 pl-9 text-sm text-zinc-900 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
               />
             </div>
           </div>
@@ -68,7 +68,7 @@ export function AkunSettingsClient({
               name="password"
               type="password"
               placeholder="Minimal 6 karakter jika ingin ganti"
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#0D6A37] focus:ring-1 focus:ring-[#0D6A37] focus:outline-none"
+              className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
             />
           </div>
         </div>
@@ -89,7 +89,7 @@ export function AkunSettingsClient({
         <button
           type="submit"
           disabled={isPending}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D6A37] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#09532A] disabled:opacity-60 sm:w-auto"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#065F46] disabled:opacity-60 sm:w-auto"
         >
           {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           Simpan Perubahan Akun

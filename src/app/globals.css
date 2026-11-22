@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --skanada-primary: #045A19;
-  --skanada-primary-mid: #157A2E;
-  --skanada-primary-soft: #E9F2EB;
+  --skanada-primary: var(--color-emerald-700, #047857);
+  --skanada-primary-mid: var(--color-emerald-600, #059669);
+  --skanada-primary-soft: var(--color-emerald-50, #ECFDF5);
   --skanada-gold: #FFCC00;
   --skanada-bg: #FAFAFA;
   --skanada-surface: #FFFFFF;
@@ -15,7 +15,7 @@
 
   /* Backward-compatible aliases */
   --nu-primary: var(--skanada-primary);
-  --nu-primary-hover: #034212;
+  --nu-primary-hover: var(--color-emerald-800, #065F46);
   --nu-primary-soft: var(--skanada-primary-soft);
   --nu-primary-border: var(--skanada-border);
   --background: var(--skanada-bg);
@@ -59,7 +59,7 @@ body {
   }
 
   .skanada-btn-primary {
-    background-color: var(--skanada-primary);
+    background-color: var(--color-emerald-700, #047857);
     color: #ffffff;
     border-radius: 0.75rem;
     font-weight: 700;
@@ -68,7 +68,7 @@ body {
   }
 
   .skanada-btn-primary:hover:not(:disabled) {
-    background-color: #034212;
+    background-color: var(--color-emerald-800, #065F46);
   }
 
   .skanada-btn-primary:active:not(:disabled) {
@@ -91,6 +91,6 @@ body {
     outline: none;
     border-color: var(--skanada-primary);
     background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(4, 90, 25, 0.12);
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
   }
 }

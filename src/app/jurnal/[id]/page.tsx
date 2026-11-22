@@ -113,7 +113,7 @@ export default async function JurnalDetailPage({
         </Link>
         <Link
           href={`/siswa/${jurnal.siswa_id}`}
-          className="text-xs font-semibold text-[#0D6A37] hover:underline"
+          className="text-xs font-semibold text-[#047857] hover:underline"
         >
           Lihat Riwayat Siswa →
         </Link>
@@ -258,7 +258,7 @@ export default async function JurnalDetailPage({
           <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
             <div className="flex items-center justify-between">
               <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-                <MessageSquare className="h-4 w-4 text-[#0D6A37]" />
+                <MessageSquare className="h-4 w-4 text-[#047857]" />
                 Catatan Pantauan Guru PJR ({jurnal.feedback.length})
               </h3>
             </div>

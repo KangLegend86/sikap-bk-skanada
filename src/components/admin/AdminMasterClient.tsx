@@ -140,7 +140,7 @@ export function AdminMasterClient({
             }}
             className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition ${
               tab === t.key
-                ? 'bg-[#0D6A37] text-white'
+                ? 'bg-[#047857] text-white'
                 : 'border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
             }`}
           >
@@ -170,7 +170,7 @@ export function AdminMasterClient({
             className="space-y-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-1"
           >
             <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-              <UserPlus className="h-4 w-4 text-[#0D6A37]" />
+              <UserPlus className="h-4 w-4 text-[#047857]" />
               Tambah Siswa Baru
             </h3>
 
@@ -276,7 +276,7 @@ export function AdminMasterClient({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D6A37] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#09532A] disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#065F46] disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -289,7 +289,7 @@ export function AdminMasterClient({
 
           <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-2">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-zinc-900">
-              <Users className="h-4 w-4 text-[#0D6A37]" />
+              <Users className="h-4 w-4 text-[#047857]" />
               Daftar Siswa Aktif ({siswaList.length})
             </h3>
             <div className="max-h-[460px] divide-y divide-zinc-100 overflow-y-auto">
@@ -334,7 +334,7 @@ export function AdminMasterClient({
             className="space-y-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs lg:col-span-1"
           >
             <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-              <UserPlus className="h-4 w-4 text-[#0D6A37]" />
+              <UserPlus className="h-4 w-4 text-[#047857]" />
               Tambah Pegawai / GTK
             </h3>
 
@@ -401,7 +401,7 @@ export function AdminMasterClient({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D6A37] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#09532A] disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#065F46] disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -445,7 +445,7 @@ export function AdminMasterClient({
       {tab === 'kategori' && (
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
           <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-            <Tag className="h-4 w-4 text-[#0D6A37]" />
+            <Tag className="h-4 w-4 text-[#047857]" />
             Kategori Permasalahan BK
           </h3>
           <form onSubmit={handleAddKategori} className="mt-3 flex gap-2">
@@ -458,7 +458,7 @@ export function AdminMasterClient({
             <button
               type="submit"
               disabled={loading || !newKat.trim()}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D6A37] px-4 py-2 text-xs font-semibold text-white hover:bg-[#09532A] disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#047857] px-4 py-2 text-xs font-semibold text-white hover:bg-[#065F46] disabled:opacity-60"
             >
               <Plus className="h-4 w-4" />
               Tambah

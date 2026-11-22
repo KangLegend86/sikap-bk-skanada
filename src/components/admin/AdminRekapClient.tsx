@@ -71,7 +71,7 @@ export function AdminRekapClient({ rows }: { rows: RekapRow[] }) {
       <button
         type="button"
         onClick={() => window.print()}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D6A37] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#09532A]"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[#047857] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#065F46]"
       >
         <Printer className="h-4 w-4" />
         Cetak / Simpan PDF (Kop Surat)
