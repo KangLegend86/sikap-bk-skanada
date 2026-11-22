@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   ChevronLeft,
   ClipboardList,
+  Contact,
   Database,
   FileText,
   Home,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
 import { formatNamaGuru } from '@/lib/utils';
+import BottomNav from '@/components/BottomNav';
 
 interface NavItem {
   href: string;
@@ -47,8 +49,9 @@ function getNavItems(role: SessionPayload['role']): NavItem[] {
   // Default: GURU_BK
   return [
     { href: '/', label: 'Beranda', icon: Home },
-    { href: '/jurnal', label: 'Jurnal', icon: FileText },
+    { href: '/jurnal', label: 'Jurnal BK', icon: FileText },
     { href: '/jurnal/baru', label: 'Catat', icon: Plus, isCenterAction: true },
+    { href: '/jurnal-sikap', label: 'Jurnal Sikap', icon: Contact },
     { href: '/siswa', label: 'Siswa', icon: Users },
     { href: '/akun', label: 'Akun', icon: User },
   ];
@@ -256,44 +259,50 @@ export function AppShell({
         </main>
 
         {/* Mobile Bottom Navigation Bar */}
-        <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DE] px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(4,90,25,0.06)]">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
+        {session.role === 'GURU_BK' ? (
+          <div className="lg:hidden">
+            <BottomNav />
+          </div>
+        ) : (
+          <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#DCE6DE] px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(4,90,25,0.06)]">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
 
-            if (item.isCenterAction) {
+              if (item.isCenterAction) {
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex flex-col items-center -mt-5"
+                  >
+                    <span className="w-12 h-12 rounded-2xl bg-[#045A19] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/25 border-4 border-white">
+                      <Icon className="w-5 h-5" />
+                    </span>
+                    <span className="text-[10px] font-bold text-[#045A19] mt-0.5">
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex flex-col items-center -mt-5"
+                  className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
+                    active ? 'text-[#045A19]' : 'text-[#6D8272] hover:text-[#17331E]'
+                  }`}
                 >
-                  <span className="w-12 h-12 rounded-2xl bg-[#045A19] text-white flex items-center justify-center shadow-lg shadow-[#045A19]/25 border-4 border-white">
-                    <Icon className="w-5 h-5" />
-                  </span>
-                  <span className="text-[10px] font-bold text-[#045A19] mt-0.5">
+                  <Icon className="w-5 h-5" />
+                  <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>
                     {item.label}
                   </span>
                 </Link>
               );
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
-                  active ? 'text-[#045A19]' : 'text-[#6D8272] hover:text-[#17331E]'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+            })}
+          </nav>
+        )}
       </div>
     </div>
   );
