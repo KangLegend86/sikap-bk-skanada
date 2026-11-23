@@ -1,16 +1,35 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { FileText, Search, Users } from 'lucide-react';
+import { ChevronRight, FileText, Users } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getMajorBadgeClass } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
+import {
+  SiswaFilterClient,
+  type BkHistoryFilter,
+  type GenderFilter,
+} from '@/components/siswa/SiswaFilterClient';
 
+const PAGE_SIZE = 10;
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'S';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
 
 export default async function SiswaDirectoryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; ruang?: string; jurusan?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    ruang?: string;
+    jurusan?: string;
+    jk?: string;
+    bk?: string;
+    page?: string;
+  }>;
 }) {
   const session = await getSession();
   if (!session) redirect('/login');
@@ -20,29 +39,29 @@ export default async function SiswaDirectoryPage({
   const q = params.q?.trim() ?? '';
   const ruangFilter = params.ruang?.trim() || undefined;
   const jurusanFilter = params.jurusan?.trim() || undefined;
+  const genderFilter: Exclude<GenderFilter, ''> | undefined =
+    params.jk === 'L' || params.jk === 'P' ? params.jk : undefined;
+  const bkFilter: Exclude<BkHistoryFilter, ''> | undefined =
+    params.bk === 'ADA' || params.bk === 'BELUM' ? params.bk : undefined;
 
-  const [students, ruangList, jurusanList] = await Promise.all([
-    prisma.siswa.findMany({
-      where: {
-        is_active: true,
-        ...(ruangFilter ? { ruang_kelas: { nama_ruang: ruangFilter } } : {}),
-        ...(jurusanFilter ? { jurusan: { kode: jurusanFilter } } : {}),
-        ...(q
-          ? { nama_lengkap: { contains: q, mode: 'insensitive' } }
-          : {}),
-      },
-      orderBy: [
-        { ruang_kelas: { nama_ruang: 'asc' } },
-        { no_absen: 'asc' },
-        { nama_lengkap: 'asc' },
-      ],
-      take: 100,
-      include: {
-        jurusan: true,
-        ruang_kelas: true,
-        _count: { select: { jurnal: true } },
-      },
-    }),
+  const parsedPage = Number.parseInt(params.page ?? '', 10);
+  const requestedPage =
+    Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+
+  const whereClause = {
+    is_active: true,
+    ...(ruangFilter ? { ruang_kelas: { nama_ruang: ruangFilter } } : {}),
+    ...(jurusanFilter ? { jurusan: { kode: jurusanFilter } } : {}),
+    ...(genderFilter ? { jenis_kelamin: genderFilter } : {}),
+    ...(bkFilter === 'ADA' ? { jurnal: { some: {} } } : {}),
+    ...(bkFilter === 'BELUM' ? { jurnal: { none: {} } } : {}),
+    ...(q
+      ? { nama_lengkap: { contains: q, mode: 'insensitive' as const } }
+      : {}),
+  };
+
+  const [totalCount, ruangList, jurusanList] = await Promise.all([
+    prisma.siswa.count({ where: whereClause }),
     prisma.ruangKelas.findMany({
       where: { is_active: true },
       orderBy: { nama_ruang: 'asc' },
@@ -53,109 +72,137 @@ export default async function SiswaDirectoryPage({
     }),
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const currentPage = Math.min(requestedPage, totalPages);
+
+  const students = await prisma.siswa.findMany({
+    where: whereClause,
+    orderBy: [
+      { ruang_kelas: { nama_ruang: 'asc' } },
+      { no_absen: 'asc' },
+      { nama_lengkap: 'asc' },
+    ],
+    skip: (currentPage - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
+    include: {
+      jurusan: true,
+      ruang_kelas: true,
+      _count: { select: { jurnal: true } },
+    },
+  });
+
+  const buildPageHref = (pageNum: number) => {
+    const p = new URLSearchParams();
+    if (q) p.set('q', q);
+    if (ruangFilter) p.set('ruang', ruangFilter);
+    if (jurusanFilter) p.set('jurusan', jurusanFilter);
+    if (genderFilter) p.set('jk', genderFilter);
+    if (bkFilter) p.set('bk', bkFilter);
+    if (pageNum > 1) p.set('page', String(pageNum));
+    const qs = p.toString();
+    return qs ? `/siswa?${qs}` : '/siswa';
+  };
+
+  const rangeStart = totalCount === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(currentPage * PAGE_SIZE, totalCount);
+  const prevHref = currentPage > 1 ? buildPageHref(currentPage - 1) : undefined;
+  const nextHref =
+    currentPage < totalPages ? buildPageHref(currentPage + 1) : undefined;
+
   return (
     <AppShell
       session={session}
-      title="Direktori Siswa"
-      subtitle="Daftar siswa aktif dan rekam jejak konseling BK"
+      title="Daftar Siswa"
+      subtitle="Data Siswa Aktif & Riwayat BK"
+      backHref="/"
     >
-      <div className="mb-5 rounded-xl border border-zinc-200 bg-white p-4 shadow-xs">
-        <form method="GET" className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-          <div className="relative sm:col-span-2">
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Cari nama siswa..."
-              className="w-full rounded-lg border border-zinc-300 py-2 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:outline-none"
-            />
-          </div>
-
-          <select
-            name="ruang"
-            defaultValue={ruangFilter ?? ''}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
-          >
-            <option value="">Semua Ruang Kelas</option>
-            {ruangList.map((r) => (
-              <option key={r.id} value={r.nama_ruang}>
-                {r.nama_ruang}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex gap-2">
-            <select
-              name="jurusan"
-              defaultValue={jurusanFilter ?? ''}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-[#047857] focus:outline-none"
-            >
-              <option value="">Semua Jurusan</option>
-              {jurusanList.map((j) => (
-                <option key={j.id} value={j.kode}>
-                  {j.kode}
-                </option>
-              ))}
-            </select>
-            <button
-              type="submit"
-              className="rounded-lg bg-[#047857] px-4 py-2 text-sm font-semibold text-white hover:bg-[#065F46]"
-            >
-              Cari
-            </button>
-          </div>
-        </form>
-      </div>
+      {/* Mobile-first Search, Filter Bottom Sheet & Top Pagination Bar */}
+      <SiswaFilterClient
+        initialQ={q}
+        initialRuang={ruangFilter}
+        initialJurusan={jurusanFilter}
+        initialGender={genderFilter}
+        initialBk={bkFilter}
+        ruangList={ruangList.map((r) => ({ id: r.id, nama_ruang: r.nama_ruang }))}
+        jurusanList={jurusanList.map((j) => ({ id: j.id, kode: j.kode }))}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        rangeStart={rangeStart}
+        rangeEnd={rangeEnd}
+        prevHref={prevHref}
+        nextHref={nextHref}
+      />
 
       {students.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
           <Users className="mx-auto h-9 w-9 text-zinc-300" />
-          <p className="mt-2 text-sm font-semibold text-zinc-700">
-            Data siswa tidak ditemukan.
+          <p className="mt-2 text-sm font-semibold text-zinc-800">
+            Data siswa tidak ditemukan
+          </p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Ubah kata kunci atau filter pencarian Anda.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {students.map((s) => (
-            <Link
-              key={s.id}
-              href={`/siswa/${s.id}`}
-              className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40 hover:shadow-sm"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-zinc-900">
-                  {s.no_absen ? `${s.no_absen}. ` : ''}
-                  {s.nama_lengkap}
-                </p>
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">
-                    {s.ruang_kelas.nama_ruang}
-                  </span>
-                  <span
-                    className={`rounded px-2 py-0.5 text-xs font-semibold ${getMajorBadgeClass(
-                      s.jurusan.kode
-                    )}`}
-                  >
-                    {s.jurusan.kode}
-                  </span>
-                  <span className="text-xs text-zinc-400">
-                    ({s.jenis_kelamin})
-                  </span>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {students.map((s) => {
+            const hasJurnal = s._count.jurnal > 0;
+            const isMale = s.jenis_kelamin === 'L';
 
-              <div className="ml-3 shrink-0 text-right">
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#047857]">
-                  <FileText className="h-3.5 w-3.5" />
-                  {s._count.jurnal}
-                </span>
-              </div>
-            </Link>
-          ))}
+            return (
+              <Link
+                key={s.id}
+                href={`/siswa/${s.id}`}
+                className="group flex items-center gap-3 rounded-2xl border border-zinc-200/70 bg-white p-3.5 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+              >
+                {/* Avatar Inisial dengan aksen gender halus */}
+                <div
+                  aria-hidden="true"
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-xs font-extrabold tracking-tight ${
+                    isMale
+                      ? 'border-sky-200/80 bg-sky-50 text-sky-700'
+                      : 'border-rose-200/80 bg-rose-50 text-rose-600'
+                  }`}
+                >
+                  {getInitials(s.nama_lengkap)}
+                </div>
+
+                {/* Info Siswa */}
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-[14.5px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
+                    {s.nama_lengkap}
+                  </h3>
+                  <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
+                    {s.no_absen ? `Absen ${String(s.no_absen).padStart(2, '0')} • ` : ''}
+                    {s.ruang_kelas.nama_ruang}{' '}
+                    <span className="text-zinc-300">|</span>{' '}
+                    <span className="font-semibold text-[#047857]">
+                      {s.jurusan.kode}
+                    </span>
+                  </p>
+                </div>
+
+                {/* Badge Jumlah Jurnal + Chevron */}
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <span
+                    title={`${s._count.jurnal} jurnal konseling`}
+                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+                      hasJurnal
+                        ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                        : 'border-zinc-200/70 bg-zinc-50 text-zinc-400'
+                    }`}
+                  >
+                    <FileText className="h-3 w-3" />
+                    {s._count.jurnal}
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-zinc-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#047857]" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </AppShell>
   );
 }
-

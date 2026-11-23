@@ -14,6 +14,7 @@ export default async function JurnalSikapPage() {
       session={session}
       title="Jurnal Penilaian Sikap"
       subtitle="Riwayat jurnal penilaian sikap siswa"
+      backHref="/"
     >
       <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">

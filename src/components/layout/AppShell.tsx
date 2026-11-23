@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   ChevronLeft,
   ClipboardList,
@@ -45,7 +45,6 @@ export function AppShell({
   backHref?: string;
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const fullName = formatNamaGuru(session.namaLengkap, session.gelar);
 
   const roleBadge =
@@ -68,20 +67,14 @@ export function AppShell({
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#D1FAE5] px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           {backHref ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  router.back();
-                } else {
-                  router.push(backHref);
-                }
-              }}
+            <Link
+              href={backHref}
               title="Kembali"
-              className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#17331E] hover:bg-[#D1FAE5] flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+              aria-label="Kembali"
+              className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#17331E] hover:bg-[#D1FAE5] flex items-center justify-center shrink-0 transition-colors active:scale-95"
             >
               <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
-            </button>
+            </Link>
           ) : (
             <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
