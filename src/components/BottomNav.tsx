@@ -12,14 +12,14 @@ type Ripple = {
     size: number;
 };
 
-type NavItem = {
+export type BottomNavItem = {
     path: string;
     label: string;
     Icon: LucideIcon;
     isCenter?: boolean;
 };
 
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS: BottomNavItem[] = [
     { path: "/", label: "Beranda", Icon: Home },
     { path: "/jurnal", label: "Jurnal BK", Icon: Notebook },
     { path: "/jurnal/baru", label: "Formulir Jurnal BK", Icon: Pencil, isCenter: true },
@@ -27,7 +27,7 @@ const NAV_ITEMS: NavItem[] = [
     { path: "/siswa", label: "Siswa", Icon: Users },
 ];
 
-export default function BottomNav() {
+export default function BottomNav({ items = NAV_ITEMS }: { items?: BottomNavItem[] }) {
     const pathname = usePathname();
     const [ripples, setRipples] = useState<Ripple[]>([]);
     const navBarRef = useRef<HTMLDivElement>(null);
@@ -88,7 +88,7 @@ export default function BottomNav() {
       `}</style>
 
             <nav className="fixed bottom-0 left-0 right-0 z-50 overflow-visible pt-6">
-                <div className="mx-auto max-w-md">
+                <div className="w-full">
                     <div
                         ref={navBarRef}
                         className="relative flex h-16 items-end justify-center rounded-t-md bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"
@@ -109,7 +109,7 @@ export default function BottomNav() {
                             ))}
                         </div>
 
-                        {NAV_ITEMS.map((item) => {
+                        {items.map((item) => {
                             const Icon = item.Icon;
 
                             if (item.isCenter) {
@@ -131,8 +131,8 @@ export default function BottomNav() {
                             }
 
                             const isActive =
-                                item.path === "/"
-                                    ? pathname === "/"
+                                item.path === "/" || item.path === "/pjr" || item.path === "/admin"
+                                    ? pathname === item.path
                                     : item.path === "/jurnal"
                                       ? pathname === "/jurnal" ||
                                         (pathname.startsWith("/jurnal/") && pathname !== "/jurnal/baru")
