@@ -4,18 +4,14 @@ import {
   FileText,
   Filter,
   Lock,
+  LockOpen,
   MessageSquare,
   Plus,
   Search,
-  Share2,
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import {
-  formatNamaGuru,
-  formatTanggalIndo,
-  getMajorBadgeClass,
-} from '@/lib/utils';
+import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
 
@@ -91,7 +87,7 @@ export default async function JurnalListPage({
       subtitle="Cari, filter, dan pantau perkembangan kasus siswa"
     >
       {/* Top Action + Filter Bar */}
-      <div className="mb-5 rounded-xl border border-zinc-200 bg-white p-4 shadow-xs">
+      <div className="mb-5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
         <form method="GET" className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className="relative lg:col-span-2">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -177,7 +173,7 @@ export default async function JurnalListPage({
 
       {/* Results */}
       {journals.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
           <FileText className="mx-auto h-9 w-9 text-zinc-300" />
           <p className="mt-2 text-sm font-semibold text-zinc-800">
             Tidak ada jurnal ditemukan
@@ -188,85 +184,93 @@ export default async function JurnalListPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {journals.map((item) => (
-            <Link
-              key={item.id}
-              href={`/jurnal/${item.id}`}
-              className="flex flex-col justify-between rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-[#047857]/40 hover:shadow-sm"
-            >
-              <div>
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-zinc-900">
-                        {item.siswa.nama_lengkap}
-                      </span>
-                      <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">
-                        {item.snapshot_ruang}
-                      </span>
-                      <span
-                        className={`rounded px-2 py-0.5 text-xs font-semibold ${getMajorBadgeClass(
-                          item.siswa.jurusan.kode
-                        )}`}
-                      >
-                        {item.siswa.jurusan.kode}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {formatTanggalIndo(item.tanggal_konseling)} •{' '}
-                      {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+          {journals.map((item) => {
+            const kategoriLabel = item.kategori
+              .map((k) => k.kategori.nama_kategori)
+              .join(', ');
+
+            return (
+              <Link
+                key={item.id}
+                href={`/jurnal/${item.id}`}
+                className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-[15px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
+                      {item.siswa.nama_lengkap}
+                    </h3>
+                    <p className="mt-1 truncate text-xs font-medium text-zinc-500">
+                      {item.snapshot_ruang} • {item.siswa.jurusan.kode}
+                      {kategoriLabel && (
+                        <>
+                          {' '}
+                          <span className="text-zinc-300">|</span>{' '}
+                          <span className="font-semibold text-[#047857]">
+                            {kategoriLabel}
+                          </span>
+                        </>
+                      )}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  {/* Ikon Flat Gembok Buka (Hijau - PJR) / Gembok Tutup (Merah - Privat) */}
+                  <span
+                    title={
+                      item.is_shared_with_pjr
+                        ? 'Dibagikan ke PJR'
+                        : 'Privat Internal BK'
+                    }
+                    aria-label={
+                      item.is_shared_with_pjr
+                        ? 'Dibagikan ke PJR'
+                        : 'Privat Internal BK'
+                    }
+                    className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
+                      item.is_shared_with_pjr
+                        ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                        : 'border-rose-200 bg-rose-50 text-rose-600'
+                    }`}
+                  >
                     {item.is_shared_with_pjr ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                        <Share2 className="h-3 w-3" />
-                        PJR
-                      </span>
+                      <LockOpen className="h-4 w-4" />
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-600">
-                        <Lock className="h-3 w-3" />
-                        Privat
+                      <Lock className="h-4 w-4" />
+                    )}
+                  </span>
+                </div>
+
+                <p className="line-clamp-1 text-[13.5px] leading-relaxed text-zinc-600">
+                  {item.permasalahan}
+                </p>
+
+                <div className="flex items-center justify-between gap-2 border-t border-zinc-100/90 pt-2">
+                  <span className="min-w-0 truncate text-[11px] font-medium text-zinc-400">
+                    {formatTanggalIndo(item.tanggal_konseling)} •{' '}
+                    {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                  </span>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                    {item._count.feedback > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#047857]">
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        {item._count.feedback}
                       </span>
                     )}
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                      className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${
                         item.status === 'SELESAI'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-[#ECFDF5] text-[#047857]'
+                          : 'bg-amber-50 text-amber-700'
                       }`}
                     >
-                      {item.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
+                      {item.status === 'SELESAI' ? 'Selesai' : 'Proses'}
                     </span>
                   </div>
                 </div>
-
-                <p className="mt-2.5 line-clamp-2 text-sm text-zinc-700">
-                  {item.permasalahan}
-                </p>
-              </div>
-
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-100 pt-2.5">
-                <div className="flex flex-wrap gap-1.5">
-                  {item.kategori.map((k) => (
-                    <span
-                      key={k.kategori_id}
-                      className="rounded bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-600"
-                    >
-                      #{k.kategori.nama_kategori}
-                    </span>
-                  ))}
-                </div>
-                {item._count.feedback > 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#047857]">
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    {item._count.feedback}
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
     </AppShell>
