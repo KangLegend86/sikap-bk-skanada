@@ -4,6 +4,10 @@ import { ChevronRight, FileText, Users } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import {
+  getCachedActiveJurusanList,
+  getCachedActiveRuangList,
+} from '@/lib/master-cache';
 import AppShell from '@/components/layout/AppShell';
 import {
   SiswaFilterClient,
@@ -63,14 +67,8 @@ export default async function SiswaDirectoryPage({
 
   const [totalCount, ruangList, jurusanList] = await Promise.all([
     prisma.siswa.count({ where: whereClause }),
-    prisma.ruangKelas.findMany({
-      where: { is_active: true },
-      orderBy: { nama_ruang: 'asc' },
-    }),
-    prisma.jurusan.findMany({
-      where: { is_active: true },
-      orderBy: { kode: 'asc' },
-    }),
+    getCachedActiveRuangList(),
+    getCachedActiveJurusanList(),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -85,9 +83,13 @@ export default async function SiswaDirectoryPage({
     ],
     skip: (currentPage - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
-    include: {
-      jurusan: true,
-      ruang_kelas: true,
+    select: {
+      id: true,
+      no_absen: true,
+      nama_lengkap: true,
+      jenis_kelamin: true,
+      jurusan: { select: { kode: true } },
+      ruang_kelas: { select: { nama_ruang: true } },
       _count: { select: { jurnal: true } },
     },
   });
@@ -160,11 +162,10 @@ export default async function SiswaDirectoryPage({
                 {/* Avatar Inisial dengan aksen gender halus */}
                 <div
                   aria-hidden="true"
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-xs font-extrabold tracking-tight ${
-                    isMale
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-xs font-extrabold tracking-tight ${isMale
                       ? 'border-sky-200/80 bg-sky-50 text-sky-700'
                       : 'border-rose-200/80 bg-rose-50 text-rose-600'
-                  }`}
+                    }`}
                 >
                   {getInitials(s.nama_lengkap)}
                 </div>
@@ -188,11 +189,10 @@ export default async function SiswaDirectoryPage({
                 <div className="flex shrink-0 items-center gap-1.5">
                   <span
                     title={`${s._count.jurnal} jurnal konseling`}
-                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
-                      hasJurnal
+                    className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${hasJurnal
                         ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
                         : 'border-zinc-200/70 bg-zinc-50 text-zinc-400'
-                    }`}
+                      }`}
                   >
                     <FileText className="h-3 w-3" />
                     {s._count.jurnal}

@@ -24,14 +24,28 @@ export default async function JurnalBaruPage() {
         { no_absen: 'asc' },
         { nama_lengkap: 'asc' },
       ],
-      include: {
-        jurusan: true,
+      select: {
+        id: true,
+        no_absen: true,
+        nama_lengkap: true,
+        jenis_kelamin: true,
+        jurusan: { select: { kode: true } },
         ruang_kelas: {
-          include: {
+          select: {
+            nama_ruang: true,
             akun_pjr: {
               where: { is_active: true, role: 'GURU_PJR' },
-              include: { pegawai: true },
               take: 1,
+              select: {
+                pegawai: {
+                  select: {
+                    nama_lengkap: true,
+                    gelar: true,
+                    jenis_kelamin: true,
+                    no_whatsapp: true,
+                  },
+                },
+              },
             },
           },
         },

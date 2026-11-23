@@ -83,6 +83,9 @@ model Siswa {
   jurnal         JurnalBk[]
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
+
+  @@index([is_active, ruang_kelas_id])
+  @@index([jurusan_id])
 }
 
 model KategoriBk {
@@ -113,6 +116,11 @@ model JurnalBk {
   feedback           PjrFeedback[]
   created_at         DateTime         @default(now())
   updated_at         DateTime         @updatedAt
+
+  @@index([tanggal_konseling(sort: Desc), created_at(sort: Desc)])
+  @@index([status])
+  @@index([snapshot_ruang])
+  @@index([siswa_id])
 }
 
 model JurnalKategori {

@@ -79,7 +79,7 @@ export function AppShell({
             <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/logo-sikap-bk.svg"
+                src="/images/logo-sikap-bk.webp"
                 alt="Logo SiKAP BK Skanada"
                 className="w-full h-full object-contain"
               />

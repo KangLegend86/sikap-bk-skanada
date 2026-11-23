@@ -9,6 +9,10 @@ import {
 import type { Prisma } from '@prisma/client';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import {
+  getCachedActiveJurusanList,
+  getCachedActiveRuangList,
+} from '@/lib/master-cache';
 import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import {
@@ -101,14 +105,8 @@ export default async function JurnalListPage({
 
   const [totalCount, ruangList, jurusanList] = await Promise.all([
     prisma.jurnalBk.count({ where: whereClause }),
-    prisma.ruangKelas.findMany({
-      where: { is_active: true },
-      orderBy: { nama_ruang: 'asc' },
-    }),
-    prisma.jurusan.findMany({
-      where: { is_active: true },
-      orderBy: { kode: 'asc' },
-    }),
+    getCachedActiveRuangList(),
+    getCachedActiveJurusanList(),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -119,15 +117,30 @@ export default async function JurnalListPage({
     orderBy: [{ tanggal_konseling: 'desc' }, { created_at: 'desc' }],
     skip: (currentPage - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
-    include: {
+    select: {
+      id: true,
+      tanggal_konseling: true,
+      snapshot_ruang: true,
+      permasalahan: true,
+      status: true,
+      is_shared_with_pjr: true,
       siswa: {
-        include: {
-          jurusan: true,
-          ruang_kelas: true,
+        select: {
+          nama_lengkap: true,
+          jurusan: { select: { kode: true } },
         },
       },
-      guru_bk: true,
-      kategori: { include: { kategori: true } },
+      guru_bk: {
+        select: {
+          nama_lengkap: true,
+          gelar: true,
+        },
+      },
+      kategori: {
+        select: {
+          kategori: { select: { nama_kategori: true } },
+        },
+      },
       _count: { select: { feedback: true } },
     },
   });

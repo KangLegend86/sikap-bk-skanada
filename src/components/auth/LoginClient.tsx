@@ -89,7 +89,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               <div className="relative flex w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/logo-sikap-bk.svg"
+                  src="/images/logo-sikap-bk.webp"
                   alt="Logo SiKAP BK Skanada"
                   className="absolute left-0 top-1/2 aspect-square h-[68px] w-[68px] -translate-y-1/2 object-contain sm:h-[76px] sm:w-[76px]"
                 />
