@@ -41,4 +41,5 @@ yarn-error.log*
 next-env.d.ts
 DATA_SISWA_SKANADA.csv
 data_guru_skanada.xlsx
+data_guru_skanada.csv
 
