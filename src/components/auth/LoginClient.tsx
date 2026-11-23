@@ -49,11 +49,11 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
       }}
     >
       <main className="flex flex-1 flex-col items-center justify-center px-4 pt-6 pb-4 sm:px-6 sm:py-3">
-        <div className="flex w-full max-w-[360px] flex-1 flex-col items-center sm:max-w-[420px] sm:flex-none sm:rounded-3xl sm:border sm:border-white/80 sm:bg-white/85 sm:px-8 sm:py-4 sm:shadow-[0_24px_60px_rgba(4,120,87,0.12)] sm:backdrop-blur-md">
+        <div className="flex w-full max-w-90 flex-1 flex-col items-center sm:max-w-105 sm:flex-none sm:rounded-3xl sm:border sm:border-white/80 sm:bg-white/85 sm:px-8 sm:py-4 sm:shadow-[0_24px_60px_rgba(4,120,87,0.12)] sm:backdrop-blur-md">
           <div className="my-auto flex w-full flex-col items-center sm:my-0">
           {/* Brand Header */}
           <header className="flex w-full flex-col items-center">
-            <div className="flex h-24 w-24 items-center justify-center p-1.5 sm:h-[68px] sm:w-[68px] sm:p-0.5">
+            <div className="flex h-24 w-24 items-center justify-center p-1.5 sm:h-17 sm:w-17 sm:p-0.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/logo-maarif.jpg"
@@ -62,9 +62,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               />
             </div>
 
-            <div className="relative mt-2 h-[40px] w-full max-w-[292px] sm:h-[43px]">
+            <div className="relative mt-2 h-10 w-full max-w-73 sm:h-10.75">
               <svg
-                className="pointer-events-none absolute left-1/2 top-[21px] z-0 block h-[27px] w-[223px] -translate-x-1/2 sm:top-6 sm:h-[29px] sm:w-[239px]"
+                className="pointer-events-none absolute left-1/2 top-5.25 z-0 block h-6.75 w-55.75 -translate-x-1/2 sm:top-6 sm:h-7.25 sm:w-59.75"
                 viewBox="0 0 239 29"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                   fill="#FCD20B"
                 />
               </svg>
-              <div className="relative z-10 flex h-[32px] w-full items-center justify-center px-2 sm:h-[34px]">
+              <div className="relative z-10 flex h-8 w-full items-center justify-center px-2 sm:h-8.5">
                 <h1
                   className={`${fontScriptClass} whitespace-nowrap text-[28px] font-normal leading-none text-[#047857] sm:text-[30px]`}
                 >
@@ -85,13 +85,13 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
             </div>
 
             {/* Brand Lockup */}
-            <div className="mt-2 flex w-full max-w-[328px] flex-col items-center gap-1.5">
+            <div className="mt-2 flex w-full max-w-82 flex-col items-center gap-1.5">
               <div className="relative flex w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/logo-sikap-bk.webp"
                   alt="Logo SiKAP BK Skanada"
-                  className="absolute left-0 top-1/2 aspect-square h-[68px] w-[68px] -translate-y-1/2 object-contain sm:h-[76px] sm:w-[76px]"
+                  className="absolute left-0 top-1/2 aspect-square h-17 w-17 -translate-y-1/2 object-contain sm:h-19 sm:w-19"
                 />
                 <div className="flex flex-col items-center gap-1.5">
                   <div
@@ -111,7 +111,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                 </div>
               </div>
 
-              <div className="relative h-[36px] w-full max-w-[323px] sm:h-[38px]">
+              <div className="relative h-9 w-full max-w-80.75 sm:h-9.5">
                 <svg
                   className="absolute inset-0 block h-full w-full"
                   viewBox="0 0 323 38"
@@ -157,7 +157,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               </div>
             </div>
 
-            <div className="mt-2 flex w-full max-w-[328px] items-center justify-center gap-3">
+            <div className="mt-2 flex w-full max-w-82 items-center justify-center gap-3">
               <span className="h-0.5 flex-1 bg-[#035526]" />
               <span className="whitespace-nowrap text-center text-sm font-extrabold leading-none text-[#004C15] sm:text-base">
                 SMKS NU 2 Kedungpring
@@ -189,13 +189,13 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                 <label htmlFor="login-username" className="sr-only">
                   Username
                 </label>
-                <div className="group flex h-[52px] items-center rounded-xl border border-[#A7F3D0] bg-white/95 pl-3.5 pr-3 shadow-[0_2px_8px_rgba(4,120,87,0.04)] transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12 sm:h-[44px]">
+                <div className="group flex h-13 items-center rounded-xl border border-[#A7F3D0] bg-white/95 pl-3.5 pr-3 shadow-[0_2px_8px_rgba(4,120,87,0.04)] transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12 sm:h-11">
                   <User
-                    className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#047857]"
+                    className="h-4.5 w-4.5 shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#047857]"
                     strokeWidth={2}
                     aria-hidden="true"
                   />
-                  <span className="mx-3 h-[22px] w-px shrink-0 bg-[#D1FAE5] transition-colors group-focus-within:bg-[#047857]/25" />
+                  <span className="mx-3 h-5.5 w-px shrink-0 bg-[#D1FAE5] transition-colors group-focus-within:bg-[#047857]/25" />
                   <input
                     id="login-username"
                     value={username}
@@ -220,13 +220,13 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                 <label htmlFor="login-password" className="sr-only">
                   Password
                 </label>
-                <div className="group flex h-[52px] items-center rounded-xl border border-[#A7F3D0] bg-white/95 pl-3.5 pr-1.5 shadow-[0_2px_8px_rgba(4,120,87,0.04)] transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12 sm:h-[44px]">
+                <div className="group flex h-13 items-center rounded-xl border border-[#A7F3D0] bg-white/95 pl-3.5 pr-1.5 shadow-[0_2px_8px_rgba(4,120,87,0.04)] transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12 sm:h-11">
                   <Lock
-                    className="h-[18px] w-[18px] shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#047857]"
+                    className="h-4.5 w-4.5 shrink-0 text-[#5C7362] transition-colors group-focus-within:text-[#047857]"
                     strokeWidth={2}
                     aria-hidden="true"
                   />
-                  <span className="mx-3 h-[22px] w-px shrink-0 bg-[#D1FAE5] transition-colors group-focus-within:bg-[#047857]/25" />
+                  <span className="mx-3 h-5.5 w-px shrink-0 bg-[#D1FAE5] transition-colors group-focus-within:bg-[#047857]/25" />
                   <input
                     id="login-password"
                     value={password}
@@ -256,9 +256,9 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-[18px] w-[18px]" strokeWidth={2} />
+                      <EyeOff className="h-4.5 w-4.5" strokeWidth={2} />
                     ) : (
-                      <Eye className="h-[18px] w-[18px]" strokeWidth={2} />
+                      <Eye className="h-4.5 w-4.5" strokeWidth={2} />
                     )}
                   </button>
                 </div>
@@ -275,8 +275,8 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               </div>
 
               {/* Remember & Forgot Password */}
-              <div className="flex min-h-[36px] items-center justify-between px-0.5 sm:min-h-[28px]">
-                <label className="inline-flex min-h-[36px] cursor-pointer items-center gap-2 text-xs font-medium text-[#495E4E] select-none sm:min-h-[28px]">
+              <div className="flex min-h-9 items-center justify-between px-0.5 sm:min-h-7">
+                <label className="inline-flex min-h-9 cursor-pointer items-center gap-2 text-xs font-medium text-[#495E4E] select-none sm:min-h-7">
                   <span className="relative flex h-4 w-4 items-center justify-center">
                     <input
                       checked={remember}
@@ -298,7 +298,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
                   type="button"
                   onClick={() => setShowForgotHint((prev) => !prev)}
                   aria-expanded={showForgotHint}
-                  className="min-h-[36px] cursor-pointer rounded-md px-1 text-xs font-semibold text-[#047857] transition-colors hover:text-[#065F46] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#047857]"
+                  className="min-h-9 cursor-pointer rounded-md px-1 text-xs font-semibold text-[#047857] transition-colors hover:text-[#065F46] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#047857]"
                 >
                   Lupa Password?
                 </button>
@@ -318,16 +318,16 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
               <button
                 type="submit"
                 disabled={isPending}
-                className="mt-0.5 flex h-[50px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[linear-gradient(354deg,#004914_0%,#4C8D5E_100%)] text-sm font-semibold tracking-wide text-white shadow-[0_6px_16px_rgba(0,73,20,0.28)] transition-all hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#004914] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65 sm:h-[44px]"
+                className="mt-0.5 flex h-12.5 w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[linear-gradient(354deg,#004914_0%,#4C8D5E_100%)] text-sm font-semibold tracking-wide text-white shadow-[0_6px_16px_rgba(0,73,20,0.28)] transition-all hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#004914] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-65 sm:h-11"
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="h-[18px] w-[18px] animate-spin" strokeWidth={2.2} />
+                    <Loader2 className="h-4.5 w-4.5 animate-spin" strokeWidth={2.2} />
                     <span>Memverifikasi...</span>
                   </>
                 ) : (
                   <>
-                    <LogIn className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                    <LogIn className="h-4.5 w-4.5" strokeWidth={2.2} />
                     <span>Masuk</span>
                   </>
                 )}
@@ -338,7 +338,7 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
           {/* Quote Banner */}
           <div className="mt-3 flex w-full justify-center sm:mt-2">
             <svg
-              className="block h-auto w-full max-w-[290px] sm:max-w-[215px]"
+              className="block h-auto w-full max-w-72.5 sm:max-w-53.75"
               viewBox="0 0 300 100"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -419,12 +419,12 @@ export function LoginClient({ fontScriptClass, fontQuoteClass }: LoginClientProp
 
           {/* App Footer */}
           <footer className="mt-auto flex w-full flex-col items-center justify-center gap-1 pt-4 sm:mt-2 sm:pt-1">
-            <div className="flex h-2 w-[72px] items-start py-1" aria-hidden="true">
+            <div className="flex h-2 w-18 items-start py-1" aria-hidden="true">
               <span className="h-0.5 w-7 shrink-0 bg-[#047857]" />
               <span className="h-0.5 w-4 shrink-0 bg-[#FFCC00]" />
               <span className="h-0.5 w-7 shrink-0 bg-[#047857]" />
             </div>
-            <p className="text-center text-xs font-medium leading-[18px] text-[#047857]">
+            <p className="text-center text-xs font-medium leading-4.5 text-[#047857]">
               Aplikasi Penilaian Sikap &amp; Bimbingan Konseling
             </p>
             <p className="text-center text-[11px] font-normal leading-4 text-[#4D6452]">

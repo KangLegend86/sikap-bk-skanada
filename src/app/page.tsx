@@ -96,7 +96,7 @@ export default async function HomePage() {
             <Calendar className="h-4 w-4 shrink-0 text-[#047857]" />
             <span>{todayLabel}</span>
           </div>
-          <span className="rounded-[6px] border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#047857]">
+          <span className="rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#047857]">
             BK SKANADA
           </span>
         </div>
@@ -112,19 +112,19 @@ export default async function HomePage() {
 
         {/* 3 Kartu Angka Ringkas */}
         <section className="grid grid-cols-3 gap-2 sm:gap-3" aria-label="Ringkasan Bulan Ini">
-          <div className="rounded-[12px] border border-zinc-200/80 bg-white p-3">
+          <div className="rounded-xl border border-zinc-200/80 bg-white p-3">
             <div className="text-xs font-medium text-zinc-500">Bulan Ini</div>
             <div className="mt-0.5 text-xl font-extrabold text-zinc-900">
               {totalBulanIni}
             </div>
           </div>
-          <div className="rounded-[12px] border border-zinc-200/80 bg-white p-3">
+          <div className="rounded-xl border border-zinc-200/80 bg-white p-3">
             <div className="text-xs font-medium text-zinc-500">Proses</div>
             <div className="mt-0.5 text-xl font-extrabold text-amber-600">
               {dalamProsesCount}
             </div>
           </div>
-          <div className="rounded-[12px] border border-zinc-200/80 bg-white p-3">
+          <div className="rounded-xl border border-zinc-200/80 bg-white p-3">
             <div className="text-xs font-medium text-zinc-500">Selesai</div>
             <div className="mt-0.5 text-xl font-extrabold text-[#047857]">
               {selesaiCount}
@@ -138,7 +138,7 @@ export default async function HomePage() {
           <section className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">
                   <FileText className="h-4 w-4" />
                 </div>
                 <h2 className="text-[13px] font-extrabold tracking-wider text-zinc-700 uppercase">
@@ -154,7 +154,7 @@ export default async function HomePage() {
             </div>
 
             {recentJournals.length === 0 ? (
-              <div className="rounded-[12px] border border-dashed border-zinc-300 bg-white p-8 text-center">
+              <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-8 text-center">
                 <FileText className="mx-auto h-8 w-8 text-zinc-300" />
                 <p className="mt-2 text-sm font-semibold text-zinc-700">
                   Belum ada catatan jurnal konseling.
@@ -239,7 +239,7 @@ export default async function HomePage() {
           <section className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] border border-sky-200 bg-sky-50 text-sky-700">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-sky-200 bg-sky-50 text-sky-700">
                   <MessageSquare className="h-4 w-4" />
                 </div>
                 <h2 className="text-[13px] font-extrabold tracking-wider text-zinc-700 uppercase">
@@ -252,7 +252,7 @@ export default async function HomePage() {
             </div>
 
             {recentFeedbacks.length === 0 ? (
-              <div className="rounded-[12px] border border-dashed border-zinc-300 bg-white p-8 text-center">
+              <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-8 text-center">
                 <MessageSquare className="mx-auto h-7 w-7 text-zinc-300" />
                 <p className="mt-2 text-xs font-medium text-zinc-500">
                   Belum ada catatan pantauan dari Guru PJR.

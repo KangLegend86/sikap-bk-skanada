@@ -73,7 +73,7 @@ export function AppShell({
               aria-label="Kembali"
               className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#17331E] hover:bg-[#D1FAE5] flex items-center justify-center shrink-0 transition-colors active:scale-95"
             >
-              <ChevronLeft className="w-[18px] h-[18px] stroke-[2.4]" />
+              <ChevronLeft className="w-4.5 h-4.5 stroke-[2.4]" />
             </Link>
           ) : (
             <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-1.5 flex items-center justify-center shrink-0">
@@ -103,7 +103,7 @@ export function AppShell({
                   {fullName}
                 </h1>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="px-2 py-0.5 rounded-[6px] bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] text-[11px] font-mono font-semibold uppercase shrink-0">
+                  <span className="px-2 py-0.5 rounded-md bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] text-[11px] font-mono font-semibold uppercase shrink-0">
                     {roleBadge}
                   </span>
                 </div>
