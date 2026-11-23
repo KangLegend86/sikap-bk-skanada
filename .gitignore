@@ -39,6 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.gitignore
 DATA_SISWA_SKANADA.csv
-.gitignore
+data_guru_skanada.xlsx
+

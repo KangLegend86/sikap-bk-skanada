@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
+import { formatTanggalIndo } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
 export default async function HomePage() {

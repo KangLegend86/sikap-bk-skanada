@@ -83,62 +83,6 @@ export async function logoutAction() {
   redirect('/login');
 }
 
-export async function updateOwnAccountAction(
-  _prevState: AuthActionState,
-  formData: FormData
-): Promise<AuthActionState> {
-  const session = await getSession();
-  if (!session) return { error: 'Sesi login telah berakhir.' };
-
-  const newUsername = String(formData.get('username') ?? '').trim().toLowerCase();
-  const newPassword = String(formData.get('password') ?? '').trim();
-
-  if (!newUsername || newUsername.length < 3) {
-    return { error: 'Username minimal 3 karakter.' };
-  }
-
-  // Cek keunikan username jika diubah
-  if (newUsername !== session.username) {
-    const existing = await prisma.userAccount.findUnique({
-      where: { username: newUsername },
-    });
-    if (existing) {
-      return { error: `Username "${newUsername}" sudah digunakan pengguna lain.` };
-    }
-  }
-
-  const updateData: { username: string; password_hash?: string } = {
-    username: newUsername,
-  };
-
-  if (newPassword.length > 0) {
-    if (newPassword.length < 6) {
-      return { error: 'Password baru minimal 6 karakter.' };
-    }
-    updateData.password_hash = await bcrypt.hash(newPassword, 10);
-  }
-
-  const updated = await prisma.userAccount.update({
-    where: { id: session.userId },
-    data: updateData,
-    include: { pegawai: true, ruang_kelas: true },
-  });
-
-  await setSessionCookie({
-    userId: updated.id,
-    pegawaiId: updated.pegawai.id,
-    username: updated.username,
-    namaLengkap: updated.pegawai.nama_lengkap,
-    gelar: updated.pegawai.gelar,
-    jenisKelamin: updated.pegawai.jenis_kelamin,
-    role: updated.role,
-    ruangKelasId: updated.ruang_kelas_id,
-    namaRuang: updated.ruang_kelas?.nama_ruang ?? null,
-  });
-
-  return { success: 'Profil akun berhasil diperbarui!' };
-}
-
 export async function updateUsernameAction(
   _prevState: AuthActionState,
   formData: FormData

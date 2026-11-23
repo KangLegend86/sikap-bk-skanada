@@ -21,7 +21,7 @@ const PJR_NAV_ITEMS: BottomNavItem[] = [
   { path: '/pjr', label: 'Beranda', Icon: Home },
   { path: '/pjr/kasus', label: 'Pantauan', Icon: ClipboardList },
   { path: '/pjr/siswa', label: 'Siswa', Icon: Users },
-  { path: '/akun', label: 'Akun', Icon: User },
+  { path: '/akun/profil', label: 'Profil', Icon: User },
 ];
 
 const ADMIN_NAV_ITEMS: BottomNavItem[] = [
@@ -29,7 +29,7 @@ const ADMIN_NAV_ITEMS: BottomNavItem[] = [
   { path: '/admin/rekap', label: 'Rekap', Icon: FileText },
   { path: '/admin/master', label: 'Master', Icon: Database },
   { path: '/admin/users', label: 'Akun', Icon: Shield },
-  { path: '/akun', label: 'Profil', Icon: Settings },
+  { path: '/akun/profil', label: 'Profil', Icon: Settings },
 ];
 
 export function AppShell({
