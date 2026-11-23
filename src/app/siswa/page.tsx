@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ChevronRight, FileText, Users } from 'lucide-react';
+import type { Prisma } from '@prisma/client';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import AppShell from '@/components/layout/AppShell';
@@ -48,7 +49,7 @@ export default async function SiswaDirectoryPage({
   const requestedPage =
     Number.isFinite(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
 
-  const whereClause = {
+  const whereClause: Prisma.SiswaWhereInput = {
     is_active: true,
     ...(ruangFilter ? { ruang_kelas: { nama_ruang: ruangFilter } } : {}),
     ...(jurusanFilter ? { jurusan: { kode: jurusanFilter } } : {}),

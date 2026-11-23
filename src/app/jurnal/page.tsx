@@ -6,6 +6,7 @@ import {
   LockOpen,
   MessageSquare,
 } from 'lucide-react';
+import type { Prisma } from '@prisma/client';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
@@ -76,7 +77,7 @@ export default async function JurnalListPage({
 
   const dateRange = getDateRangeForPeriode(periodeFilter);
 
-  const whereClause = {
+  const whereClause: Prisma.JurnalBkWhereInput = {
     ...(statusFilter ? { status: statusFilter } : {}),
     ...(dateRange ? { tanggal_konseling: dateRange } : {}),
     ...(ruangFilter ? { snapshot_ruang: ruangFilter } : {}),
