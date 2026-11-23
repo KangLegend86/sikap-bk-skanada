@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { SplashScreen } from "@/components/layout/SplashScreen";
 import { TopProgressBar } from "@/components/layout/TopProgressBar";
 import "./globals.css";
 
@@ -56,7 +55,6 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#FAFAFA] text-zinc-900">
-        <SplashScreen />
         <Suspense fallback={null}>
           <TopProgressBar />
         </Suspense>
