@@ -273,14 +273,26 @@ export function JurnalFormClient({
     minute: '2-digit',
   });
 
+  const formattedTanggalKonseling = (() => {
+    if (!tanggalKonseling) return 'Pilih tanggal konseling';
+    const [y, m, d] = tanggalKonseling.split('-').map(Number);
+    if (!y || !m || !d) return tanggalKonseling;
+    return new Date(y, m - 1, d).toLocaleDateString('id-ID', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  })();
+
   return (
     <>
-      <div className="mx-auto w-full max-w-[520px]">
+      <div className="mx-auto w-full max-w-130">
         {/* Info Strip Petugas */}
         <div className="mb-3.5 flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[11px] text-zinc-600 shadow-2xs">
           <div className="flex items-center gap-2 font-semibold text-zinc-800">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            <span>{counselorName} (BK)</span>
+            <span>{counselorName}</span>
           </div>
           <span className="font-mono text-[10.5px] text-zinc-500">
             {liveDate}
@@ -303,13 +315,25 @@ export function JurnalFormClient({
                 Wajib
               </span>
             </div>
-            <input
-              type="date"
-              required
-              value={tanggalKonseling}
-              onChange={(e) => setTanggalKonseling(e.target.value)}
-              className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 font-mono text-[13.5px] text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
-            />
+            <div className="relative flex w-full items-center justify-between rounded-[11px] border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-[13.5px] font-semibold text-zinc-900 transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12">
+              <span>{formattedTanggalKonseling}</span>
+              <Calendar className="h-4 w-4 shrink-0 text-zinc-400" />
+              <input
+                type="date"
+                required
+                aria-label="Tanggal Konseling"
+                value={tanggalKonseling}
+                onChange={(e) => setTanggalKonseling(e.target.value)}
+                onClick={(e) => {
+                  try {
+                    e.currentTarget.showPicker?.();
+                  } catch {
+                    // Fallback ke picker bawaan browser
+                  }
+                }}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+            </div>
           </section>
 
           {/* 1. IDENTITAS SISWA */}
@@ -340,7 +364,7 @@ export function JurnalFormClient({
                       setShowStudentDropdown(true);
                     }}
                     onFocus={() => setShowStudentDropdown(true)}
-                    placeholder="Ketik nama siswa, kelas (XII-A), atau absen..."
+                    placeholder="Ketik nama siswa, kelas atau absen"
                     className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 py-2.5 pr-3 pl-9 text-[13.5px] text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
                   />
                 </div>
@@ -515,7 +539,7 @@ export function JurnalFormClient({
                       >
                         <div className="flex items-center gap-2.5">
                           <span
-                            className={`flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border-[1.5px] text-[11px] font-bold transition-colors ${
+                            className={`flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border-[1.5px] text-[11px] font-bold transition-colors ${
                               isChecked
                                 ? 'border-[#047857] bg-[#047857] text-white'
                                 : 'border-zinc-300 bg-white text-transparent'
@@ -541,7 +565,7 @@ export function JurnalFormClient({
                             setShowCatDropdown(false);
                             setCatModalOpen(true);
                           }}
-                          className="flex h-[26px] w-[26px] cursor-pointer items-center justify-center rounded-[7px] border border-zinc-200 bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900"
+                          className="flex h-6.5 w-6.5 cursor-pointer items-center justify-center rounded-[7px] border border-zinc-200 bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900"
                         >
                           <Edit2 className="h-3 w-3" />
                         </button>
@@ -586,7 +610,7 @@ export function JurnalFormClient({
             {/* Permasalahan */}
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] bg-rose-100 text-rose-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-rose-100 text-rose-600">
                   <AlertCircle className="h-3 w-3" />
                 </span>
                 <span>
@@ -599,14 +623,14 @@ export function JurnalFormClient({
                 onChange={(e) => setPermasalahan(e.target.value)}
                 rows={3}
                 placeholder="Fakta kronologi kejadian atau pelanggaran yang terjadi..."
-                className="min-h-[96px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-24 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Kendala */}
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] bg-amber-100 text-amber-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-amber-100 text-amber-600">
                   <Search className="h-3 w-3" />
                 </span>
                 <span>Kendala</span>
@@ -616,14 +640,14 @@ export function JurnalFormClient({
                 onChange={(e) => setKendala(e.target.value)}
                 rows={2}
                 placeholder="Faktor pemicu dari siswa, keluarga, atau lingkungan..."
-                className="min-h-[76px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Solusi */}
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] bg-emerald-100 text-emerald-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-600">
                   <Lightbulb className="h-3 w-3" />
                 </span>
                 <span>Solusi</span>
@@ -633,14 +657,14 @@ export function JurnalFormClient({
                 onChange={(e) => setSolusi(e.target.value)}
                 rows={2}
                 placeholder="Kesepakatan / komitmen bersama siswa di ruang BK..."
-                className="min-h-[76px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Tindak Lanjut */}
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] bg-sky-100 text-sky-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-600">
                   <Send className="h-3 w-3" />
                 </span>
                 <span>
@@ -653,14 +677,14 @@ export function JurnalFormClient({
                 onChange={(e) => setTindakLanjut(e.target.value)}
                 rows={2}
                 placeholder="Aksi koordinasi keluar (PJR, Orang Tua, Guru Mapel)..."
-                className="min-h-[76px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Catatan */}
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] bg-slate-100 text-slate-600">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600">
                   <FileText className="h-3 w-3" />
                 </span>
                 <span>Catatan</span>
@@ -670,7 +694,7 @@ export function JurnalFormClient({
                 onChange={(e) => setCatatan(e.target.value)}
                 rows={2}
                 placeholder="Memo tambahan konselor / observasi sikap siswa..."
-                className="min-h-[76px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
           </section>
@@ -686,7 +710,7 @@ export function JurnalFormClient({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 rounded-[13px] border border-zinc-200 bg-zinc-100 p-[5px]">
+            <div className="grid grid-cols-2 gap-1.5 rounded-[13px] border border-zinc-200 bg-zinc-100 p-1.25">
               <button
                 type="button"
                 onClick={() => setStatus('DALAM_PROSES')}
@@ -716,7 +740,7 @@ export function JurnalFormClient({
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
                 <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
                     status === 'DALAM_PROSES'
                       ? 'bg-amber-100 text-amber-600'
                       : 'bg-emerald-100 text-emerald-600'
@@ -743,7 +767,7 @@ export function JurnalFormClient({
                     ? 'Tuliskan alasan masih dalam proses, jadwal pemantauan berikutnya, atau kendala...'
                     : 'Tuliskan ringkasan penutupan kasus atau hasil akhir pembinaan...'
                 }
-                className="min-h-[68px] w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-17 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
           </section>
@@ -781,7 +805,7 @@ export function JurnalFormClient({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <div
-                    className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] border transition-colors ${
+                    className={`flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-[10px] border transition-colors ${
                       isSharedWithPjr
                         ? 'border-[#047857] bg-[#047857] text-white'
                         : 'border-zinc-200 bg-white text-zinc-700'
@@ -814,7 +838,7 @@ export function JurnalFormClient({
                 {/* Toggle Switch Modern */}
                 <div
                   aria-hidden="true"
-                  className={`relative h-[26px] w-[46px] shrink-0 rounded-full p-[3px] transition-colors ${
+                  className={`relative h-6.5 w-11.5 shrink-0 rounded-full p-0.75 transition-colors ${
                     isSharedWithPjr ? 'bg-[#047857]' : 'bg-zinc-300'
                   }`}
                 >
@@ -856,7 +880,7 @@ export function JurnalFormClient({
               disabled={isSubmitting}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[13px] bg-[#047857] px-4 py-3.5 text-[14.5px] font-bold text-white shadow-[0_4px_12px_rgba(13,106,55,0.22)] transition-all hover:bg-[#065F46] disabled:opacity-60"
             >
-              <Save className="h-[18px] w-[18px]" />
+              <Save className="h-4.5 w-4.5" />
               <span>{isSubmitting ? 'Menyimpan...' : 'Simpan Jurnal BK'}</span>
             </button>
 
@@ -865,7 +889,7 @@ export function JurnalFormClient({
               onClick={() => setWaModalOpen(true)}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[13px] border border-zinc-300 bg-white px-4 py-3 text-[13.5px] font-semibold text-zinc-800 transition-colors hover:border-zinc-400 hover:bg-zinc-50"
             >
-              <MessageCircle className="h-[17px] w-[17px] text-[#047857]" />
+              <MessageCircle className="h-4.25 w-4.25 text-[#047857]" />
               <span>Pratinjau WhatsApp PJR</span>
             </button>
           </div>
@@ -875,7 +899,7 @@ export function JurnalFormClient({
       {/* Modal Tambah / Edit Kategori */}
       {catModalOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-zinc-900/55 p-4 backdrop-blur-[3px]">
-          <div className="flex w-full max-w-[420px] flex-col gap-3.5 rounded-[18px] bg-white p-5 shadow-2xl">
+          <div className="flex w-full max-w-105 flex-col gap-3.5 rounded-[18px] bg-white p-5 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-bold text-zinc-900">
                 {editingCat ? 'Edit Nama Kategori' : 'Tambah Kategori Baru'}
@@ -921,11 +945,11 @@ export function JurnalFormClient({
       {/* Modal Pratinjau WhatsApp */}
       {waModalOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center bg-zinc-900/55 p-4 backdrop-blur-[3px]">
-          <div className="flex w-full max-w-[420px] flex-col gap-3 rounded-[18px] bg-white p-4 shadow-2xl">
+          <div className="flex w-full max-w-105 flex-col gap-3 rounded-[18px] bg-white p-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#008069] text-white">
-                  <MessageCircle className="h-[18px] w-[18px]" />
+                  <MessageCircle className="h-4.5 w-4.5" />
                 </div>
                 <div>
                   <h3 className="text-sm leading-tight font-bold text-zinc-900">

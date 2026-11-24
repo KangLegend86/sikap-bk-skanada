@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
+  CheckCircle2,
+  Clock,
   FileText,
   Lock,
   LockOpen,
@@ -230,7 +232,7 @@ export default async function JurnalListPage({
                     <Link
                       key={item.id}
                       href={`/jurnal/${item.id}`}
-                      className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+                      className="group flex flex-col justify-between gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -263,16 +265,16 @@ export default async function JurnalListPage({
                               ? 'Dibagikan ke PJR'
                               : 'Privat Internal BK'
                           }
-                          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
+                          className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
                             item.is_shared_with_pjr
                               ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
                               : 'border-rose-200 bg-rose-50 text-rose-600'
                           }`}
                         >
                           {item.is_shared_with_pjr ? (
-                            <LockOpen className="h-4 w-4" />
+                            <LockOpen className="h-3.5 w-3.5" />
                           ) : (
-                            <Lock className="h-4 w-4" />
+                            <Lock className="h-3.5 w-3.5" />
                           )}
                         </span>
                       </div>
@@ -281,7 +283,7 @@ export default async function JurnalListPage({
                         {item.permasalahan}
                       </p>
 
-                      <div className="flex items-center justify-between gap-2 border-t border-zinc-100/90 pt-2">
+                      <div className="flex items-center justify-between gap-2 border-t border-[#c3c1c1] pt-2">
                         <span className="min-w-0 truncate text-[11px] font-medium text-zinc-400">
                           {formatTanggalIndo(item.tanggal_konseling)} •{' '}
                           {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
@@ -295,13 +297,19 @@ export default async function JurnalListPage({
                             </span>
                           )}
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${
+                            title={item.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
+                            aria-label={item.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
+                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${
                               item.status === 'SELESAI'
-                                ? 'bg-[#ECFDF5] text-[#047857]'
-                                : 'bg-amber-50 text-amber-700'
+                                ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                                : 'border-amber-200 bg-amber-50 text-amber-600'
                             }`}
                           >
-                            {item.status === 'SELESAI' ? 'Selesai' : 'Proses'}
+                            {item.status === 'SELESAI' ? (
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            ) : (
+                              <Clock className="h-3.5 w-3.5" />
+                            )}
                           </span>
                         </div>
                       </div>

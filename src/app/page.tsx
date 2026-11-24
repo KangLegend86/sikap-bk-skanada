@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
   Calendar,
+  CheckCircle2,
+  Clock,
   FilePenLine,
   FileText,
   Lock,
@@ -10,7 +12,7 @@ import {
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { formatTanggalIndo } from '@/lib/utils';
+import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
 export default async function HomePage() {
@@ -49,16 +51,31 @@ export default async function HomePage() {
     prisma.jurnalBk.findMany({
       take: 5,
       orderBy: [{ tanggal_konseling: 'desc' }, { created_at: 'desc' }],
-      include: {
+      select: {
+        id: true,
+        tanggal_konseling: true,
+        snapshot_ruang: true,
+        permasalahan: true,
+        status: true,
+        is_shared_with_pjr: true,
         siswa: {
-          include: {
-            jurusan: true,
-            ruang_kelas: true,
+          select: {
+            nama_lengkap: true,
+            jurusan: { select: { kode: true } },
+          },
+        },
+        guru_bk: {
+          select: {
+            nama_lengkap: true,
+            gelar: true,
           },
         },
         kategori: {
-          include: { kategori: true },
+          select: {
+            kategori: { select: { nama_kategori: true } },
+          },
         },
+        _count: { select: { feedback: true } },
       },
     }),
     prisma.pjrFeedback.findMany({
@@ -174,7 +191,7 @@ export default async function HomePage() {
                     <Link
                       key={item.id}
                       href={`/jurnal/${item.id}`}
-                      className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+                      className="group flex flex-col justify-between gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -207,16 +224,16 @@ export default async function HomePage() {
                               ? 'Dibagikan ke PJR'
                               : 'Privat Internal BK'
                           }
-                          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border ${
+                          className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
                             item.is_shared_with_pjr
                               ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
                               : 'border-rose-200 bg-rose-50 text-rose-600'
                           }`}
                         >
                           {item.is_shared_with_pjr ? (
-                            <LockOpen className="h-4 w-4" />
+                            <LockOpen className="h-3.5 w-3.5" />
                           ) : (
-                            <Lock className="h-4 w-4" />
+                            <Lock className="h-3.5 w-3.5" />
                           )}
                         </span>
                       </div>
@@ -225,8 +242,35 @@ export default async function HomePage() {
                         {item.permasalahan}
                       </p>
 
-                      <div className="truncate border-t border-zinc-100/90 pt-2 text-[11px] font-medium text-zinc-400">
-                        {formatTanggalIndo(item.tanggal_konseling)}
+                      <div className="flex items-center justify-between gap-2 border-t border-[#c3c1c1] pt-2">
+                        <span className="min-w-0 truncate text-[11px] font-medium text-zinc-400">
+                          {formatTanggalIndo(item.tanggal_konseling)} •{' '}
+                          {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                        </span>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          {item._count.feedback > 0 && (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#047857]">
+                              <MessageSquare className="h-3.5 w-3.5" />
+                              {item._count.feedback}
+                            </span>
+                          )}
+                          <span
+                            title={item.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
+                            aria-label={item.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
+                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${
+                              item.status === 'SELESAI'
+                                ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                                : 'border-amber-200 bg-amber-50 text-amber-600'
+                            }`}
+                          >
+                            {item.status === 'SELESAI' ? (
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            ) : (
+                              <Clock className="h-3.5 w-3.5" />
+                            )}
+                          </span>
+                        </div>
                       </div>
                     </Link>
                   );
@@ -269,7 +313,7 @@ export default async function HomePage() {
                     <Link
                       key={fb.id}
                       href={`/jurnal/${fb.jurnal_id}`}
-                      className="group flex flex-col justify-between gap-2.5 rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-sky-600/30 hover:shadow-[0_6px_18px_-4px_rgba(2,132,199,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+                      className="group flex flex-col justify-between gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-sky-600/30 hover:shadow-[0_6px_18px_-4px_rgba(2,132,199,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
                     >
                       <div className="min-w-0">
                         <h3 className="truncate text-[15px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-sky-700">
@@ -288,7 +332,7 @@ export default async function HomePage() {
                         &ldquo;{fb.pesan_pantauan}&rdquo;
                       </p>
 
-                      <div className="truncate border-t border-zinc-100/90 pt-2 text-[11px] font-medium text-zinc-400">
+                      <div className="truncate border-t border-[#c3c1c1] pt-2 text-[11px] font-medium text-zinc-400">
                         {formatTanggalIndo(fb.created_at)}
                       </div>
                     </Link>

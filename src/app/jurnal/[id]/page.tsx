@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import {
-  ArrowLeft,
   Calendar,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  FileText,
   Lock,
+  LockOpen,
   MessageCircle,
   MessageSquare,
-  Share2,
   User,
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
@@ -15,12 +18,17 @@ import {
   formatNamaGuru,
   formatTanggalIndo,
   formatWaNumber,
-  getMajorBadgeClass,
   getSapaan,
 } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import { JurnalStatusUpdateClient } from '@/components/jurnal/JurnalStatusUpdateClient';
 
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'S';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
 
 export default async function JurnalDetailPage({
   params,
@@ -68,9 +76,18 @@ export default async function JurnalDetailPage({
 
   if (!jurnal) notFound();
 
+  const canEdit =
+    session.role === 'ADMIN' || jurnal.guru_bk_id === session.pegawaiId;
+
   const pjrAkun = jurnal.siswa.ruang_kelas.akun_pjr[0];
   const pjrWa = formatWaNumber(pjrAkun?.pegawai.no_whatsapp);
   const ortuWa = formatWaNumber(jurnal.siswa.no_hp_ortu);
+  const isMale = jurnal.siswa.jenis_kelamin === 'L';
+  const isSelesai = jurnal.status === 'SELESAI';
+  const counselorName = formatNamaGuru(
+    jurnal.guru_bk.nama_lengkap,
+    jurnal.guru_bk.gelar
+  );
 
   const pjrWaText = pjrAkun
     ? encodeURIComponent(
@@ -97,260 +114,333 @@ export default async function JurnalDetailPage({
       )
     : '';
 
+  const chronologicalItems = [
+    { num: '1', label: 'Permasalahan', content: jurnal.permasalahan },
+    ...(jurnal.kendala
+      ? [{ num: '2', label: 'Kendala', content: jurnal.kendala }]
+      : []),
+    ...(jurnal.solusi
+      ? [{ num: '3', label: 'Solusi', content: jurnal.solusi }]
+      : []),
+    { num: '4', label: 'Tindak Lanjut', content: jurnal.tindak_lanjut },
+    ...(jurnal.catatan
+      ? [{ num: '5', label: 'Catatan Tambahan', content: jurnal.catatan }]
+      : []),
+  ];
+
   return (
     <AppShell
       session={session}
-      title="Detail Jurnal Konseling"
+      title="Detail Jurnal BK"
       subtitle={`${jurnal.siswa.nama_lengkap} • ${jurnal.snapshot_ruang}`}
+      backHref="/jurnal"
     >
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <Link
-          href="/jurnal"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Kembali ke Daftar Jurnal
-        </Link>
-        <Link
-          href={`/siswa/${jurnal.siswa_id}`}
-          className="text-xs font-semibold text-[#047857] hover:underline"
-        >
-          Lihat Riwayat Siswa →
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left: Main Chronological Content */}
-        <div className="space-y-4 lg:col-span-2">
-          {/* Header Card */}
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-bold text-zinc-900">
-                    {jurnal.siswa.nama_lengkap}
-                  </h2>
-                  <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-700">
-                    {jurnal.snapshot_ruang}
-                  </span>
-                  <span
-                    className={`rounded-md px-2 py-0.5 text-xs font-semibold ${getMajorBadgeClass(
-                      jurnal.siswa.jurusan.kode
-                    )}`}
-                  >
-                    {jurnal.siswa.jurusan.kode}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500">
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {formatTanggalIndo(jurnal.tanggal_konseling)}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    Konselor:{' '}
-                    {formatNamaGuru(
-                      jurnal.guru_bk.nama_lengkap,
-                      jurnal.guru_bk.gelar
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                {jurnal.is_shared_with_pjr ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                    <Share2 className="h-3.5 w-3.5" />
-                    Dibagikan ke PJR
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600">
-                    <Lock className="h-3.5 w-3.5" />
-                    Privat BK
-                  </span>
-                )}
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    jurnal.status === 'SELESAI'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}
-                >
-                  {jurnal.status === 'SELESAI' ? 'Selesai' : 'Dalam Proses'}
-                </span>
-              </div>
+      <div className="mx-auto max-w-2xl space-y-4">
+        {/* 1. Student Identity & Case Summary Card */}
+        <section className="rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+          {/* Tappable Student Row */}
+          <Link
+            href={`/siswa/${jurnal.siswa_id}`}
+            className="group flex items-center gap-3 rounded-xl transition-colors"
+          >
+            <div
+              aria-hidden="true"
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-xs font-extrabold tracking-tight ${
+                isMale
+                  ? 'border-sky-200/80 bg-sky-50 text-sky-700'
+                  : 'border-rose-200/80 bg-rose-50 text-rose-600'
+              }`}
+            >
+              {getInitials(jurnal.siswa.nama_lengkap)}
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-[15.5px] font-bold tracking-[-0.01em] text-zinc-950 transition-colors group-hover:text-[#047857]">
+                {jurnal.siswa.nama_lengkap}
+              </h2>
+              <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
+                {jurnal.snapshot_ruang}{' '}
+                <span className="text-zinc-300">|</span>{' '}
+                <span className="font-semibold text-[#047857]">
+                  {jurnal.siswa.jurusan.kode}
+                </span>
+              </p>
+              <span className="mt-0.5 inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#047857]">
+                Lihat Riwayat Siswa
+                <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </div>
+
+            {/* Compact Status & Privacy Icons */}
+            <div className="flex shrink-0 items-center gap-1.5">
+              <span
+                title={
+                  jurnal.is_shared_with_pjr
+                    ? 'Dibagikan ke PJR'
+                    : 'Privat Internal BK'
+                }
+                aria-label={
+                  jurnal.is_shared_with_pjr
+                    ? 'Dibagikan ke PJR'
+                    : 'Privat Internal BK'
+                }
+                className={`inline-flex h-7 w-7 items-center justify-center rounded-full border ${
+                  jurnal.is_shared_with_pjr
+                    ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                    : 'border-rose-200 bg-rose-50 text-rose-600'
+                }`}
+              >
+                {jurnal.is_shared_with_pjr ? (
+                  <LockOpen className="h-3.5 w-3.5" />
+                ) : (
+                  <Lock className="h-3.5 w-3.5" />
+                )}
+              </span>
+
+              <span
+                title={isSelesai ? 'Selesai' : 'Dalam Proses'}
+                aria-label={isSelesai ? 'Selesai' : 'Dalam Proses'}
+                className={`inline-flex h-7 w-7 items-center justify-center rounded-full border ${
+                  isSelesai
+                    ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
+                    : 'border-amber-200 bg-amber-50 text-amber-600'
+                }`}
+              >
+                {isSelesai ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : (
+                  <Clock className="h-3.5 w-3.5" />
+                )}
+              </span>
+            </div>
+          </Link>
+
+          {/* Category Tags */}
+          {jurnal.kategori.length > 0 && (
+            <div className="mt-3.5 flex flex-wrap gap-1.5">
               {jurnal.kategori.map((k) => (
                 <span
                   key={k.kategori_id}
-                  className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700"
+                  className="rounded-full border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]"
                 >
-                  #{k.kategori.nama_kategori}
+                  {k.kategori.nama_kategori}
                 </span>
               ))}
             </div>
+          )}
+
+          {/* Meta Footer */}
+          <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-[#c3c1c1] pt-3 text-[11.5px] font-medium text-zinc-500">
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5 text-[#047857]" />
+              {formatTanggalIndo(jurnal.tanggal_konseling)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <User className="h-3.5 w-3.5 text-zinc-400" />
+              {counselorName}
+            </span>
           </div>
+        </section>
 
-          {/* 5 Chronological Fields */}
-          <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
-            <div>
-              <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                1. Permasalahan
-              </h3>
-              <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-zinc-800">
-                {jurnal.permasalahan}
-              </p>
-            </div>
-
-            {jurnal.kendala && (
-              <div className="border-t border-zinc-100 pt-4">
-                <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                  2. Kendala
-                </h3>
-                <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-zinc-800">
-                  {jurnal.kendala}
-                </p>
-              </div>
-            )}
-
-            {jurnal.solusi && (
-              <div className="border-t border-zinc-100 pt-4">
-                <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                  3. Solusi
-                </h3>
-                <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-zinc-800">
-                  {jurnal.solusi}
-                </p>
-              </div>
-            )}
-
-            <div className="border-t border-zinc-100 pt-4">
-              <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                4. Tindak Lanjut
-              </h3>
-              <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-zinc-800">
-                {jurnal.tindak_lanjut}
-              </p>
-            </div>
-
-            {jurnal.catatan && (
-              <div className="border-t border-zinc-100 pt-4">
-                <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                  5. Catatan Tambahan
-                </h3>
-                <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-zinc-800">
-                  {jurnal.catatan}
-                </p>
-              </div>
-            )}
-
-            {jurnal.keterangan_status && (
-              <div className="rounded-lg bg-zinc-50 p-3 text-xs text-zinc-700">
-                <span className="font-semibold">Keterangan Status: </span>
-                {jurnal.keterangan_status}
-              </div>
-            )}
-          </div>
-
-          {/* PJR Feedback Thread */}
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-                <MessageSquare className="h-4 w-4 text-[#047857]" />
-                Catatan Pantauan Guru PJR ({jurnal.feedback.length})
+        {/* 2. Chronological Counseling Notes */}
+        <section className="rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+          <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">
+                <FileText className="h-4 w-4" />
+              </span>
+              <h3 className="text-xs font-extrabold tracking-wider text-zinc-800 uppercase">
+                Catatan Konseling
               </h3>
             </div>
-
-            {jurnal.feedback.length === 0 ? (
-              <p className="mt-3 text-xs text-zinc-500">
-                {jurnal.is_shared_with_pjr
-                  ? 'Belum ada pantauan yang dikirim oleh Guru PJR kelas ini.'
-                  : 'Jurnal ini bersifat Privat BK sehingga tidak tampil di halaman Guru PJR.'}
-              </p>
-            ) : (
-              <div className="mt-3 space-y-3">
-                {jurnal.feedback.map((fb) => (
-                  <div
-                    key={fb.id}
-                    className="rounded-lg border border-zinc-100 bg-zinc-50 p-3.5"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-zinc-900">
-                        {formatNamaGuru(
-                          fb.user_pjr.pegawai.nama_lengkap,
-                          fb.user_pjr.pegawai.gelar
-                        )}{' '}
-                        ({fb.user_pjr.ruang_kelas?.nama_ruang ?? jurnal.snapshot_ruang})
-                      </span>
-                      <span className="text-[11px] text-zinc-500">
-                        {formatTanggalIndo(fb.created_at)}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 whitespace-pre-line text-sm text-zinc-700">
-                      {fb.pesan_pantauan}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[10.5px] font-bold ${
+                isSelesai
+                  ? 'bg-[#ECFDF5] text-[#047857]'
+                  : 'bg-amber-50 text-amber-700'
+              }`}
+            >
+              {isSelesai ? 'Selesai' : 'Dalam Proses'}
+            </span>
           </div>
-        </div>
 
-        {/* Right: Status Update & Quick WhatsApp */}
-        <div className="space-y-4">
+          <div className="mt-3.5 divide-y divide-zinc-100">
+            {chronologicalItems.map((field) => (
+              <div key={field.num} className="py-3 first:pt-0 last:pb-0">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                    {field.num}
+                  </span>
+                  <h4 className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
+                    {field.label}
+                  </h4>
+                </div>
+                <p className="mt-1.5 pl-7 whitespace-pre-line text-[13.5px] leading-relaxed text-zinc-800">
+                  {field.content}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {jurnal.keterangan_status && (
+            <div
+              className={`mt-4 flex items-start gap-2.5 rounded-xl border p-3 text-xs leading-relaxed ${
+                isSelesai
+                  ? 'border-[#A7F3D0] bg-[#ECFDF5]/70 text-[#065F46]'
+                  : 'border-amber-200 bg-amber-50/70 text-amber-900'
+              }`}
+            >
+              {isSelesai ? (
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
+              ) : (
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              )}
+              <div>
+                <span className="font-bold">Keterangan Status: </span>
+                <span>{jurnal.keterangan_status}</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* 3. Status Update (Pembuat / Admin) atau Mode Lihat Saja */}
+        {canEdit ? (
           <JurnalStatusUpdateClient
             jurnalId={jurnal.id}
             initialStatus={jurnal.status}
             initialKeterangan={jurnal.keterangan_status ?? ''}
           />
+        ) : (
+          <section className="rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-500">
+                <Lock className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="text-sm font-bold text-zinc-900">
+                  Mode Lihat Saja
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+                  Jurnal ini dicatat oleh{' '}
+                  <strong className="font-semibold text-zinc-700">
+                    {counselorName}
+                  </strong>
+                  . Anda hanya dapat mengedit jurnal yang Anda buat sendiri.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs">
-            <h3 className="text-sm font-bold text-zinc-900">
-              Koordinasi WhatsApp
-            </h3>
-            <p className="mt-0.5 text-xs text-zinc-500">
-              Kirim ringkasan tindak lanjut secara cepat.
-            </p>
-
-            <div className="mt-3 space-y-2">
-              {pjrWa ? (
-                <a
-                  href={`https://wa.me/${pjrWa}?text=${pjrWaText}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Chat WA Guru PJR ({jurnal.snapshot_ruang})
-                </a>
-              ) : (
-                <div className="rounded-lg border border-dashed border-zinc-200 p-2.5 text-center text-xs text-zinc-400">
-                  Nomor WA Guru PJR belum tersedia
-                </div>
-              )}
-
-              {ortuWa ? (
-                <a
-                  href={`https://wa.me/${ortuWa}?text=${ortuWaText}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-600 bg-white px-3 py-2.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Chat WA Orang Tua / Wali
-                </a>
-              ) : (
-                <div className="rounded-lg border border-dashed border-zinc-200 p-2.5 text-center text-xs text-zinc-400">
-                  Nomor WA Orang Tua belum diisi
-                </div>
-              )}
+        {/* 4. Koordinasi WhatsApp */}
+        <section className="rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+          <div className="flex items-center gap-2 border-b border-zinc-100 pb-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]">
+              <MessageCircle className="h-4 w-4" />
+            </span>
+            <div>
+              <h3 className="text-xs font-extrabold tracking-wider text-zinc-800 uppercase">
+                Koordinasi WhatsApp
+              </h3>
+              <p className="text-[11px] text-zinc-400">
+                Kirim ringkasan tindak lanjut secara cepat
+              </p>
             </div>
           </div>
-        </div>
+
+          <div className="mt-3.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {pjrWa ? (
+              <a
+                href={`https://wa.me/${pjrWa}?text=${pjrWaText}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#047857] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-[#065F46] active:scale-[0.985]"
+              >
+                <MessageCircle className="h-4 w-4 shrink-0" />
+                <span>WA Guru PJR ({jurnal.snapshot_ruang})</span>
+              </a>
+            ) : (
+              <div className="flex items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/70 px-3 py-2.5 text-center text-xs text-zinc-400">
+                No. WA PJR {jurnal.snapshot_ruang} belum diisi
+              </div>
+            )}
+
+            {ortuWa ? (
+              <a
+                href={`https://wa.me/${ortuWa}?text=${ortuWaText}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-xl border border-[#047857] bg-white px-3.5 py-2.5 text-xs font-bold text-[#047857] transition-all hover:bg-[#ECFDF5] active:scale-[0.985]"
+              >
+                <MessageCircle className="h-4 w-4 shrink-0" />
+                <span>WA Orang Tua / Wali</span>
+              </a>
+            ) : (
+              <div className="flex items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/70 px-3 py-2.5 text-center text-xs text-zinc-400">
+                No. WA Orang Tua belum diisi
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* 5. Catatan Pantauan Guru PJR */}
+        <section className="rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+          <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-sky-200 bg-sky-50 text-sky-700">
+                <MessageSquare className="h-4 w-4" />
+              </span>
+              <h3 className="text-xs font-extrabold tracking-wider text-zinc-800 uppercase">
+                Pantauan Guru PJR
+              </h3>
+            </div>
+            <span className="font-mono text-xs text-zinc-400">
+              {jurnal.feedback.length} Laporan
+            </span>
+          </div>
+
+          {jurnal.feedback.length === 0 ? (
+            <div className="mt-3.5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50/60 p-5 text-center">
+              <p className="text-xs font-medium text-zinc-500">
+                {jurnal.is_shared_with_pjr
+                  ? 'Belum ada catatan pantauan yang dikirim oleh Guru PJR kelas ini.'
+                  : 'Jurnal ini bersifat Privat Internal BK sehingga tidak ditampilkan ke Guru PJR.'}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-3.5 space-y-2.5">
+              {jurnal.feedback.map((fb) => {
+                const ruangPjr =
+                  fb.user_pjr.ruang_kelas?.nama_ruang ?? jurnal.snapshot_ruang;
+                return (
+                  <div
+                    key={fb.id}
+                    className="rounded-xl border border-zinc-200/60 bg-zinc-50/80 p-3.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-xs font-bold text-zinc-900">
+                        {formatNamaGuru(
+                          fb.user_pjr.pegawai.nama_lengkap,
+                          fb.user_pjr.pegawai.gelar
+                        )}
+                      </span>
+                      <span className="shrink-0 rounded-md border border-sky-200 bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700">
+                        PJR {ruangPjr}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 whitespace-pre-line text-[13.5px] leading-relaxed text-zinc-700">
+                      {fb.pesan_pantauan}
+                    </p>
+                    <div className="mt-2 border-t border-zinc-200/70 pt-1.5 text-[11px] font-medium text-zinc-400">
+                      {formatTanggalIndo(fb.created_at)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
     </AppShell>
   );
 }
-

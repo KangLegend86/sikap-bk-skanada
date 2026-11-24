@@ -112,6 +112,19 @@ export async function updateJurnalStatusAction(
     return { error: 'Anda tidak memiliki akses untuk mengubah status jurnal.' };
   }
 
+  const existing = await prisma.jurnalBk.findUnique({
+    where: { id: jurnalId },
+    select: { guru_bk_id: true },
+  });
+
+  if (!existing) {
+    return { error: 'Jurnal tidak ditemukan.' };
+  }
+
+  if (session.role === 'GURU_BK' && existing.guru_bk_id !== session.pegawaiId) {
+    return { error: 'Anda hanya dapat mengedit jurnal yang Anda buat sendiri.' };
+  }
+
   await prisma.jurnalBk.update({
     where: { id: jurnalId },
     data: {

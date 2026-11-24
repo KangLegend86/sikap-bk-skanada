@@ -1,36 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  ChevronLeft,
-  ClipboardList,
-  Database,
-  FileText,
-  Home,
-  Settings,
-  Shield,
-  User,
-  Users,
-} from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
 import { formatNamaGuru } from '@/lib/utils';
-import BottomNav, { type BottomNavItem } from '@/components/BottomNav';
 import { AccountMenuDropdown } from '@/components/layout/AccountMenuDropdown';
-
-const PJR_NAV_ITEMS: BottomNavItem[] = [
-  { path: '/pjr', label: 'Beranda', Icon: Home },
-  { path: '/pjr/kasus', label: 'Pantauan', Icon: ClipboardList },
-  { path: '/pjr/siswa', label: 'Siswa', Icon: Users },
-  { path: '/akun/profil', label: 'Profil', Icon: User },
-];
-
-const ADMIN_NAV_ITEMS: BottomNavItem[] = [
-  { path: '/admin', label: 'Beranda', Icon: Home },
-  { path: '/admin/rekap', label: 'Rekap', Icon: FileText },
-  { path: '/admin/master', label: 'Master', Icon: Database },
-  { path: '/admin/users', label: 'Akun', Icon: Shield },
-  { path: '/akun/profil', label: 'Profil', Icon: Settings },
-];
 
 export function AppShell({
   session,
@@ -53,13 +27,6 @@ export function AppShell({
       : session.role === 'GURU_PJR'
         ? `PJR ${session.namaRuang || ''}`
         : 'Guru BK';
-
-  const roleNavItems =
-    session.role === 'GURU_PJR'
-      ? PJR_NAV_ITEMS
-      : session.role === 'ADMIN'
-        ? ADMIN_NAV_ITEMS
-        : undefined;
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
@@ -115,13 +82,10 @@ export function AppShell({
         <AccountMenuDropdown session={session} />
       </header>
 
-      {/* Page Body */}
+      {/* Page Body (pb-24 menjaga ruang untuk PersistentBottomNav) */}
       <main className="flex-1 w-full max-w-5xl mx-auto p-4 pb-24">
         {children}
       </main>
-
-      {/* Bottom Navigation Bar (untuk semua ukuran layar & semua role) */}
-      <BottomNav items={roleNavItems} />
     </div>
   );
 }

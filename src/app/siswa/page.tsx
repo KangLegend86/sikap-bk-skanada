@@ -157,7 +157,7 @@ export default async function SiswaDirectoryPage({
               <Link
                 key={s.id}
                 href={`/siswa/${s.id}`}
-                className="group flex items-center gap-3 rounded-2xl border border-zinc-200/70 bg-white p-3.5 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
+                className="group flex items-center gap-3 rounded-xl border border-zinc-200/70 bg-white p-3.5 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)] transition-all duration-150 ease-out hover:border-[#047857]/30 hover:shadow-[0_6px_18px_-4px_rgba(4,120,87,0.12)] active:scale-[0.985] active:bg-zinc-50/90 active:shadow-xs"
               >
                 {/* Avatar Inisial dengan aksen gender halus */}
                 <div

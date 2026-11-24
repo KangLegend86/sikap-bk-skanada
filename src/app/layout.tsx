@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { getSession } from "@/lib/auth";
+import { PersistentBottomNav } from "@/components/layout/PersistentBottomNav";
 import { TopProgressBar } from "@/components/layout/TopProgressBar";
 import "./globals.css";
 
@@ -44,11 +46,13 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html
       lang="id"
@@ -59,6 +63,7 @@ export default function RootLayout({
           <TopProgressBar />
         </Suspense>
         {children}
+        <PersistentBottomNav role={session?.role ?? null} />
       </body>
     </html>
   );

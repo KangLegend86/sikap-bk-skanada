@@ -23,7 +23,7 @@ const NAV_ITEMS: BottomNavItem[] = [
     { path: "/", label: "Beranda", Icon: Home },
     { path: "/jurnal", label: "Jurnal BK", Icon: Notebook },
     { path: "/jurnal/baru", label: "Formulir Jurnal BK", Icon: Pencil, isCenter: true },
-    { path: "/jurnal-sikap", label: "Jurnal Sikap", Icon: Contact },
+    { path: "/jurnal-sikap", label: "Sikap", Icon: Contact },
     { path: "/siswa", label: "Siswa", Icon: Users },
 ];
 
@@ -122,7 +122,7 @@ export default function BottomNav({ items = NAV_ITEMS }: { items?: BottomNavItem
                                         className="relative z-10 flex flex-1 flex-col items-center justify-end gap-2 overflow-visible pb-6"
                                     >
                                         <div className="relative z-10 flex items-center justify-center rounded-full border-[6px] border-[#e3e3e3]">
-                                            <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-emerald-700 shadow-[0_4px_20px_0_rgba(4,120,87,0.2)]">
+                                            <div className="flex h-13 w-13 items-center justify-center rounded-full bg-emerald-700 shadow-[0_4px_20px_0_rgba(4,120,87,0.2)]">
                                                 <Icon className="h-6 w-6 text-white" />
                                             </div>
                                         </div>
@@ -150,7 +150,7 @@ export default function BottomNav({ items = NAV_ITEMS }: { items?: BottomNavItem
                                             <Icon className="h-6 w-6" />
                                         </div>
                                         <span
-                                            className={`text-xs font-bold leading-normal ${isActive ? "text-emerald-700" : "text-[#5E5F60]"
+                                            className={`whitespace-nowrap text-xs font-bold leading-normal ${isActive ? "text-emerald-700" : "text-[#5E5F60]"
                                                 }`}
                                         >
                                             {item.label}
