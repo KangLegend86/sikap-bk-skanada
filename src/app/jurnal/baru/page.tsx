@@ -91,8 +91,8 @@ export default async function JurnalBaruPage() {
   return (
     <AppShell
       session={session}
-      title="Form Jurnal BK"
-      subtitle="SMKS NU 2 Kedungpring"
+      title="Formulir Jurnal BK"
+      subtitle="Catat Bimbingan Konseling Siswa"
       backHref="/"
     >
       <JurnalFormClient

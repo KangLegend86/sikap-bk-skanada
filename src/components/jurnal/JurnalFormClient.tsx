@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
-  AlertCircle,
   Calendar,
   Check,
   CheckCheck,
@@ -13,9 +13,8 @@ import {
   Copy,
   Edit2,
   Eye,
-  FileText,
-  Lightbulb,
   Lock,
+  LockOpen,
   MessageCircle,
   PenLine,
   Plus,
@@ -94,6 +93,12 @@ export function JurnalFormClient({
   const [solusi, setSolusi] = useState('');
   const [tindakLanjut, setTindakLanjut] = useState('');
   const [catatan, setCatatan] = useState('');
+  const [showCatatan, setShowCatatan] = useState(false);
+
+  const autoResizeTextarea = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
 
   // Status & Privasi PJR
   const [status, setStatus] = useState<'DALAM_PROSES' | 'SELESAI'>('DALAM_PROSES');
@@ -104,6 +109,28 @@ export function JurnalFormClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [waModalOpen, setWaModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!waModalOpen && !catModalOpen) return;
+
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setWaModalOpen(false);
+        setCatModalOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [waModalOpen, catModalOpen]);
 
   useEffect(() => {
     function handleClickOutside(e: PointerEvent) {
@@ -239,11 +266,11 @@ export function JurnalFormClient({
 
     const tanggalFormatted = tanggalKonseling
       ? new Date(`${tanggalKonseling}T12:00:00+07:00`).toLocaleDateString('id-ID', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        })
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
       : '-';
 
     let msg = `*LAPORAN KOORDINASI BIMBINGAN KONSELING*\n`;
@@ -287,35 +314,35 @@ export function JurnalFormClient({
 
   return (
     <>
-      <div className="mx-auto w-full max-w-130">
+      <div className="mx-auto w-full max-w-2xl">
         {/* Info Strip Petugas */}
-        <div className="mb-3.5 flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[11px] text-zinc-600 shadow-2xs">
-          <div className="flex items-center gap-2 font-semibold text-zinc-800">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            <span>{counselorName}</span>
+        <div className="mb-3.5 flex items-center justify-between gap-2 rounded-xl border border-zinc-200/70 bg-white px-3.5 py-2.5 text-xs text-zinc-600 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
+          <div className="flex min-w-0 items-center gap-2 font-semibold text-zinc-800">
+            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-[#047857]" />
+            <span className="truncate">{counselorName}</span>
           </div>
-          <span className="font-mono text-[10.5px] text-zinc-500">
+          <span className="shrink-0 rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2 py-0.5 text-[11px] font-semibold text-[#047857]">
             {liveDate}
           </span>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           {/* TANGGAL KONSELING */}
-          <section className="flex flex-col gap-2.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-2.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Calendar className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
+                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
                   Tanggal Konseling
                 </span>
               </div>
-              <span className="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-[10px] font-semibold text-[#047857]">
+              <span className="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
                 Wajib
               </span>
             </div>
-            <div className="relative flex w-full items-center justify-between rounded-[11px] border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-[13.5px] font-semibold text-zinc-900 transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12">
+            <div className="relative flex w-full items-center justify-between rounded-[11px] border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-sm font-medium text-zinc-600 transition-all focus-within:border-[#047857] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#047857]/12">
               <span>{formattedTanggalKonseling}</span>
               <Calendar className="h-4 w-4 shrink-0 text-zinc-400" />
               <input
@@ -337,17 +364,17 @@ export function JurnalFormClient({
           </section>
 
           {/* 1. IDENTITAS SISWA */}
-          <section className="flex flex-col gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-3.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <User className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
+                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
                   Identitas Siswa
                 </span>
               </div>
-              <span className="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-[10px] font-semibold text-[#047857]">
+              <span className="rounded-full bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
                 Wajib Dipilih
               </span>
             </div>
@@ -365,7 +392,7 @@ export function JurnalFormClient({
                     }}
                     onFocus={() => setShowStudentDropdown(true)}
                     placeholder="Ketik nama siswa, kelas atau absen"
-                    className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 py-2.5 pr-3 pl-9 text-[13.5px] text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                    className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 py-2.5 pr-3 pl-9 text-sm text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
                   />
                 </div>
 
@@ -384,23 +411,28 @@ export function JurnalFormClient({
                             setSelectedStudent(s);
                             setShowStudentDropdown(false);
                           }}
-                          className="flex w-full items-center justify-between gap-2 border-b border-zinc-100 px-3.5 py-2.5 text-left transition-colors last:border-none hover:bg-zinc-50"
+                          className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-zinc-100 px-3.5 py-2.5 text-left transition-colors last:border-none hover:bg-zinc-50"
                         >
-                          <div>
-                            <div className="text-[13px] font-semibold text-zinc-900">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-bold text-zinc-900">
                               {s.namaLengkap}
                             </div>
-                            <div className="font-mono text-[11px] text-zinc-500">
-                              {s.ruangNama} • Absen: {s.noAbsen ?? '-'} •{' '}
-                              {s.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                            <div className="truncate text-[11.5px] font-medium text-zinc-500">
+                              {s.noAbsen ? `Absen ${String(s.noAbsen).padStart(2, '0')} • ` : ''}
+                              {s.ruangNama}{' '}
+                              <span className="text-zinc-300">|</span>{' '}
+                              <span className="font-semibold text-[#047857]">
+                                {s.jurusanKode}
+                              </span>
                             </div>
                           </div>
                           <span
-                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide ${getMajorBadgeClass(
-                              s.jurusanKode
-                            )}`}
+                            className={`shrink-0 rounded-md border px-2 py-0.5 text-[11px] font-bold ${s.jenisKelamin === 'L'
+                              ? 'border-sky-200/80 bg-sky-50 text-sky-700'
+                              : 'border-rose-200/80 bg-rose-50 text-rose-600'
+                              }`}
                           >
-                            {s.jurusanKode}
+                            {s.jenisKelamin}
                           </span>
                         </button>
                       ))
@@ -409,17 +441,35 @@ export function JurnalFormClient({
                 )}
               </div>
             ) : (
-              <div className="flex flex-col gap-3 rounded-[14px] bg-linear-to-br from-zinc-900 to-zinc-800 p-3.5 text-white">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="text-[14.5px] font-bold">
+              <div className="flex flex-col gap-2 rounded-[14px] bg-linear-to-br from-zinc-900 to-zinc-800 p-3.5 text-white">
+                <div className="flex items-start justify-between gap-2 pl-1">
+                  <div className="min-w-0">
+                    <div className="truncate text-[14.5px] font-bold">
                       {selectedStudent.namaLengkap}
                     </div>
-                    <div className="mt-0.5 font-mono text-[11px] text-zinc-400">
-                      Absen: {selectedStudent.noAbsen ?? '-'} •{' '}
-                      {selectedStudent.jenisKelamin === 'L'
-                        ? 'Laki-laki'
-                        : 'Perempuan'}
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11.5px] font-medium text-zinc-300">
+                      <span className="font-mono text-[11px] text-zinc-400">
+                        Absen {selectedStudent.noAbsen ?? '-'}
+                      </span>
+                      <span className="text-zinc-500">•</span>
+                      <span>{selectedStudent.ruangNama}</span>
+                      <span className="text-zinc-500">•</span>
+                      <span
+                        className={`rounded-md border px-1.5 py-0.2 text-[10px] font-bold ${selectedStudent.jenisKelamin === 'L'
+                          ? 'border-sky-400/30 bg-sky-500/15 text-sky-300'
+                          : 'border-rose-400/30 bg-rose-500/15 text-rose-300'
+                          }`}
+                      >
+                        {selectedStudent.jenisKelamin}
+                      </span>
+                      <span className="text-zinc-500">|</span>
+                      <span
+                        className={`rounded-md px-1.5 py-0.2 text-[10px] font-bold ${getMajorBadgeClass(
+                          selectedStudent.jurusanKode
+                        )}`}
+                      >
+                        {selectedStudent.jurusanKode}
+                      </span>
                     </div>
                   </div>
                   <button
@@ -428,33 +478,21 @@ export function JurnalFormClient({
                       setSelectedStudent(null);
                       setSearchQuery('');
                     }}
-                    className="cursor-pointer rounded-[7px] border border-white/15 bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-white/20"
+                    className="shrink-0 cursor-pointer rounded-[7px] border border-white/15 bg-white/12 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-white/20"
                   >
                     Ganti
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5 rounded-[10px] bg-white/6 px-3 py-2.5">
-                  <div>
-                    <div className="mb-0.5 text-[10px] tracking-wider text-zinc-400 uppercase">
-                      Ruang & Jurusan
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[12.5px] font-semibold text-zinc-100">
-                      <span>{selectedStudent.ruangNama}</span>
-                      <span
-                        className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${getMajorBadgeClass(
-                          selectedStudent.jurusanKode
-                        )}`}
-                      >
-                        {selectedStudent.jurusanKode}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-0.5 text-[10px] tracking-wider text-zinc-400 uppercase">
+                <div className="flex items-center gap-2.5 rounded-[10px] bg-white/6 px-3 py-2.5">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-zinc-200">
+                    <User className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="mb-0.5 text-[10px] tracking-wider text-zinc-300 uppercase">
                       Guru PJR
                     </div>
-                    <div className="truncate text-[12.5px] font-semibold text-zinc-100">
+                    <div className="truncate text-[13px] font-semibold text-zinc-100">
                       {selectedStudent.pjrNama || 'Belum ditentukan'}
                     </div>
                   </div>
@@ -464,13 +502,13 @@ export function JurnalFormClient({
           </section>
 
           {/* 2. KATEGORI BIMBINGAN */}
-          <section className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-3 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Tag className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
+                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
                   Kategori Bimbingan
                 </span>
               </div>
@@ -504,7 +542,7 @@ export function JurnalFormClient({
               <button
                 type="button"
                 onClick={() => setShowCatDropdown(!showCatDropdown)}
-                className="flex w-full cursor-pointer items-center justify-between rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] text-zinc-500 transition-colors hover:bg-zinc-100/70"
+                className="flex w-full cursor-pointer items-center justify-between rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-500 transition-colors hover:bg-zinc-100/70"
               >
                 <span className="flex items-center gap-2.5">
                   <Tag className="h-4 w-4 text-zinc-400" />
@@ -521,9 +559,8 @@ export function JurnalFormClient({
                   </span>
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 text-zinc-400 transition-transform ${
-                    showCatDropdown ? 'rotate-180' : ''
-                  }`}
+                  className={`h-4 w-4 text-zinc-400 transition-transform ${showCatDropdown ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -539,18 +576,16 @@ export function JurnalFormClient({
                       >
                         <div className="flex items-center gap-2.5">
                           <span
-                            className={`flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border-[1.5px] text-[11px] font-bold transition-colors ${
-                              isChecked
-                                ? 'border-[#047857] bg-[#047857] text-white'
-                                : 'border-zinc-300 bg-white text-transparent'
-                            }`}
+                            className={`flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border-[1.5px] text-[11px] font-bold transition-colors ${isChecked
+                              ? 'border-[#047857] bg-[#047857] text-white'
+                              : 'border-zinc-300 bg-white text-transparent'
+                              }`}
                           >
                             <Check className="h-3 w-3" />
                           </span>
                           <span
-                            className={`text-[13px] font-semibold ${
-                              isChecked ? 'text-[#047857]' : 'text-zinc-900'
-                            }`}
+                            className={`text-[13px] font-semibold ${isChecked ? 'text-[#047857]' : 'text-zinc-900'
+                              }`}
                           >
                             {c.nama_kategori}
                           </span>
@@ -592,120 +627,160 @@ export function JurnalFormClient({
           </section>
 
           {/* 3. KRONOLOGI PENANGANAN */}
-          <section className="flex flex-col gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-3.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <PenLine className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
-                  Kronologi Penanganan
+                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                  Catatan Konseling
                 </span>
               </div>
-              <span className="text-[10px] font-medium text-zinc-400">
-                ↕ Tarik bawah kolom
-              </span>
             </div>
 
             {/* Permasalahan */}
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-rose-100 text-rose-600">
-                  <AlertCircle className="h-3 w-3" />
+              <label className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                  1
                 </span>
-                <span>
+                <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
                   Permasalahan<span className="ml-0.5 text-rose-600">*</span>
                 </span>
               </label>
               <textarea
                 required
                 value={permasalahan}
-                onChange={(e) => setPermasalahan(e.target.value)}
+                onChange={(e) => {
+                  setPermasalahan(e.target.value);
+                  autoResizeTextarea(e.currentTarget);
+                }}
                 rows={3}
                 placeholder="Fakta kronologi kejadian atau pelanggaran yang terjadi..."
-                className="min-h-24 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-24 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Kendala */}
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-amber-100 text-amber-600">
-                  <Search className="h-3 w-3" />
+              <label className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                  2
                 </span>
-                <span>Kendala</span>
+                <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
+                  Kendala
+                </span>
               </label>
               <textarea
                 value={kendala}
-                onChange={(e) => setKendala(e.target.value)}
+                onChange={(e) => {
+                  setKendala(e.target.value);
+                  autoResizeTextarea(e.currentTarget);
+                }}
                 rows={2}
                 placeholder="Faktor pemicu dari siswa, keluarga, atau lingkungan..."
-                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Solusi */}
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-600">
-                  <Lightbulb className="h-3 w-3" />
+              <label className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                  3
                 </span>
-                <span>Solusi</span>
+                <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
+                  Solusi
+                </span>
               </label>
               <textarea
                 value={solusi}
-                onChange={(e) => setSolusi(e.target.value)}
+                onChange={(e) => {
+                  setSolusi(e.target.value);
+                  autoResizeTextarea(e.currentTarget);
+                }}
                 rows={2}
                 placeholder="Kesepakatan / komitmen bersama siswa di ruang BK..."
-                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
             {/* Tindak Lanjut */}
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-600">
-                  <Send className="h-3 w-3" />
+              <label className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                  4
                 </span>
-                <span>
+                <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
                   Tindak Lanjut<span className="ml-0.5 text-rose-600">*</span>
                 </span>
               </label>
               <textarea
                 required
                 value={tindakLanjut}
-                onChange={(e) => setTindakLanjut(e.target.value)}
+                onChange={(e) => {
+                  setTindakLanjut(e.target.value);
+                  autoResizeTextarea(e.currentTarget);
+                }}
                 rows={2}
                 placeholder="Aksi koordinasi keluar (PJR, Orang Tua, Guru Mapel)..."
-                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-19 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
 
-            {/* Catatan */}
-            <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600">
-                  <FileText className="h-3 w-3" />
-                </span>
-                <span>Catatan</span>
-              </label>
-              <textarea
-                value={catatan}
-                onChange={(e) => setCatatan(e.target.value)}
-                rows={2}
-                placeholder="Memo tambahan konselor / observasi sikap siswa..."
-                className="min-h-19 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
-              />
-            </div>
+            {/* Catatan Tambahan (Collapsible / Opsional) */}
+            {showCatatan || catatan.trim().length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2">
+                    <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#ECFDF5] font-mono text-[10.5px] font-bold text-[#047857]">
+                      5
+                    </span>
+                    <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
+                      Catatan Tambahan
+                    </span>
+                  </label>
+                  {catatan.trim().length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCatatan(false)}
+                      className="cursor-pointer text-[11px] font-medium text-zinc-400 hover:text-zinc-700"
+                    >
+                      Sembunyikan
+                    </button>
+                  )}
+                </div>
+                <textarea
+                  value={catatan}
+                  onChange={(e) => {
+                    setCatatan(e.target.value);
+                    autoResizeTextarea(e.currentTarget);
+                  }}
+                  rows={2}
+                  placeholder="Memo tambahan konselor / observasi sikap siswa..."
+                  className="min-h-19 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                />
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowCatatan(true)}
+                className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#047857]/45 bg-[#ECFDF5]/40 px-3 py-2.5 text-xs font-semibold text-[#047857] transition-all hover:border-[#047857] hover:bg-[#ECFDF5] active:scale-[0.985]"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Tambah Catatan Tambahan (Opsional)</span>
+              </button>
+            )}
           </section>
 
           {/* 4. STATUS PENANGANAN */}
-          <section className="flex flex-col gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-3.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center gap-2 border-b border-zinc-100 pb-2.5">
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <CheckCircle2 className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
+              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
                 Status Penanganan
               </span>
             </div>
@@ -714,11 +789,10 @@ export function JurnalFormClient({
               <button
                 type="button"
                 onClick={() => setStatus('DALAM_PROSES')}
-                className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border px-2 py-2.5 text-[12.5px] font-bold whitespace-nowrap transition-all select-none ${
-                  status === 'DALAM_PROSES'
-                    ? 'border-zinc-200 bg-white text-amber-700 shadow-xs'
-                    : 'border-transparent bg-transparent text-zinc-600 hover:text-zinc-900'
-                }`}
+                className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border px-2 py-2.5 text-xs font-semibold whitespace-nowrap transition-all select-none ${status === 'DALAM_PROSES'
+                  ? 'border-zinc-200 bg-white text-amber-700 shadow-xs'
+                  : 'border-transparent bg-transparent text-zinc-600 hover:text-zinc-900'
+                  }`}
               >
                 <Clock className="h-4 w-4 shrink-0" />
                 <span>Dalam Proses</span>
@@ -726,11 +800,10 @@ export function JurnalFormClient({
               <button
                 type="button"
                 onClick={() => setStatus('SELESAI')}
-                className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border px-2 py-2.5 text-[12.5px] font-bold whitespace-nowrap transition-all select-none ${
-                  status === 'SELESAI'
-                    ? 'border-zinc-200 bg-white text-[#047857] shadow-xs'
-                    : 'border-transparent bg-transparent text-zinc-600 hover:text-zinc-900'
-                }`}
+                className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-[9px] border px-2 py-2.5 text-xs font-semibold whitespace-nowrap transition-all select-none ${status === 'SELESAI'
+                  ? 'border-zinc-200 bg-white text-[#047857] shadow-xs'
+                  : 'border-transparent bg-transparent text-zinc-600 hover:text-zinc-900'
+                  }`}
               >
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
                 <span>Selesai</span>
@@ -738,13 +811,12 @@ export function JurnalFormClient({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-2 text-[13px] font-semibold text-zinc-800">
+              <label className="flex items-center gap-2">
                 <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
-                    status === 'DALAM_PROSES'
-                      ? 'bg-amber-100 text-amber-600'
-                      : 'bg-emerald-100 text-emerald-600'
-                  }`}
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${status === 'DALAM_PROSES'
+                    ? 'bg-amber-100 text-amber-600'
+                    : 'bg-[#ECFDF5] text-[#047857]'
+                    }`}
                 >
                   {status === 'DALAM_PROSES' ? (
                     <Clock className="h-3 w-3" />
@@ -752,43 +824,43 @@ export function JurnalFormClient({
                     <CheckCircle2 className="h-3 w-3" />
                   )}
                 </span>
-                <span>
-                  {status === 'DALAM_PROSES'
-                    ? 'Keterangan Dalam Proses'
-                    : 'Keterangan Selesai'}
+                <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
+                  Keterangan
                 </span>
               </label>
               <textarea
                 value={keteranganStatus}
-                onChange={(e) => setKeteranganStatus(e.target.value)}
+                onChange={(e) => {
+                  setKeteranganStatus(e.target.value);
+                  autoResizeTextarea(e.currentTarget);
+                }}
                 rows={2}
                 placeholder={
                   status === 'DALAM_PROSES'
-                    ? 'Tuliskan alasan masih dalam proses, jadwal pemantauan berikutnya, atau kendala...'
+                    ? 'Tuliskan alasan masih dalam proses atau kendala...'
                     : 'Tuliskan ringkasan penutupan kasus atau hasil akhir pembinaan...'
                 }
-                className="min-h-17 w-full resize-y rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="min-h-17 w-full resize-none overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm leading-relaxed text-zinc-900 transition-all outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
           </section>
 
           {/* 5. AKSES & PRIVASI PJR */}
-          <section className="flex flex-col gap-3.5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+          <section className="flex flex-col gap-3.5 rounded-xl border border-zinc-200/70 bg-white p-4 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.07),0_1px_3px_-1px_rgba(15,23,42,0.04)]">
             <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Shield className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-800 uppercase">
+                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
                   Akses & Privasi PJR
                 </span>
               </div>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                  isSharedWithPjr
-                    ? 'bg-[#ECFDF5] text-[#047857]'
-                    : 'text-zinc-400'
-                }`}
+                className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${isSharedWithPjr
+                  ? 'bg-[#ECFDF5] text-[#047857]'
+                  : 'text-zinc-400'
+                  }`}
               >
                 {isSharedWithPjr ? 'Terbuka ke PJR' : 'Rahasia BK'}
               </span>
@@ -796,32 +868,29 @@ export function JurnalFormClient({
 
             <div
               onClick={() => setIsSharedWithPjr(!isSharedWithPjr)}
-              className={`flex cursor-pointer flex-col gap-2.5 rounded-[13px] border px-3.5 py-3 transition-all select-none ${
-                isSharedWithPjr
-                  ? 'border-[#A7F3D0] bg-[#ECFDF5]'
-                  : 'border-zinc-200 bg-zinc-50'
-              }`}
+              className={`flex cursor-pointer flex-col gap-2.5 rounded-[13px] border px-3.5 py-3 transition-all select-none ${isSharedWithPjr
+                ? 'border-[#A7F3D0] bg-[#ECFDF5]'
+                : 'border-zinc-200 bg-zinc-50'
+                }`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <div
-                    className={`flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-[10px] border transition-colors ${
-                      isSharedWithPjr
-                        ? 'border-[#047857] bg-[#047857] text-white'
-                        : 'border-zinc-200 bg-white text-zinc-700'
-                    }`}
+                    className={`flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-[10px] border transition-colors ${isSharedWithPjr
+                      ? 'border-[#047857] bg-[#047857] text-white'
+                      : 'border-rose-200 bg-rose-50 text-rose-600'
+                      }`}
                   >
                     {isSharedWithPjr ? (
-                      <Eye className="h-4 w-4" />
+                      <LockOpen className="h-4 w-4" />
                     ) : (
                       <Lock className="h-4 w-4" />
                     )}
                   </div>
                   <div>
                     <div
-                      className={`text-[13px] font-bold leading-tight ${
-                        isSharedWithPjr ? 'text-[#047857]' : 'text-zinc-900'
-                      }`}
+                      className={`text-[13px] font-bold leading-tight ${isSharedWithPjr ? 'text-[#047857]' : 'text-zinc-900'
+                        }`}
                     >
                       {isSharedWithPjr
                         ? 'Bagikan ke Guru PJR'
@@ -838,35 +907,29 @@ export function JurnalFormClient({
                 {/* Toggle Switch Modern */}
                 <div
                   aria-hidden="true"
-                  className={`relative h-6.5 w-11.5 shrink-0 rounded-full p-0.75 transition-colors ${
-                    isSharedWithPjr ? 'bg-[#047857]' : 'bg-zinc-300'
-                  }`}
+                  className={`relative h-6.5 w-11.5 shrink-0 rounded-full p-0.75 transition-colors ${isSharedWithPjr ? 'bg-[#047857]' : 'bg-zinc-300'
+                    }`}
                 >
                   <div
-                    className={`h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${
-                      isSharedWithPjr ? 'translate-x-5' : 'translate-x-0'
-                    }`}
+                    className={`h-5 w-5 rounded-full bg-white shadow-xs transition-transform ${isSharedWithPjr ? 'translate-x-5' : 'translate-x-0'
+                      }`}
                   />
                 </div>
               </div>
 
               <div
-                className={`border-t border-dashed pt-2 text-[11.5px] leading-snug ${
-                  isSharedWithPjr
-                    ? 'border-[#A7F3D0] text-emerald-800'
-                    : 'border-zinc-200 text-zinc-600'
-                }`}
+                className={`border-t border-dashed pt-2 text-xs leading-relaxed ${isSharedWithPjr
+                  ? 'border-[#A7F3D0] text-emerald-800'
+                  : 'border-zinc-200 text-zinc-600'
+                  }`}
               >
                 {isSharedWithPjr ? (
                   <>
-                    Seluruh isi jurnal ini tampil di akun{' '}
-                    <strong>Guru PJR ruang siswa</strong> agar dapat dipantau dan
-                    diberi umpan balik perkembangan di kelas.
+                    Tampil di akun <strong>Guru PJR &amp; tim Guru BK</strong>.
                   </>
                 ) : (
                   <>
-                    Hanya dapat dilihat oleh tim Guru BK dan Administrator. Kasus
-                    ini <strong>tidak akan muncul</strong> di akun Guru PJR.
+                    Hanya tampil di akun <strong>tim Guru BK &amp; Admin</strong>.
                   </>
                 )}
               </div>
@@ -878,7 +941,7 @@ export function JurnalFormClient({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[13px] bg-[#047857] px-4 py-3.5 text-[14.5px] font-bold text-white shadow-[0_4px_12px_rgba(13,106,55,0.22)] transition-all hover:bg-[#065F46] disabled:opacity-60"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3.5 text-sm font-bold text-white shadow-[0_6px_16px_rgba(4,120,87,0.28)] transition-all hover:bg-emerald-800 active:scale-[0.985] disabled:opacity-60"
             >
               <Save className="h-4.5 w-4.5" />
               <span>{isSubmitting ? 'Menyimpan...' : 'Simpan Jurnal BK'}</span>
@@ -887,9 +950,9 @@ export function JurnalFormClient({
             <button
               type="button"
               onClick={() => setWaModalOpen(true)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[13px] border border-zinc-300 bg-white px-4 py-3 text-[13.5px] font-semibold text-zinc-800 transition-colors hover:border-zinc-400 hover:bg-zinc-50"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-700/50 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 shadow-[0_4px_14px_rgba(4,120,87,0.16)] transition-all hover:border-emerald-700/75 hover:bg-zinc-50 active:scale-[0.985]"
             >
-              <MessageCircle className="h-4.25 w-4.25 text-[#047857]" />
+              <MessageCircle className="h-4.25 w-4.25 text-emerald-700" />
               <span>Pratinjau WhatsApp PJR</span>
             </button>
           </div>
@@ -928,7 +991,7 @@ export function JurnalFormClient({
                   }
                 }}
                 placeholder="Contoh: Absensi, Keluarga, Kesehatan..."
-                className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-[13.5px] outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
+                className="w-full rounded-[11px] border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm outline-none focus:border-[#047857] focus:bg-white focus:ring-3 focus:ring-[#047857]/12"
               />
             </div>
             <button
@@ -943,101 +1006,111 @@ export function JurnalFormClient({
       )}
 
       {/* Modal Pratinjau WhatsApp */}
-      {waModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-zinc-900/55 p-4 backdrop-blur-[3px]">
-          <div className="flex w-full max-w-105 flex-col gap-3 rounded-[18px] bg-white p-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#008069] text-white">
-                  <MessageCircle className="h-4.5 w-4.5" />
-                </div>
-                <div>
-                  <h3 className="text-sm leading-tight font-bold text-zinc-900">
-                    Pratinjau WhatsApp PJR
-                  </h3>
-                  <p className="mt-0.5 text-[11px] text-zinc-500">
-                    {selectedStudent
-                      ? `Kepada: ${selectedStudent.pjrNama || 'Guru PJR'} (PJR ${
-                          selectedStudent.ruangNama
-                        })`
-                      : 'Tujuan: Guru PJR (Siswa belum dipilih)'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setWaModalOpen(false)}
-                className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 hover:bg-zinc-100"
-              >
-                Tutup
-              </button>
-            </div>
-
+      {waModalOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            onClick={() => setWaModalOpen(false)}
+            className="fixed inset-0 z-[9999] flex touch-none items-center justify-center overscroll-none bg-zinc-900/55 p-4 backdrop-blur-[3px]"
+          >
             <div
-              className={`flex items-center gap-1.5 rounded-[9px] border px-2.5 py-1.5 text-[11px] font-semibold ${
-                isSharedWithPjr
+              role="dialog"
+              aria-modal="true"
+              aria-label="Pratinjau WhatsApp PJR"
+              onClick={(e) => e.stopPropagation()}
+              className="flex max-h-[85dvh] w-full max-w-105 touch-pan-y flex-col gap-3 overscroll-contain rounded-[18px] bg-white p-4 shadow-2xl"
+            >
+              <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#008069] text-white">
+                    <MessageCircle className="h-4.5 w-4.5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm leading-tight font-bold text-zinc-900">
+                      Pratinjau WhatsApp PJR
+                    </h3>
+                    <p className="mt-0.5 text-[11px] text-zinc-500">
+                      {selectedStudent
+                        ? `Kepada: ${selectedStudent.pjrNama || 'Guru PJR'} (PJR ${selectedStudent.ruangNama
+                        })`
+                        : 'Tujuan: Guru PJR (Siswa belum dipilih)'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWaModalOpen(false)}
+                  className="cursor-pointer rounded-lg border border-zinc-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 hover:bg-zinc-100"
+                >
+                  Tutup
+                </button>
+              </div>
+
+              <div
+                className={`flex items-center gap-1.5 rounded-[9px] border px-2.5 py-1.5 text-[11px] font-semibold ${isSharedWithPjr
                   ? 'border-[#A7F3D0] bg-[#ECFDF5] text-[#047857]'
                   : 'border-zinc-200 bg-zinc-100 text-zinc-700'
-              }`}
-            >
-              {isSharedWithPjr ? (
-                <Eye className="h-3.5 w-3.5 shrink-0" />
-              ) : (
-                <Lock className="h-3.5 w-3.5 shrink-0" />
-              )}
-              <span>
-                {isSharedWithPjr
-                  ? 'Akses PJR Aktif • Jurnal juga tampil di akun Guru PJR'
-                  : 'Mode Rahasia BK • Hanya dikirim via WA (tidak tampil di akun PJR)'}
-              </span>
-            </div>
+                  }`}
+              >
+                {isSharedWithPjr ? (
+                  <Eye className="h-3.5 w-3.5 shrink-0" />
+                ) : (
+                  <Lock className="h-3.5 w-3.5 shrink-0" />
+                )}
+                <span>
+                  {isSharedWithPjr
+                    ? 'Akses PJR Aktif • Jurnal juga tampil di akun Guru PJR'
+                    : 'Mode Rahasia BK • Hanya dikirim via WA (tidak tampil di akun PJR)'}
+                </span>
+              </div>
 
-            {/* Authentic WA Bubble Background */}
-            <div
-              className="max-h-72 overflow-y-auto rounded-[14px] border border-zinc-200 p-3.5"
-              style={{
-                backgroundColor: '#EFEAE2',
-                backgroundImage:
-                  'radial-gradient(#D5CEC2 0.75px, transparent 0.75px)',
-                backgroundSize: '14px 14px',
-              }}
-            >
-              <div className="relative rounded-xl rounded-tl-xs bg-white px-3.5 pt-2.5 pb-5 text-[12.5px] leading-relaxed whitespace-pre-wrap text-[#111B21] shadow-xs">
-                {buildWhatsAppDraft()}
-                <div className="absolute right-2.5 bottom-1 flex items-center gap-1 text-[10px] text-[#667781]">
-                  <span>{nowTime}</span>
-                  <CheckCheck className="h-3.5 w-3.5 text-[#53BDEB]" />
+              {/* Authentic WA Bubble Background */}
+              <div
+                className="max-h-72 overflow-y-auto overscroll-contain rounded-[14px] border border-zinc-200 p-3.5"
+                style={{
+                  backgroundColor: '#EFEAE2',
+                  backgroundImage:
+                    'radial-gradient(#D5CEC2 0.75px, transparent 0.75px)',
+                  backgroundSize: '14px 14px',
+                }}
+              >
+                <div className="relative rounded-xl rounded-tl-xs bg-white px-3.5 pt-2.5 pb-5 text-[12.5px] leading-relaxed whitespace-pre-wrap text-[#111B21] shadow-xs">
+                  {buildWhatsAppDraft()}
+                  <div className="absolute right-2.5 bottom-1 flex items-center gap-1 text-[10px] text-[#667781]">
+                    <span>{nowTime}</span>
+                    <CheckCheck className="h-3.5 w-3.5 text-[#53BDEB]" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard?.writeText(buildWhatsAppDraft());
-                  showToast('Pesan berhasil disalin');
-                }}
-                className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
-              >
-                <Copy className="h-3.5 w-3.5" />
-                Salin Pesan
-              </button>
-              <a
-                href={`https://wa.me/${selectedStudent?.pjrWa || ''}?text=${encodeURIComponent(
-                  buildWhatsAppDraft()
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-[#008069] py-2.5 text-xs font-semibold text-white hover:bg-[#006A57]"
-              >
-                <Send className="h-3.5 w-3.5" />
-                Kirim via WA
-              </a>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(buildWhatsAppDraft());
+                    showToast('Pesan berhasil disalin');
+                  }}
+                  className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  Salin Pesan
+                </button>
+                <a
+                  href={`https://wa.me/${selectedStudent?.pjrWa || ''}?text=${encodeURIComponent(
+                    buildWhatsAppDraft()
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 rounded-lg bg-[#008069] py-2.5 text-xs font-semibold text-white hover:bg-[#006A57]"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  Kirim via WA
+                </a>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* Toast Banner */}
       {toastMsg && (
