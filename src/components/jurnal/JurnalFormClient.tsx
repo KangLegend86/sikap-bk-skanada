@@ -441,14 +441,14 @@ export function JurnalFormClient({
                 )}
               </div>
             ) : (
-              <div className="flex flex-col gap-2 rounded-[14px] bg-linear-to-br from-zinc-900 to-zinc-800 p-3.5 text-white">
+              <div className="flex flex-col gap-2 rounded-[14px] bg-linear-to-br from-[hsl(240_6%_20%)] to-[hsl(240_4%_30%)] p-3.5 text-white">
                 <div className="flex items-start justify-between gap-2 pl-1">
                   <div className="min-w-0">
                     <div className="truncate text-[14.5px] font-bold">
                       {selectedStudent.namaLengkap}
                     </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11.5px] font-medium text-zinc-300">
-                      <span className="font-mono text-[11px] text-zinc-400">
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11.5px] font-medium text-zinc-200">
+                      <span className="font-mono text-[11px] text-zinc-300">
                         Absen {selectedStudent.noAbsen ?? '-'}
                       </span>
                       <span className="text-zinc-500">•</span>
