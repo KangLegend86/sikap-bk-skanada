@@ -215,13 +215,13 @@ export function JurnalFilterClient({
             type="button"
             onClick={openSheet}
             aria-label="Buka Filter"
-            className={`relative flex h-[42px] w-[42px] shrink-0 cursor-pointer items-center justify-center rounded-xl border transition-all active:scale-95 ${
+            className={`relative flex h-10.5 w-10.5 shrink-0 cursor-pointer items-center justify-center rounded-xl border transition-all active:scale-95 ${
               activeFilterCount > 0
                 ? 'border-[#047857] bg-[#ECFDF5] text-[#047857]'
                 : 'border-zinc-200/80 bg-white text-zinc-600 shadow-[0_1px_4px_rgba(15,23,42,0.04)] hover:border-zinc-300 hover:text-zinc-900'
             }`}
           >
-            <SlidersHorizontal className="h-[18px] w-[18px]" />
+            <SlidersHorizontal className="h-4.5 w-4.5" />
             {activeFilterCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#047857] px-1 text-[10px] font-bold text-white shadow-xs">
                 {activeFilterCount}
@@ -362,7 +362,7 @@ export function JurnalFilterClient({
         typeof document !== 'undefined' &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex touch-none items-end justify-center overscroll-none bg-zinc-950/45 backdrop-blur-[2px]"
+            className="fixed inset-0 z-9999 flex touch-none items-end justify-center overscroll-none bg-zinc-950/45 backdrop-blur-[2px]"
             onClick={() => setSheetOpen(false)}
           >
             <div

@@ -1011,7 +1011,7 @@ export function JurnalFormClient({
         createPortal(
           <div
             onClick={() => setWaModalOpen(false)}
-            className="fixed inset-0 z-[9999] flex touch-none items-center justify-center overscroll-none bg-zinc-900/55 p-4 backdrop-blur-[3px]"
+            className="fixed inset-0 z-9999 flex touch-none items-center justify-center overscroll-none bg-zinc-900/55 p-4 backdrop-blur-[3px]"
           >
             <div
               role="dialog"

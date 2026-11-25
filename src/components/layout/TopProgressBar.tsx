@@ -117,7 +117,7 @@ export function TopProgressBar() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed top-0 right-0 left-0 z-[10000] h-[2.5px] bg-transparent"
+      className="pointer-events-none fixed top-0 right-0 left-0 z-10000 h-[2.5px] bg-transparent"
     >
       <div
         className="h-full bg-[#047857] shadow-[0_0_8px_rgba(4,120,87,0.55)] transition-[width,opacity] duration-200 ease-out"

@@ -17,8 +17,8 @@ export default function GlobalLoading() {
       <div className="mx-auto w-full max-w-5xl flex-1 space-y-4 p-4 pb-24">
         {/* Search / Toolbar Skeleton */}
         <div className="flex items-center gap-2">
-          <div className="h-[42px] flex-1 animate-pulse rounded-xl bg-white border border-zinc-200/70" />
-          <div className="h-[42px] w-[42px] animate-pulse rounded-xl bg-white border border-zinc-200/70" />
+          <div className="h-10.5 flex-1 animate-pulse rounded-xl bg-white border border-zinc-200/70" />
+          <div className="h-10.5 w-10.5 animate-pulse rounded-xl bg-white border border-zinc-200/70" />
         </div>
 
         <div className="h-10 w-full animate-pulse rounded-xl bg-white border border-zinc-200/70" />
