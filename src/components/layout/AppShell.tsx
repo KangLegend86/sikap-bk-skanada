@@ -19,7 +19,7 @@ export function AppShell({
   backHref?: string;
   children: React.ReactNode;
 }) {
-  const fullName = formatNamaGuru(session.namaLengkap, session.gelar);
+  const fullName = formatNamaGuru(session.namaLengkap);
 
   const roleBadge =
     session.role === 'ADMIN'

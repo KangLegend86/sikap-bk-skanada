@@ -85,7 +85,7 @@ export default async function PjrKasusPage() {
                   </div>
                   <p className="mt-1 text-xs text-zinc-500">
                     {formatTanggalIndo(item.tanggal_konseling)} • Guru BK:{' '}
-                    {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                    {formatNamaGuru(item.guru_bk.nama_lengkap)}
                   </p>
                 </div>
 
@@ -167,10 +167,7 @@ export default async function PjrKasusPage() {
                       >
                         <div className="flex items-center justify-between text-zinc-500">
                           <span className="font-semibold text-zinc-800">
-                            {formatNamaGuru(
-                              fb.user_pjr.pegawai.nama_lengkap,
-                              fb.user_pjr.pegawai.gelar
-                            )}
+                            {formatNamaGuru(fb.user_pjr.pegawai.nama_lengkap)}
                           </span>
                           <span>{formatTanggalIndo(fb.created_at)}</span>
                         </div>

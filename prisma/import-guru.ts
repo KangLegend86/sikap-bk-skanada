@@ -12,22 +12,10 @@ const ZUMROTUS_EXISTING_PEGAWAI_ID = 'cmwgpn2dq000qhg28fnsyungt';
 type GuruRow = {
   no: number;
   namaLengkap: string;
-  gelar: string | null;
   pjrRuang: string | null;
   isGuruBk: boolean;
   jenisKelamin: JenisKelamin;
 };
-
-function parseNamaDanGelar(raw: string): { namaLengkap: string; gelar: string | null } {
-  const cleaned = raw.trim();
-  const commaIdx = cleaned.indexOf(',');
-  if (commaIdx === -1) {
-    return { namaLengkap: cleaned, gelar: null };
-  }
-  const namaLengkap = cleaned.slice(0, commaIdx).trim();
-  const gelar = cleaned.slice(commaIdx + 1).trim() || null;
-  return { namaLengkap, gelar };
-}
 
 function parseCsv(filePath: string): GuruRow[] {
   const raw = fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, '');
@@ -51,13 +39,11 @@ function parseCsv(filePath: string): GuruRow[] {
 
     if (!namaRaw) continue;
 
-    const { namaLengkap, gelar } = parseNamaDanGelar(namaRaw);
     const jenisKelamin: JenisKelamin = jkRaw === 'L' ? 'L' : 'P';
 
     rows.push({
       no: Number.isFinite(no) ? no : i,
-      namaLengkap,
-      gelar,
+      namaLengkap: namaRaw.trim(),
       pjrRuang: pjrRaw || null,
       isGuruBk: bkRaw === 'iya' || bkRaw === 'ya' || bkRaw === 'true',
       jenisKelamin,
@@ -128,14 +114,13 @@ async function main() {
         where: { id: zumrotusExistingPegawai.id },
         data: {
           nama_lengkap: row.namaLengkap,
-          gelar: row.gelar,
           jenis_kelamin: row.jenisKelamin,
         },
       });
       pegawaiId = updated.id;
       pegawaiUpdated++;
       console.log(
-        `🔄 Update Pegawai lama (${updated.id}) -> ${updated.nama_lengkap}${updated.gelar ? ', ' + updated.gelar : ''}`
+        `🔄 Update Pegawai lama (${updated.id}) -> ${updated.nama_lengkap}`
       );
     } else {
       const existing = pegawaiByName.get(row.namaLengkap.toLowerCase());
@@ -143,7 +128,6 @@ async function main() {
         const updated = await prisma.pegawai.update({
           where: { id: existing.id },
           data: {
-            gelar: row.gelar,
             jenis_kelamin: row.jenisKelamin,
           },
         });
@@ -153,7 +137,6 @@ async function main() {
         const created = await prisma.pegawai.create({
           data: {
             nama_lengkap: row.namaLengkap,
-            gelar: row.gelar,
             jenis_kelamin: row.jenisKelamin,
           },
         });
@@ -163,9 +146,7 @@ async function main() {
       }
     }
 
-    const displayName = row.gelar
-      ? `${row.namaLengkap}, ${row.gelar}`
-      : row.namaLengkap;
+    const displayName = row.namaLengkap;
 
     // 1. Akun GURU_BK
     if (row.isGuruBk) {

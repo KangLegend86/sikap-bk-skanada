@@ -70,8 +70,7 @@ export default async function PjrDashboardPage() {
       session={session}
       title={`Beranda PJR ${namaRuang}`}
       subtitle={`Penanggung Jawab Ruang • ${formatNamaGuru(
-        session.namaLengkap,
-        session.gelar
+        session.namaLengkap
       )}`}
     >
       {!ruangId ? (
@@ -204,7 +203,7 @@ export default async function PjrDashboardPage() {
 
                   <p className="mt-1 text-xs text-zinc-500">
                     {formatTanggalIndo(item.tanggal_konseling)} • Guru BK:{' '}
-                    {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                    {formatNamaGuru(item.guru_bk.nama_lengkap)}
                   </p>
                   <p className="mt-2 line-clamp-2 text-sm text-zinc-700">
                     <span className="font-semibold">Tindak Lanjut: </span>

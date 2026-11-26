@@ -32,7 +32,7 @@ export default async function ProfilPage() {
     },
   });
 
-  const fullName = formatNamaGuru(session.namaLengkap, session.gelar);
+  const fullName = formatNamaGuru(session.namaLengkap);
   const backHref =
     session.role === 'ADMIN'
       ? '/admin'

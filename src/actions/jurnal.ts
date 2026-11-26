@@ -58,7 +58,7 @@ export async function createJurnalAction(input: {
 
   const pjrAccount = siswa.ruang_kelas.akun_pjr[0];
   const snapshotPjr = pjrAccount
-    ? formatNamaGuru(pjrAccount.pegawai.nama_lengkap, pjrAccount.pegawai.gelar)
+    ? formatNamaGuru(pjrAccount.pegawai.nama_lengkap)
     : null;
 
   const parsedTanggal =

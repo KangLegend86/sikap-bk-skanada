@@ -54,7 +54,6 @@ export async function createPegawaiAction(formData: FormData) {
     await requireAdmin();
     const nipNik = String(formData.get('nip_nik') ?? '').trim() || null;
     const namaLengkap = String(formData.get('nama_lengkap') ?? '').trim();
-    const gelar = String(formData.get('gelar') ?? '').trim() || null;
     const jenisKelamin = String(formData.get('jenis_kelamin') ?? 'L') as JenisKelamin;
     const noWhatsapp = String(formData.get('no_whatsapp') ?? '').trim() || null;
 
@@ -66,7 +65,6 @@ export async function createPegawaiAction(formData: FormData) {
       data: {
         nip_nik: nipNik,
         nama_lengkap: namaLengkap,
-        gelar,
         jenis_kelamin: jenisKelamin,
         no_whatsapp: noWhatsapp,
       },

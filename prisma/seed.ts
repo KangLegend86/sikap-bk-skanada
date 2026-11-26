@@ -66,8 +66,7 @@ async function main() {
     update: {},
     create: {
       nip_nik: '198503152010012001',
-      nama_lengkap: 'Siti Aminah',
-      gelar: 'S.Pd',
+      nama_lengkap: 'Siti Aminah, S.Pd',
       jenis_kelamin: JenisKelamin.P,
       no_whatsapp: '6281234567890',
     },
@@ -113,8 +112,7 @@ async function main() {
     update: {},
     create: {
       nip_nik: '199201102019031002',
-      nama_lengkap: 'Ahmad Farhan',
-      gelar: 'S.Sos',
+      nama_lengkap: 'Ahmad Farhan, S.Sos',
       jenis_kelamin: JenisKelamin.L,
       no_whatsapp: '6281345678901',
     },
@@ -137,8 +135,7 @@ async function main() {
     update: {},
     create: {
       nip_nik: '198807202015021003',
-      nama_lengkap: 'Bambang Sutrisno',
-      gelar: 'S.Pd',
+      nama_lengkap: 'Bambang Sutrisno, S.Pd',
       jenis_kelamin: JenisKelamin.L,
       no_whatsapp: '6281298765432',
     },

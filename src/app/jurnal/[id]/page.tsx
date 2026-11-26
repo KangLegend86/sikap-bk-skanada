@@ -84,16 +84,12 @@ export default async function JurnalDetailPage({
   const ortuWa = formatWaNumber(jurnal.siswa.no_hp_ortu);
   const isMale = jurnal.siswa.jenis_kelamin === 'L';
   const isSelesai = jurnal.status === 'SELESAI';
-  const counselorName = formatNamaGuru(
-    jurnal.guru_bk.nama_lengkap,
-    jurnal.guru_bk.gelar
-  );
+  const counselorName = formatNamaGuru(jurnal.guru_bk.nama_lengkap);
 
   const pjrWaText = pjrAkun
     ? encodeURIComponent(
         `Assalamu'alaikum ${getSapaan(pjrAkun.pegawai.jenis_kelamin)} ${formatNamaGuru(
-          pjrAkun.pegawai.nama_lengkap,
-          pjrAkun.pegawai.gelar
+          pjrAkun.pegawai.nama_lengkap
         )}, mohon izin menyampaikan tindak lanjut konseling ananda *${
           jurnal.siswa.nama_lengkap
         }* (${jurnal.snapshot_ruang} / ${jurnal.siswa.jurusan.kode}):\n\n*Tindak Lanjut:* ${
@@ -419,10 +415,7 @@ export default async function JurnalDetailPage({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-xs font-bold text-zinc-900">
-                        {formatNamaGuru(
-                          fb.user_pjr.pegawai.nama_lengkap,
-                          fb.user_pjr.pegawai.gelar
-                        )}
+                        {formatNamaGuru(fb.user_pjr.pegawai.nama_lengkap)}
                       </span>
                       <span className="shrink-0 rounded-md border border-sky-200 bg-sky-50 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700">
                         PJR {ruangPjr}

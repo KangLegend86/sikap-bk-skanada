@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatNamaGuru(nama: string, gelar?: string | null): string {
-  return gelar ? `${nama}, ${gelar}` : nama;
+export function formatNamaGuru(nama: string): string {
+  return nama.trim();
 }
 
 export function getSapaan(jenisKelamin?: 'L' | 'P' | null): string {

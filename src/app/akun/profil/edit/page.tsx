@@ -17,7 +17,6 @@ export default async function EditProfilPage() {
       <div className="mx-auto max-w-xl">
         <EditProfileFormClient
           namaLengkap={pegawai?.nama_lengkap ?? session.namaLengkap}
-          gelar={pegawai?.gelar ?? session.gelar ?? null}
           jenisKelamin={pegawai?.jenis_kelamin ?? session.jenisKelamin}
           noWhatsapp={pegawai?.no_whatsapp ?? null}
         />

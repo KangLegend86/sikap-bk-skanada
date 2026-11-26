@@ -39,7 +39,6 @@ interface PegawaiItem {
   id: string;
   nip_nik: string | null;
   nama_lengkap: string;
-  gelar: string | null;
   jenis_kelamin: 'L' | 'P';
   no_whatsapp: string | null;
 }
@@ -340,40 +339,28 @@ export function AdminMasterClient({
 
             <div>
               <label className="mb-1 block text-xs font-medium text-zinc-700">
-                Nama Lengkap (Tanpa Gelar) *
+                Nama Lengkap &amp; Gelar *
               </label>
               <input
                 name="nama_lengkap"
                 required
-                placeholder="Contoh: Siti Aminah"
+                placeholder="Contoh: Zumrotus Sa'adah, S.Pd."
                 className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-zinc-700">
-                  Gelar
-                </label>
-                <input
-                  name="gelar"
-                  placeholder="S.Pd., M.Pd."
-                  className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-zinc-700">
-                  Jenis Kelamin *
-                </label>
-                <select
-                  name="jenis_kelamin"
-                  required
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
-                >
-                  <option value="L">Laki-laki (Bapak)</option>
-                  <option value="P">Perempuan (Ibu)</option>
-                </select>
-              </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-zinc-700">
+                Jenis Kelamin *
+              </label>
+              <select
+                name="jenis_kelamin"
+                required
+                className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="L">Laki-laki (Bapak)</option>
+                <option value="P">Perempuan (Ibu)</option>
+              </select>
             </div>
 
             <div>
@@ -424,7 +411,7 @@ export function AdminMasterClient({
                 >
                   <div>
                     <p className="font-semibold text-zinc-900">
-                      {formatNamaGuru(p.nama_lengkap, p.gelar)}
+                      {formatNamaGuru(p.nama_lengkap)}
                     </p>
                     <p className="text-xs text-zinc-500">
                       {p.jenis_kelamin === 'L' ? 'Bapak (L)' : 'Ibu (P)'}

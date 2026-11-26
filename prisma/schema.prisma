@@ -27,7 +27,6 @@ model Pegawai {
   id            String        @id @default(cuid())
   nip_nik       String?       @unique
   nama_lengkap  String
-  gelar         String?
   jenis_kelamin JenisKelamin
   no_whatsapp   String?
   akun          UserAccount[]

@@ -16,7 +16,7 @@ export default async function AdminUsersPage() {
   const [pegawaiList, ruangList, rawUsers] = await Promise.all([
     prisma.pegawai.findMany({
       orderBy: { nama_lengkap: 'asc' },
-      select: { id: true, nama_lengkap: true, gelar: true },
+      select: { id: true, nama_lengkap: true },
     }),
     prisma.ruangKelas.findMany({
       where: { is_active: true },
@@ -37,7 +37,7 @@ export default async function AdminUsersPage() {
     username: u.username,
     role: u.role,
     is_active: u.is_active,
-    pegawaiNama: formatNamaGuru(u.pegawai.nama_lengkap, u.pegawai.gelar),
+    pegawaiNama: formatNamaGuru(u.pegawai.nama_lengkap),
     ruangNama: u.ruang_kelas?.nama_ruang ?? null,
   }));
 

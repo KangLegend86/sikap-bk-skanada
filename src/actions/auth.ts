@@ -46,7 +46,6 @@ export async function loginGuruAction(
         pegawaiId: account.pegawai.id,
         username: account.username,
         namaLengkap: account.pegawai.nama_lengkap,
-        gelar: account.pegawai.gelar,
         jenisKelamin: account.pegawai.jenis_kelamin,
         role: account.role,
         ruangKelasId: null,
@@ -63,7 +62,6 @@ export async function loginGuruAction(
       pegawaiId: account.pegawai.id,
       username: account.username,
       namaLengkap: account.pegawai.nama_lengkap,
-      gelar: account.pegawai.gelar,
       jenisKelamin: account.pegawai.jenis_kelamin,
       role: account.role,
       ruangKelasId: account.ruang_kelas_id,
@@ -118,7 +116,6 @@ export async function updateUsernameAction(
     pegawaiId: updated.pegawai.id,
     username: updated.username,
     namaLengkap: updated.pegawai.nama_lengkap,
-    gelar: updated.pegawai.gelar,
     jenisKelamin: updated.pegawai.jenis_kelamin,
     role: updated.role,
     ruangKelasId: updated.ruang_kelas_id,
@@ -180,7 +177,6 @@ export async function updateOwnProfileAction(
   if (!session) return { error: 'Sesi login telah berakhir.' };
 
   const namaLengkap = String(formData.get('namaLengkap') ?? '').trim();
-  const gelar = String(formData.get('gelar') ?? '').trim();
   const jenisKelaminRaw = String(formData.get('jenisKelamin') ?? '').trim();
   const noWhatsapp = String(formData.get('noWhatsapp') ?? '').trim();
 
@@ -196,7 +192,6 @@ export async function updateOwnProfileAction(
     where: { id: session.pegawaiId },
     data: {
       nama_lengkap: namaLengkap,
-      gelar: gelar || null,
       jenis_kelamin: jenisKelaminRaw,
       no_whatsapp: noWhatsapp || null,
     },
@@ -205,7 +200,6 @@ export async function updateOwnProfileAction(
   await setSessionCookie({
     ...session,
     namaLengkap: updatedPegawai.nama_lengkap,
-    gelar: updatedPegawai.gelar,
     jenisKelamin: updatedPegawai.jenis_kelamin,
   });
 

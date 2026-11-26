@@ -63,7 +63,7 @@ export default async function AdminRekapPage({
     siswaNama: j.siswa.nama_lengkap,
     ruang: j.snapshot_ruang,
     jurusanKode: j.siswa.jurusan.kode,
-    konselor: formatNamaGuru(j.guru_bk.nama_lengkap, j.guru_bk.gelar),
+    konselor: formatNamaGuru(j.guru_bk.nama_lengkap),
     kategori: j.kategori.map((k) => k.kategori.nama_kategori).join(', '),
     permasalahan: j.permasalahan,
     tindakLanjut: j.tindak_lanjut,
@@ -197,7 +197,7 @@ export default async function AdminRekapPage({
                     {item.snapshot_ruang} ({item.siswa.jurusan.kode})
                   </td>
                   <td className="px-3 py-3 align-top text-zinc-700">
-                    {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                    {formatNamaGuru(item.guru_bk.nama_lengkap)}
                   </td>
                   <td className="max-w-md px-3 py-3 align-top text-zinc-700">
                     <p className="font-medium text-zinc-900">

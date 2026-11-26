@@ -8,12 +8,10 @@ const initialState: AuthActionState = {};
 
 export function EditProfileFormClient({
   namaLengkap,
-  gelar,
   jenisKelamin,
   noWhatsapp,
 }: {
   namaLengkap: string;
-  gelar: string | null;
   jenisKelamin: 'L' | 'P';
   noWhatsapp: string | null;
 }) {
@@ -56,27 +54,10 @@ export function EditProfileFormClient({
               required
               minLength={2}
               defaultValue={namaLengkap}
-              placeholder="Nama lengkap tanpa gelar"
+              placeholder="Nama lengkap beserta gelar (jika ada)"
               className="w-full rounded-xl border border-zinc-300 py-2.5 pr-3 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
             />
           </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="gelar"
-            className="mb-1.5 block text-xs font-semibold text-zinc-700"
-          >
-            Gelar (Opsional)
-          </label>
-          <input
-            id="gelar"
-            name="gelar"
-            type="text"
-            defaultValue={gelar ?? ''}
-            placeholder="Contoh: S.Pd., Gr."
-            className="w-full rounded-xl border border-zinc-300 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#047857] focus:ring-1 focus:ring-[#047857] focus:outline-none"
-          />
         </div>
 
         <div>

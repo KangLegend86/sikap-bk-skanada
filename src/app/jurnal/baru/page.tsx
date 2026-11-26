@@ -40,7 +40,6 @@ export default async function JurnalBaruPage() {
                 pegawai: {
                   select: {
                     nama_lengkap: true,
-                    gelar: true,
                     jenis_kelamin: true,
                     no_whatsapp: true,
                   },
@@ -68,14 +67,14 @@ export default async function JurnalBaruPage() {
       ruangNama: s.ruang_kelas.nama_ruang,
       jurusanKode: s.jurusan.kode,
       pjrNama: pjrAkun
-        ? formatNamaGuru(pjrAkun.pegawai.nama_lengkap, pjrAkun.pegawai.gelar)
+        ? formatNamaGuru(pjrAkun.pegawai.nama_lengkap)
         : null,
       pjrGender: pjrAkun ? pjrAkun.pegawai.jenis_kelamin : null,
       pjrWa: pjrAkun?.pegawai.no_whatsapp ?? null,
     };
   });
 
-  const counselorName = formatNamaGuru(session.namaLengkap, session.gelar);
+  const counselorName = formatNamaGuru(session.namaLengkap);
   const now = new Date();
   const liveDate = now.toLocaleDateString('id-ID', {
     timeZone: 'Asia/Jakarta',

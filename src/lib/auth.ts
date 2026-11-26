@@ -7,7 +7,6 @@ export interface SessionPayload {
   pegawaiId: string;
   username: string;
   namaLengkap: string;
-  gelar?: string | null;
   jenisKelamin: 'L' | 'P';
   role: 'ADMIN' | 'GURU_BK' | 'GURU_PJR';
   ruangKelasId?: string | null;

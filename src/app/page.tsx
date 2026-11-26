@@ -67,7 +67,6 @@ export default async function HomePage() {
         guru_bk: {
           select: {
             nama_lengkap: true,
-            gelar: true,
           },
         },
         kategori: {
@@ -245,7 +244,7 @@ export default async function HomePage() {
                       <div className="flex items-center justify-between gap-2 border-t border-[#c3c1c1] pt-2">
                         <span className="min-w-0 truncate text-[11px] font-medium text-zinc-400">
                           {formatTanggalIndo(item.tanggal_konseling)} •{' '}
-                          {formatNamaGuru(item.guru_bk.nama_lengkap, item.guru_bk.gelar)}
+                          {formatNamaGuru(item.guru_bk.nama_lengkap)}
                         </span>
 
                         <div className="flex shrink-0 items-center gap-2">

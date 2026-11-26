@@ -19,7 +19,7 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const fullName = formatNamaGuru(session.namaLengkap, session.gelar);
+  const fullName = formatNamaGuru(session.namaLengkap);
   const roleBadge =
     session.role === 'ADMIN'
       ? 'Koordinator BK'

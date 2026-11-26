@@ -211,10 +211,7 @@ export default async function AdminDashboardPage() {
                     </p>
                     <p className="text-xs text-zinc-500">
                       {formatTanggalIndo(item.tanggal_konseling)} •{' '}
-                      {formatNamaGuru(
-                        item.guru_bk.nama_lengkap,
-                        item.guru_bk.gelar
-                      )}
+                      {formatNamaGuru(item.guru_bk.nama_lengkap)}
                     </p>
                   </div>
                   <span

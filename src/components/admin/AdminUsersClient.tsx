@@ -21,7 +21,6 @@ import { formatNamaGuru } from '@/lib/utils';
 interface PegawaiOption {
   id: string;
   nama_lengkap: string;
-  gelar: string | null;
 }
 
 interface RuangOption {
@@ -137,7 +136,7 @@ export function AdminUsersClient({
             <option value="">Pilih Pegawai</option>
             {pegawaiList.map((p) => (
               <option key={p.id} value={p.id}>
-                {formatNamaGuru(p.nama_lengkap, p.gelar)}
+                {formatNamaGuru(p.nama_lengkap)}
               </option>
             ))}
           </select>
