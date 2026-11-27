@@ -73,7 +73,13 @@ const JENIS_META: Record<
   },
 };
 
-export function GuruRiwayatClient({ items }: { items: GuruRiwayatItem[] }) {
+export function GuruRiwayatClient({
+  items,
+  mode = 'dashboard',
+}: {
+  items: GuruRiwayatItem[];
+  mode?: 'dashboard' | 'full';
+}) {
   const router = useRouter();
   const [filterJenis, setFilterJenis] = useState<'ALL' | JenisJurnalSikap>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,7 +101,7 @@ export function GuruRiwayatClient({ items }: { items: GuruRiwayatItem[] }) {
 
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return items.filter((item) => {
+    const matched = items.filter((item) => {
       if (filterJenis !== 'ALL' && item.jenis !== filterJenis) return false;
       if (!q) return true;
       const summary =
@@ -110,7 +116,10 @@ export function GuruRiwayatClient({ items }: { items: GuruRiwayatItem[] }) {
         item.tindakLanjut.toLowerCase().includes(q)
       );
     });
-  }, [items, filterJenis, searchQuery]);
+    return mode === 'dashboard' && filterJenis === 'ALL' && !q
+      ? matched.slice(0, 5)
+      : matched;
+  }, [items, filterJenis, searchQuery, mode]);
 
   async function handleDelete(item: GuruRiwayatItem) {
     const ok = window.confirm(
@@ -204,7 +213,9 @@ export function GuruRiwayatClient({ items }: { items: GuruRiwayatItem[] }) {
               <NotebookPen className="h-4 w-4" />
             </div>
             <h2 className="text-[13px] font-extrabold tracking-wider text-zinc-700 uppercase">
-              Riwayat Catatan Saya
+              {mode === 'dashboard'
+                ? 'Catatan Sikap Terbaru'
+                : 'Semua Riwayat Catatan'}
             </h2>
           </div>
 
@@ -216,15 +227,22 @@ export function GuruRiwayatClient({ items }: { items: GuruRiwayatItem[] }) {
             >
               Tampilkan Semua
             </button>
+          ) : mode === 'dashboard' ? (
+            <Link
+              href="/guru/riwayat"
+              className="text-xs font-semibold text-[#047857] hover:underline"
+            >
+              Lihat Semua
+            </Link>
           ) : (
             <span className="text-xs font-semibold text-zinc-400">
-              {items.length} catatan
+              {filtered.length} catatan
             </span>
           )}
         </div>
 
-        {/* Pencarian Ringkas (hanya muncul bila sudah ada catatan) */}
-        {items.length > 0 && (
+        {/* Pencarian Ringkas (khusus halaman Riwayat penuh) */}
+        {mode === 'full' && items.length > 0 && (
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
             <input

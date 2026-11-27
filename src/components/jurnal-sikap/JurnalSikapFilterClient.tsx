@@ -18,6 +18,7 @@ import type { JenisJurnalSikap } from '@prisma/client';
 export type SikapPeriodeFilter = '' | 'BULAN_INI' | 'BULAN_LALU' | '3_BULAN';
 
 interface JurnalSikapFilterClientProps {
+  basePath?: string;
   initialQ: string;
   initialJenis?: JenisJurnalSikap;
   initialRuang?: string;
@@ -61,6 +62,7 @@ const PERIODE_LABEL: Record<Exclude<SikapPeriodeFilter, ''>, string> = {
 };
 
 export function JurnalSikapFilterClient({
+  basePath = '/jurnal-sikap',
   initialQ,
   initialJenis,
   initialRuang,
@@ -160,7 +162,7 @@ export function JurnalSikapFilterClient({
 
     const qs = params.toString();
     startTransition(() => {
-      router.push(qs ? `/jurnal-sikap?${qs}` : '/jurnal-sikap');
+      router.push(qs ? `${basePath}?${qs}` : basePath);
     });
   };
 

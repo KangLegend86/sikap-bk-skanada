@@ -15,18 +15,33 @@ export function getSapaan(jenisKelamin?: 'L' | 'P' | null): string {
   return 'Bapak/Ibu';
 }
 
+export function getMajorTextClass(kode: string): string {
+  const key = kode.trim().toUpperCase();
+  const map: Record<string, string> = {
+    TKJ: 'text-sky-600',
+    TKR: 'text-rose-600',
+    TSM: 'text-amber-600',
+    DKV: 'text-purple-600',
+    BISDIG: 'text-indigo-600',
+    'BISDIG 1': 'text-indigo-600',
+    'BISDIG 2': 'text-indigo-600',
+    DPB: 'text-pink-600',
+  };
+  return map[key] ?? 'text-zinc-600';
+}
+
 export function getMajorBadgeClass(kode: string): string {
   const map: Record<string, string> = {
     TKJ: 'bg-sky-100 text-sky-800 border-sky-200',
     TKR: 'bg-red-100 text-red-800 border-red-200',
     TSM: 'bg-amber-100 text-amber-800 border-amber-200',
     DKV: 'bg-purple-100 text-purple-800 border-purple-200',
-    BISDIG: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    'BISDIG 1': 'bg-green-100 text-green-800 border-green-200',
-    'BISDIG 2': 'bg-lime-100 text-lime-800 border-lime-200',
-    DPB: 'bg-teal-100 text-teal-800 border-teal-200',
+    BISDIG: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'BISDIG 1': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'BISDIG 2': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    DPB: 'bg-pink-100 text-pink-800 border-pink-200',
   };
-  return map[kode.toUpperCase()] ?? 'bg-zinc-100 text-zinc-700 border-zinc-200';
+  return map[kode.trim().toUpperCase()] ?? 'bg-zinc-100 text-zinc-700 border-zinc-200';
 }
 
 export function formatTanggalIndo(date: Date | string): string {

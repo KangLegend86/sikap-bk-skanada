@@ -32,9 +32,9 @@ const PJR_NAV_ITEMS: BottomNavItem[] = [
 ];
 
 const GURU_NAV_ITEMS: BottomNavItem[] = [
-  { path: '/guru', label: 'Riwayat', Icon: NotebookPen },
+  { path: '/guru', label: 'Beranda', Icon: Home },
   { path: '/guru/baru', label: 'Catat Sikap', Icon: Pencil, isCenter: true },
-  { path: '/akun/profil', label: 'Profil', Icon: User },
+  { path: '/guru/riwayat', label: 'Riwayat', Icon: NotebookPen },
 ];
 
 const ADMIN_NAV_ITEMS: BottomNavItem[] = [

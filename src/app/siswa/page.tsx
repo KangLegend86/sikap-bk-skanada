@@ -8,6 +8,7 @@ import {
   getCachedActiveJurusanList,
   getCachedActiveRuangList,
 } from '@/lib/master-cache';
+import { getMajorTextClass } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import {
   SiswaFilterClient,
@@ -179,7 +180,11 @@ export default async function SiswaDirectoryPage({
                     {s.no_absen ? `Absen ${String(s.no_absen).padStart(2, '0')} • ` : ''}
                     {s.ruang_kelas.nama_ruang}{' '}
                     <span className="text-zinc-300">|</span>{' '}
-                    <span className="font-semibold text-[#047857]">
+                    <span
+                      className={`font-semibold ${getMajorTextClass(
+                        s.jurusan.kode
+                      )}`}
+                    >
                       {s.jurusan.kode}
                     </span>
                   </p>

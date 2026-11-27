@@ -18,6 +18,7 @@ import {
   formatNamaGuru,
   formatTanggalIndo,
   formatWaNumber,
+  getMajorTextClass,
   getSapaan,
 } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
@@ -157,7 +158,11 @@ export default async function JurnalDetailPage({
               <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
                 {jurnal.snapshot_ruang}{' '}
                 <span className="text-zinc-300">|</span>{' '}
-                <span className="font-semibold text-[#047857]">
+                <span
+                  className={`font-semibold ${getMajorTextClass(
+                    jurnal.siswa.jurusan.kode
+                  )}`}
+                >
                   {jurnal.siswa.jurusan.kode}
                 </span>
               </p>

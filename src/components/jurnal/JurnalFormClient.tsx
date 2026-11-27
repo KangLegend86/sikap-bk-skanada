@@ -31,7 +31,11 @@ import {
   createKategoriAction,
   updateKategoriAction,
 } from '@/actions/jurnal';
-import { getMajorBadgeClass, getSapaan } from '@/lib/utils';
+import {
+  getMajorBadgeClass,
+  getMajorTextClass,
+  getSapaan,
+} from '@/lib/utils';
 
 export interface StudentOption {
   id: string;
@@ -421,7 +425,11 @@ export function JurnalFormClient({
                               {s.noAbsen ? `Absen ${String(s.noAbsen).padStart(2, '0')} • ` : ''}
                               {s.ruangNama}{' '}
                               <span className="text-zinc-300">|</span>{' '}
-                              <span className="font-semibold text-[#047857]">
+                              <span
+                                className={`font-semibold ${getMajorTextClass(
+                                  s.jurusanKode
+                                )}`}
+                              >
                                 {s.jurusanKode}
                               </span>
                             </div>

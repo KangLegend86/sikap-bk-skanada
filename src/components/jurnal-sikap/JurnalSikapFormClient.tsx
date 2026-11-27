@@ -27,7 +27,7 @@ import {
   updateJurnalSikapAction,
 } from '@/actions/jurnal-sikap';
 import { compressImageFile } from '@/lib/image-compress';
-import { getMajorBadgeClass } from '@/lib/utils';
+import { getMajorBadgeClass, getMajorTextClass } from '@/lib/utils';
 
 export interface SikapStudentOption {
   id: string;
@@ -463,7 +463,11 @@ export function JurnalSikapFormClient({
                               : ''}
                             {s.ruangNama}{' '}
                             <span className="text-zinc-300">|</span>{' '}
-                            <span className="font-semibold text-[#047857]">
+                            <span
+                              className={`font-semibold ${getMajorTextClass(
+                                s.jurusanKode
+                              )}`}
+                            >
                               {s.jurusanKode}
                             </span>
                           </div>

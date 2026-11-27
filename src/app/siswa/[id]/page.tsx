@@ -18,6 +18,7 @@ import {
   formatNamaGuru,
   formatTanggalIndo,
   formatWaNumber,
+  getMajorTextClass,
 } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
@@ -125,7 +126,11 @@ export default async function SiswaDetailPage({
               <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
                 {siswa.ruang_kelas.nama_ruang}{' '}
                 <span className="text-zinc-300">|</span>{' '}
-                <span className="font-semibold text-[#047857]">
+                <span
+                  className={`font-semibold ${getMajorTextClass(
+                    siswa.jurusan.kode
+                  )}`}
+                >
                   {siswa.jurusan.kode}
                 </span>
               </p>

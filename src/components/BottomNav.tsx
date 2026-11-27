@@ -131,12 +131,18 @@ export default function BottomNav({ items = NAV_ITEMS }: { items?: BottomNavItem
                             }
 
                             const isActive =
-                                item.path === "/" || item.path === "/pjr" || item.path === "/admin"
+                                item.path === "/" ||
+                                item.path === "/pjr" ||
+                                item.path === "/admin" ||
+                                item.path === "/guru"
                                     ? pathname === item.path
                                     : item.path === "/jurnal"
                                       ? pathname === "/jurnal" ||
                                         (pathname.startsWith("/jurnal/") && pathname !== "/jurnal/baru")
-                                      : pathname === item.path || pathname.startsWith(`${item.path}/`);
+                                      : item.path === "/guru/riwayat"
+                                        ? pathname === "/guru/riwayat" ||
+                                          (pathname.startsWith("/guru/") && pathname !== "/guru/baru")
+                                        : pathname === item.path || pathname.startsWith(`${item.path}/`);
 
                             return (
                                 <Link

@@ -15,7 +15,11 @@ import {
   getCachedActiveJurusanList,
   getCachedActiveRuangList,
 } from '@/lib/master-cache';
-import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
+import {
+  formatNamaGuru,
+  formatTanggalIndo,
+  getMajorTextClass,
+} from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import {
   JurnalFilterClient,
@@ -239,7 +243,14 @@ export default async function JurnalListPage({
                             {item.siswa.nama_lengkap}
                           </h3>
                           <p className="mt-1 truncate text-xs font-medium text-zinc-500">
-                            {item.snapshot_ruang} • {item.siswa.jurusan.kode}
+                            {item.snapshot_ruang} •{' '}
+                            <span
+                              className={`font-semibold ${getMajorTextClass(
+                                item.siswa.jurusan.kode
+                              )}`}
+                            >
+                              {item.siswa.jurusan.kode}
+                            </span>
                             {kategoriLabel && (
                               <>
                                 {' '}

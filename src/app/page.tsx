@@ -12,7 +12,11 @@ import {
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { formatNamaGuru, formatTanggalIndo } from '@/lib/utils';
+import {
+  formatNamaGuru,
+  formatTanggalIndo,
+  getMajorTextClass,
+} from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
 export default async function HomePage() {
@@ -198,7 +202,14 @@ export default async function HomePage() {
                             {item.siswa.nama_lengkap}
                           </h3>
                           <p className="mt-1 truncate text-xs font-medium text-zinc-500">
-                            {item.snapshot_ruang} • {item.siswa.jurusan.kode}
+                            {item.snapshot_ruang} •{' '}
+                            <span
+                              className={`font-semibold ${getMajorTextClass(
+                                item.siswa.jurusan.kode
+                              )}`}
+                            >
+                              {item.siswa.jurusan.kode}
+                            </span>
                             {kategoriLabel && (
                               <>
                                 {' '}
@@ -319,7 +330,14 @@ export default async function HomePage() {
                           {fb.jurnal.siswa.nama_lengkap}
                         </h3>
                         <p className="mt-1 truncate text-xs font-medium text-zinc-500">
-                          {namaRuang} • {fb.jurnal.siswa.jurusan.kode}{' '}
+                          {namaRuang} •{' '}
+                          <span
+                            className={`font-semibold ${getMajorTextClass(
+                              fb.jurnal.siswa.jurusan.kode
+                            )}`}
+                          >
+                            {fb.jurnal.siswa.jurusan.kode}
+                          </span>{' '}
                           <span className="text-zinc-300">|</span>{' '}
                           <span className="font-semibold text-sky-700">
                             Laporan PJR {namaRuang}
