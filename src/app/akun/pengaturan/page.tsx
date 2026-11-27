@@ -1,6 +1,12 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Lock, User } from 'lucide-react';
 import { getSession } from '@/lib/auth';
+import {
+  ACTIVE_MODE_COOKIE,
+  getHomeHrefForMode,
+  resolveActiveMode,
+} from '@/lib/mode';
 import AppShell from '@/components/layout/AppShell';
 import { UsernameFormClient } from '@/components/akun/UsernameFormClient';
 import { PasswordFormClient } from '@/components/akun/PasswordFormClient';
@@ -9,12 +15,14 @@ export default async function PengaturanAkunPage() {
   const session = await getSession();
   if (!session) redirect('/login');
 
-  const backHref =
-    session.role === 'ADMIN'
-      ? '/admin'
-      : session.role === 'GURU_PJR'
-        ? '/pjr'
-        : '/';
+  const cookieStore = await cookies();
+  const activeMode = resolveActiveMode({
+    pathname: '/akun/pengaturan',
+    savedMode: cookieStore.get(ACTIVE_MODE_COOKIE)?.value,
+    role: session.role,
+    ruangKelasId: session.ruangKelasId,
+  });
+  const backHref = getHomeHrefForMode(activeMode);
 
   return (
     <AppShell session={session} title="Setting Akun" backHref={backHref}>

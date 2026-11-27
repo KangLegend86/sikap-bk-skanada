@@ -21,12 +21,38 @@ import AppShell from '@/components/layout/AppShell';
 export default async function PjrDashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
-  if (session.role !== 'GURU_PJR') {
-    redirect(session.role === 'ADMIN' ? '/admin' : '/');
+
+  const account = await prisma.userAccount.findUnique({
+    where: { id: session.userId },
+    select: {
+      role: true,
+      ruang_kelas_id: true,
+      ruang_kelas: { select: { nama_ruang: true } },
+    },
+  });
+
+  const canAccessPjr =
+    account &&
+    (account.role === 'GURU_PJR' ||
+      (account.role === 'GURU_BK' && Boolean(account.ruang_kelas_id)));
+
+  if (!canAccessPjr) {
+    redirect(
+      session.role === 'ADMIN'
+        ? '/admin'
+        : session.role === 'GURU'
+          ? '/guru'
+          : '/'
+    );
   }
 
-  const ruangId = session.ruangKelasId;
-  const namaRuang = session.namaRuang ?? 'Belum Ditugaskan';
+  const ruangId = account.ruang_kelas_id;
+  const namaRuang = account.ruang_kelas?.nama_ruang ?? 'Belum Ditugaskan';
+  const liveSession = {
+    ...session,
+    ruangKelasId: ruangId,
+    namaRuang: account.ruang_kelas?.nama_ruang ?? null,
+  };
 
   const [totalSiswa, sharedJournals, dalamProsesCount, selesaiCount] =
     ruangId
@@ -67,7 +93,7 @@ export default async function PjrDashboardPage() {
 
   return (
     <AppShell
-      session={session}
+      session={liveSession}
       title={`Beranda PJR ${namaRuang}`}
       subtitle={`Penanggung Jawab Ruang • ${formatNamaGuru(
         session.namaLengkap

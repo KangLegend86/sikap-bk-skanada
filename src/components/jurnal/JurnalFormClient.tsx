@@ -669,10 +669,11 @@ export function JurnalFormClient({
                   2
                 </span>
                 <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
-                  Kendala
+                  Kendala<span className="ml-0.5 text-rose-600">*</span>
                 </span>
               </label>
               <textarea
+                required
                 value={kendala}
                 onChange={(e) => {
                   setKendala(e.target.value);
@@ -691,10 +692,11 @@ export function JurnalFormClient({
                   3
                 </span>
                 <span className="text-xs font-bold tracking-wide text-zinc-600 uppercase">
-                  Solusi
+                  Solusi<span className="ml-0.5 text-rose-600">*</span>
                 </span>
               </label>
               <textarea
+                required
                 value={solusi}
                 onChange={(e) => {
                   setSolusi(e.target.value);

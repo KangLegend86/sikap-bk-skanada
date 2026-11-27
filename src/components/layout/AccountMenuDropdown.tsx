@@ -4,15 +4,122 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  Check,
   ChevronRight,
+  ClipboardList,
   LogOut,
+  NotebookPen,
   Settings,
+  ShieldCheck,
   User,
   UserCircle2,
 } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
+import {
+  type AppMode,
+  readClientSavedMode,
+  resolveActiveMode,
+  writeClientSavedMode,
+} from '@/lib/mode';
 import { formatNamaGuru } from '@/lib/utils';
 import { logoutAction } from '@/actions/auth';
+
+type ModeOption = {
+  key: AppMode;
+  label: string;
+  desc: string;
+  href: string;
+  active: boolean;
+  Icon: React.ComponentType<{ className?: string }>;
+};
+
+function getAvailableModes(
+  session: SessionPayload,
+  activeMode: AppMode
+): ModeOption[] {
+  if (session.role === 'GURU') {
+    return [];
+  }
+
+  if (session.role === 'GURU_PJR') {
+    return [
+      {
+        key: 'PJR',
+        label: 'PJR',
+        desc: 'Pantau Bimbingan Konseling',
+        href: '/pjr',
+        active: activeMode === 'PJR',
+        Icon: ClipboardList,
+      },
+      {
+        key: 'GURU',
+        label: 'Jurnal Sikap',
+        desc: 'Catat Penilaian Sikap',
+        href: '/guru',
+        active: activeMode === 'GURU',
+        Icon: NotebookPen,
+      },
+    ];
+  }
+
+  if (session.role === 'GURU_BK') {
+    const modes: ModeOption[] = [
+      {
+        key: 'BK',
+        label: 'Jurnal BK',
+        desc: 'Catat Bimbingan Konseling',
+        href: '/',
+        active: activeMode === 'BK',
+        Icon: ShieldCheck,
+      },
+    ];
+
+    if (session.ruangKelasId) {
+      modes.push({
+        key: 'PJR',
+        label: 'PJR',
+        desc: 'Pantau Bimbingan Konseling',
+        href: '/pjr',
+        active: activeMode === 'PJR',
+        Icon: ClipboardList,
+      });
+    }
+
+    modes.push({
+      key: 'GURU',
+      label: 'Jurnal Sikap',
+      desc: 'Catat Penilaian Sikap',
+      href: '/guru',
+      active: activeMode === 'GURU',
+      Icon: NotebookPen,
+    });
+
+    return modes;
+  }
+
+  if (session.role === 'ADMIN') {
+    return [
+      {
+        key: 'ADMIN',
+        label: 'Admin BK',
+        desc: 'Kelola Data Master & Rekap',
+        href: '/admin',
+        active: activeMode === 'ADMIN' || activeMode === 'BK',
+        Icon: ShieldCheck,
+      },
+      {
+        key: 'GURU',
+        label: 'Jurnal Sikap',
+        desc: 'Catat Penilaian Sikap',
+        href: '/guru',
+        active: activeMode === 'GURU',
+        Icon: NotebookPen,
+      },
+    ];
+  }
+
+  return [];
+}
 
 export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
   const [open, setOpen] = useState(false);
@@ -20,12 +127,22 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
   const pathname = usePathname();
 
   const fullName = formatNamaGuru(session.namaLengkap);
+  const activeMode = resolveActiveMode({
+    pathname,
+    savedMode: readClientSavedMode(),
+    role: session.role,
+    ruangKelasId: session.ruangKelasId,
+  });
+  const modes = getAvailableModes(session, activeMode);
+
   const roleBadge =
-    session.role === 'ADMIN'
-      ? 'Koordinator BK'
-      : session.role === 'GURU_PJR'
-        ? `PJR ${session.namaRuang || ''}`
-        : 'Guru BK';
+    activeMode === 'GURU'
+      ? 'GURU | STAF'
+      : activeMode === 'PJR'
+        ? `PJR ${session.namaRuang || ''}`.trim()
+        : activeMode === 'ADMIN'
+          ? 'KOORDINATOR BK'
+          : 'GURU BK';
 
   useEffect(() => {
     if (!open) return;
@@ -79,11 +196,10 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
         aria-haspopup="menu"
         aria-expanded={open}
         title="Menu Akun"
-        className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border transition-all active:scale-95 ${
-          open
+        className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border transition-all active:scale-95 ${open
             ? 'border-[#047857] bg-[#047857] text-white shadow-sm shadow-[#047857]/25'
             : 'border-[#D1FAE5] bg-[#ECFDF5] text-[#17331E] hover:bg-[#D1FAE5]'
-        }`}
+          }`}
       >
         <User className="h-5 w-5" />
       </button>
@@ -91,7 +207,7 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2.5 w-64 origin-top-right overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.16),0_4px_12px_-4px_rgba(15,23,42,0.08)] z-50"
+          className="absolute right-0 mt-2.5 w-72 origin-top-right overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.16),0_4px_12px_-4px_rgba(15,23,42,0.08)] z-50"
         >
           {/* User Identity Header */}
           <div className="border-b border-zinc-100 bg-[#ECFDF5]/60 px-4 py-3">
@@ -103,7 +219,53 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
             </div>
           </div>
 
-          {/* Menu Items */}
+          {/* Ganti Mode (khusus akun dengan lebih dari 1 peran) */}
+          {modes.length > 1 && (
+            <div className="border-b border-zinc-100 p-1.5">
+              <div className="px-3 pt-1.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                Ganti Mode Aplikasi
+              </div>
+              {modes.map(({ key, label, desc, href, active, Icon }) => (
+                <Link
+                  key={key}
+                  href={href}
+                  role="menuitem"
+                  onClick={() => {
+                    writeClientSavedMode(key);
+                    setOpen(false);
+                  }}
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2 transition-colors ${active
+                      ? 'bg-[#ECFDF5] text-[#047857]'
+                      : 'text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950'
+                    }`}
+                >
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active
+                        ? 'bg-[#047857] text-white'
+                        : 'bg-zinc-100 text-zinc-600'
+                      }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold leading-tight">
+                      {label}
+                    </div>
+                    <div className="mt-0.5 truncate text-[11px] text-zinc-400">
+                      {desc}
+                    </div>
+                  </div>
+                  {active ? (
+                    <Check className="h-4 w-4 shrink-0 text-[#047857]" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 shrink-0 text-zinc-300" />
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Account Menu Items */}
           <div className="p-1.5">
             {menuItems.map(({ href, label, desc, Icon }) => {
               const active = pathname === href;
@@ -113,18 +275,16 @@ export function AccountMenuDropdown({ session }: { session: SessionPayload }) {
                   href={href}
                   role="menuitem"
                   onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
-                    active
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${active
                       ? 'bg-[#ECFDF5] text-[#047857]'
                       : 'text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950'
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                      active
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active
                         ? 'bg-[#047857] text-white'
                         : 'bg-zinc-100 text-zinc-600'
-                    }`}
+                      }`}
                   >
                     <Icon className="h-4 w-4" />
                   </span>

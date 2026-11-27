@@ -34,7 +34,10 @@ export default async function JurnalBaruPage() {
           select: {
             nama_ruang: true,
             akun_pjr: {
-              where: { is_active: true, role: 'GURU_PJR' },
+              where: {
+                is_active: true,
+                role: { in: ['GURU_PJR', 'GURU_BK'] },
+              },
               take: 1,
               select: {
                 pegawai: {

@@ -2,7 +2,7 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import bcrypt from 'bcryptjs';
-import { PrismaClient, type JenisKelamin } from '@prisma/client';
+import { PrismaClient, type JenisKelamin, type Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const CSV_PATH = path.resolve(process.cwd(), 'data_guru_skanada.csv');
@@ -15,6 +15,7 @@ type GuruRow = {
   pjrRuang: string | null;
   isGuruBk: boolean;
   jenisKelamin: JenisKelamin;
+  username: string;
 };
 
 function parseCsv(filePath: string): GuruRow[] {
@@ -36,8 +37,9 @@ function parseCsv(filePath: string): GuruRow[] {
     const pjrRaw = (cols[2] ?? '').toUpperCase();
     const bkRaw = (cols[3] ?? '').toLowerCase();
     const jkRaw = (cols[4] ?? '').toUpperCase();
+    const usernameRaw = (cols[5] ?? '').trim().toLowerCase();
 
-    if (!namaRaw) continue;
+    if (!namaRaw || !usernameRaw) continue;
 
     const jenisKelamin: JenisKelamin = jkRaw === 'L' ? 'L' : 'P';
 
@@ -47,17 +49,18 @@ function parseCsv(filePath: string): GuruRow[] {
       pjrRuang: pjrRaw || null,
       isGuruBk: bkRaw === 'iya' || bkRaw === 'ya' || bkRaw === 'true',
       jenisKelamin,
+      username: usernameRaw,
     });
   }
 
   return rows;
 }
 
-function makePjrUsername(namaRuang: string): string {
+function makeLegacyPjrUsername(namaRuang: string): string {
   return `pjr.${namaRuang.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
 }
 
-function makeBkUsername(namaLengkap: string): string {
+function makeLegacyBkUsername(namaLengkap: string): string {
   const lower = namaLengkap.toLowerCase();
   if (lower.includes('zumrotus')) return 'bk.zumrotus';
   if (lower.includes('sulistiani')) return 'bk.sulis';
@@ -68,10 +71,12 @@ function makeBkUsername(namaLengkap: string): string {
 async function main() {
   console.log('📂 Membaca file:', CSV_PATH);
   const rows = parseCsv(CSV_PATH);
-  console.log(`✅ Terbaca ${rows.length} data guru.`);
+  console.log(`✅ Terbaca ${rows.length} data guru dari CSV.`);
 
   const jurnalBefore = await prisma.jurnalBk.count();
-  console.log(`🛡️  Total Jurnal BK sebelum import: ${jurnalBefore}`);
+  const feedbackBefore = await prisma.pjrFeedback.count();
+  console.log(`🛡️  Jurnal BK sebelum import   : ${jurnalBefore}`);
+  console.log(`🛡️  PJR Feedback sebelum import: ${feedbackBefore}`);
 
   const defaultHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
 
@@ -85,21 +90,21 @@ async function main() {
     existingPegawai.map((p) => [p.nama_lengkap.trim().toLowerCase(), p])
   );
 
-  // Cari akun bk.siti atau pegawai Zumrotus lama agar relasi JurnalBk tetap 100% utuh
-  const bkSitiAccount = await prisma.userAccount.findFirst({
-    where: { username: { in: ['bk.siti', 'bk.zumrotus'] } },
+  // Cari pegawai Zumrotus lama agar relasi JurnalBk tetap 100% utuh
+  const bkSitiOrZumrotusAccount = await prisma.userAccount.findFirst({
+    where: { username: { in: ['bk.siti', 'bk.zumrotus', 'zumrotus'] } },
   });
   const zumrotusExistingPegawai =
     existingPegawai.find((p) => p.id === ZUMROTUS_EXISTING_PEGAWAI_ID) ??
-    (bkSitiAccount
-      ? existingPegawai.find((p) => p.id === bkSitiAccount.pegawai_id)
+    (bkSitiOrZumrotusAccount
+      ? existingPegawai.find((p) => p.id === bkSitiOrZumrotusAccount.pegawai_id)
       : undefined);
 
   const activeSyncedUsernames = new Set<string>();
   let pegawaiCreated = 0;
   let pegawaiUpdated = 0;
-  const createdOrUpdatedAccounts: {
-    role: string;
+  const syncedAccounts: {
+    role: Role;
     username: string;
     nama: string;
     ruang: string;
@@ -119,9 +124,6 @@ async function main() {
       });
       pegawaiId = updated.id;
       pegawaiUpdated++;
-      console.log(
-        `🔄 Update Pegawai lama (${updated.id}) -> ${updated.nama_lengkap}`
-      );
     } else {
       const existing = pegawaiByName.get(row.namaLengkap.toLowerCase());
       if (existing) {
@@ -146,54 +148,10 @@ async function main() {
       }
     }
 
-    const displayName = row.namaLengkap;
-
-    // 1. Akun GURU_BK
-    if (row.isGuruBk) {
-      const bkUsername = makeBkUsername(row.namaLengkap);
-      activeSyncedUsernames.add(bkUsername);
-
-      if (isZumrotus && bkSitiAccount) {
-        await prisma.userAccount.update({
-          where: { id: bkSitiAccount.id },
-          data: {
-            username: bkUsername,
-            role: 'GURU_BK',
-            pegawai_id: pegawaiId,
-            ruang_kelas_id: null,
-            is_active: true,
-          },
-        });
-      } else {
-        await prisma.userAccount.upsert({
-          where: { username: bkUsername },
-          update: {
-            role: 'GURU_BK',
-            pegawai_id: pegawaiId,
-            ruang_kelas_id: null,
-            is_active: true,
-          },
-          create: {
-            username: bkUsername,
-            password_hash: defaultHash,
-            role: 'GURU_BK',
-            pegawai_id: pegawaiId,
-            is_active: true,
-          },
-        });
-      }
-
-      createdOrUpdatedAccounts.push({
-        role: 'GURU_BK',
-        username: bkUsername,
-        nama: displayName,
-        ruang: '-',
-      });
-    }
-
-    // 2. Akun GURU_PJR
+    // Pastikan RuangKelas tersedia jika guru ini punya tugas PJR
+    let ruangId: string | null = null;
     if (row.pjrRuang) {
-      let ruangId = ruangMap.get(row.pjrRuang);
+      ruangId = ruangMap.get(row.pjrRuang) ?? null;
       if (!ruangId) {
         const tingkat = row.pjrRuang.split('-')[0] || 'X';
         const createdRuang = await prisma.ruangKelas.create({
@@ -203,64 +161,127 @@ async function main() {
         ruangMap.set(row.pjrRuang, ruangId);
         console.log(`➕ Membuat RuangKelas baru: ${row.pjrRuang}`);
       }
+    }
 
-      const pjrUsername = makePjrUsername(row.pjrRuang);
-      activeSyncedUsernames.add(pjrUsername);
+    // Tentukan 1 role utama (1 Guru = 1 Akun)
+    const targetRole: Role = row.isGuruBk
+      ? 'GURU_BK'
+      : row.pjrRuang
+        ? 'GURU_PJR'
+        : 'GURU';
 
-      await prisma.userAccount.upsert({
-        where: { username: pjrUsername },
-        update: {
-          role: 'GURU_PJR',
-          pegawai_id: pegawaiId,
-          ruang_kelas_id: ruangId,
-          is_active: true,
-        },
-        create: {
-          username: pjrUsername,
-          password_hash: defaultHash,
-          role: 'GURU_PJR',
+    const targetUsername = row.username;
+    activeSyncedUsernames.add(targetUsername);
+
+    // Cari akun target yang sudah ada, atau akun legacy (bk.* / pjr.*) untuk migrasi in-place
+    const legacyCandidates: string[] = [];
+    if (row.isGuruBk) {
+      legacyCandidates.push(makeLegacyBkUsername(row.namaLengkap));
+      if (isZumrotus) legacyCandidates.push('bk.siti');
+    }
+    if (row.pjrRuang) {
+      legacyCandidates.push(makeLegacyPjrUsername(row.pjrRuang));
+    }
+
+    let primaryAccount = await prisma.userAccount.findUnique({
+      where: { username: targetUsername },
+    });
+
+    if (!primaryAccount && legacyCandidates.length > 0) {
+      // Pilih akun legacy pertama yang ditemukan (prioritas bk.* dulu untuk guru BK)
+      for (const candidate of legacyCandidates) {
+        const found = await prisma.userAccount.findUnique({
+          where: { username: candidate },
+        });
+        if (found) {
+          primaryAccount = found;
+          break;
+        }
+      }
+    }
+
+    if (primaryAccount) {
+      primaryAccount = await prisma.userAccount.update({
+        where: { id: primaryAccount.id },
+        data: {
+          username: targetUsername,
+          role: targetRole,
           pegawai_id: pegawaiId,
           ruang_kelas_id: ruangId,
           is_active: true,
         },
       });
-
-      createdOrUpdatedAccounts.push({
-        role: 'GURU_PJR',
-        username: pjrUsername,
-        nama: displayName,
-        ruang: row.pjrRuang,
+    } else {
+      primaryAccount = await prisma.userAccount.create({
+        data: {
+          username: targetUsername,
+          password_hash: defaultHash,
+          role: targetRole,
+          pegawai_id: pegawaiId,
+          ruang_kelas_id: ruangId,
+          is_active: true,
+        },
       });
     }
+
+    // Jika pegawai punya akun legacy tambahan (misal Bu Zumrotus sebelumnya punya bk.zumrotus DAN pjr.xiie),
+    // pindahkan PjrFeedback ke primaryAccount lalu nonaktifkan akun legacy ganda tersebut
+    for (const candidate of legacyCandidates) {
+      if (candidate === targetUsername) continue;
+      const dupAccount = await prisma.userAccount.findUnique({
+        where: { username: candidate },
+      });
+      if (dupAccount && dupAccount.id !== primaryAccount.id) {
+        await prisma.pjrFeedback.updateMany({
+          where: { user_pjr_id: dupAccount.id },
+          data: { user_pjr_id: primaryAccount.id },
+        });
+        await prisma.userAccount.update({
+          where: { id: dupAccount.id },
+          data: { is_active: false, ruang_kelas_id: null },
+        });
+        console.log(
+          `🔀 Gabung akun legacy "${candidate}" -> "${targetUsername}" (feedback dipindah & akun lama dinonaktifkan)`
+        );
+      }
+    }
+
+    syncedAccounts.push({
+      role: targetRole,
+      username: targetUsername,
+      nama: row.namaLengkap,
+      ruang: row.pjrRuang ?? '-',
+    });
   }
 
-  // Nonaktifkan akun dummy lama GURU_BK / GURU_PJR yang tidak ada di CSV (ADMIN tetap aman!)
+  // Nonaktifkan akun lama non-ADMIN yang tidak ada di daftar 52 username CSV
   const deactivated = await prisma.userAccount.updateMany({
     where: {
-      role: { in: ['GURU_BK', 'GURU_PJR'] },
+      role: { in: ['GURU_BK', 'GURU_PJR', 'GURU'] },
       username: { notIn: Array.from(activeSyncedUsernames) },
       is_active: true,
     },
-    data: { is_active: false },
+    data: { is_active: false, ruang_kelas_id: null },
   });
 
   const jurnalAfter = await prisma.jurnalBk.count();
+  const feedbackAfter = await prisma.pjrFeedback.count();
   const totalPegawai = await prisma.pegawai.count();
 
-  console.log('\n=== RINGKASAN IMPORT GURU ===');
-  console.log(`Pegawai baru    : ${pegawaiCreated}`);
-  console.log(`Pegawai diupdate: ${pegawaiUpdated}`);
-  console.log(`Total Pegawai   : ${totalPegawai}`);
-  console.log(`Akun aktif CSV  : ${createdOrUpdatedAccounts.length}`);
-  console.log(`Akun lama off   : ${deactivated.count}`);
-  console.log(`Jurnal BK       : ${jurnalBefore} -> ${jurnalAfter} (100% AMAN!)`);
-  console.log(`Password default akun baru: ${DEFAULT_PASSWORD}\n`);
-  console.log('=== DAFTAR AKUN AKTIF (BK & PJR) ===');
-  for (const acc of createdOrUpdatedAccounts) {
-    console.log(
-      `${acc.role.padEnd(9)} | ${acc.username.padEnd(13)} | ${acc.ruang.padEnd(5)} | ${acc.nama}`
-    );
-  }
+  console.log('\n=== RINGKASAN IMPORT 52 GURU (1 GURU = 1 AKUN) ===');
+  console.log(`Pegawai baru     : ${pegawaiCreated}`);
+  console.log(`Pegawai diupdate : ${pegawaiUpdated}`);
+  console.log(`Total Pegawai    : ${totalPegawai}`);
+  console.log(`Akun aktif CSV   : ${syncedAccounts.length}`);
+  console.log(`Akun lama off    : ${deactivated.count}`);
+  console.log(`Jurnal BK        : ${jurnalBefore} -> ${jurnalAfter} (100% AMAN!)`);
+  console.log(`PJR Feedback     : ${feedbackBefore} -> ${feedbackAfter} (100% AMAN!)`);
+  console.log(`Password default : ${DEFAULT_PASSWORD}\n`);
+
+  const bkCount = syncedAccounts.filter((a) => a.role === 'GURU_BK').length;
+  const pjrCount = syncedAccounts.filter((a) => a.role === 'GURU_PJR').length;
+  const guruCount = syncedAccounts.filter((a) => a.role === 'GURU').length;
+  console.log(`Rincian Role     : GURU_BK=${bkCount}, GURU_PJR=${pjrCount}, GURU=${guruCount}`);
 }
 
 main()

@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import type { SessionPayload } from '@/lib/auth';
+import { readClientSavedMode, resolveActiveMode } from '@/lib/mode';
 import { formatNamaGuru } from '@/lib/utils';
 import { AccountMenuDropdown } from '@/components/layout/AccountMenuDropdown';
 
@@ -19,18 +21,28 @@ export function AppShell({
   backHref?: string;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const fullName = formatNamaGuru(session.namaLengkap);
 
+  const activeMode = resolveActiveMode({
+    pathname,
+    savedMode: readClientSavedMode(),
+    role: session.role,
+    ruangKelasId: session.ruangKelasId,
+  });
+
   const roleBadge =
-    session.role === 'ADMIN'
-      ? 'Koordinator BK'
-      : session.role === 'GURU_PJR'
-        ? `PJR ${session.namaRuang || ''}`
-        : 'Guru BK';
+    activeMode === 'GURU'
+      ? 'GURU | STAF'
+      : activeMode === 'PJR'
+        ? `PJR ${session.namaRuang || ''}`.trim()
+        : activeMode === 'ADMIN'
+          ? 'KOORDINATOR BK'
+          : 'GURU BK';
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
-      {/* Sticky Header (Mobile-first untuk semua ukuran layar) */}
+      {/* Sticky Header (Mobile-first, bersih tanpa bar tambahan) */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#D1FAE5] px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           {backHref ? (

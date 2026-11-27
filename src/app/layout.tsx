@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { getSession } from "@/lib/auth";
+import { ACTIVE_MODE_COOKIE, isValidAppMode } from "@/lib/mode";
 import { PersistentBottomNav } from "@/components/layout/PersistentBottomNav";
 import { TopProgressBar } from "@/components/layout/TopProgressBar";
 import "./globals.css";
@@ -52,6 +54,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getSession();
+  const cookieStore = await cookies();
+  const rawSavedMode = cookieStore.get(ACTIVE_MODE_COOKIE)?.value;
+  const savedMode = isValidAppMode(rawSavedMode) ? rawSavedMode : null;
 
   return (
     <html
@@ -63,7 +68,11 @@ export default async function RootLayout({
           <TopProgressBar />
         </Suspense>
         {children}
-        <PersistentBottomNav role={session?.role ?? null} />
+        <PersistentBottomNav
+          role={session?.role ?? null}
+          ruangKelasId={session?.ruangKelasId ?? null}
+          initialSavedMode={savedMode}
+        />
       </body>
     </html>
   );

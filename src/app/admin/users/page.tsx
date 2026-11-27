@@ -5,15 +5,20 @@ import { formatNamaGuru } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import { AdminUsersClient } from '@/components/admin/AdminUsersClient';
 
-
 export default async function AdminUsersPage() {
   const session = await getSession();
   if (!session) redirect('/admin/login');
   if (session.role !== 'ADMIN') {
-    redirect(session.role === 'GURU_PJR' ? '/pjr' : '/');
+    redirect(
+      session.role === 'GURU_PJR'
+        ? '/pjr'
+        : session.role === 'GURU'
+          ? '/guru'
+          : '/'
+    );
   }
 
-  const [pegawaiList, ruangList, rawUsers] = await Promise.all([
+  const [pegawaiList, ruangList, rawUsers, missingCount] = await Promise.all([
     prisma.pegawai.findMany({
       orderBy: { nama_lengkap: 'asc' },
       select: { id: true, nama_lengkap: true },
@@ -24,11 +29,14 @@ export default async function AdminUsersPage() {
       select: { id: true, nama_ruang: true },
     }),
     prisma.userAccount.findMany({
-      orderBy: [{ role: 'asc' }, { username: 'asc' }],
+      orderBy: [{ is_active: 'desc' }, { role: 'asc' }, { username: 'asc' }],
       include: {
         pegawai: true,
         ruang_kelas: true,
       },
+    }),
+    prisma.pegawai.count({
+      where: { akun: { none: {} } },
     }),
   ]);
 
@@ -38,6 +46,7 @@ export default async function AdminUsersPage() {
     role: u.role,
     is_active: u.is_active,
     pegawaiNama: formatNamaGuru(u.pegawai.nama_lengkap),
+    ruangKelasId: u.ruang_kelas_id,
     ruangNama: u.ruang_kelas?.nama_ruang ?? null,
   }));
 
@@ -45,14 +54,14 @@ export default async function AdminUsersPage() {
     <AppShell
       session={session}
       title="Manajemen Akun Pengguna"
-      subtitle="Atur akun terpisah untuk Admin, Guru BK, dan Guru PJR"
+      subtitle="Atur 1 akun per guru untuk Admin, Guru BK, Guru PJR, dan Guru"
     >
       <AdminUsersClient
         pegawaiList={pegawaiList}
         ruangList={ruangList}
         users={users}
+        missingGuruCount={missingCount}
       />
     </AppShell>
   );
 }
-

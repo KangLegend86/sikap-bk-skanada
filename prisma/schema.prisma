@@ -11,6 +11,13 @@ enum Role {
   ADMIN
   GURU_BK
   GURU_PJR
+  GURU
+}
+
+enum JenisJurnalSikap {
+  BERPRESTASI
+  BERMASALAH
+  HOME_VISIT
 }
 
 enum JenisKelamin {
@@ -24,30 +31,32 @@ enum StatusKasus {
 }
 
 model Pegawai {
-  id            String        @id @default(cuid())
-  nip_nik       String?       @unique
-  nama_lengkap  String
-  jenis_kelamin JenisKelamin
-  no_whatsapp   String?
-  akun          UserAccount[]
-  jurnal_dibuat JurnalBk[]    @relation("KonselorJurnal")
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+  id                  String        @id @default(cuid())
+  nip_nik             String?       @unique
+  nama_lengkap        String
+  jenis_kelamin       JenisKelamin
+  no_whatsapp         String?
+  akun                UserAccount[]
+  jurnal_dibuat       JurnalBk[]    @relation("KonselorJurnal")
+  jurnal_sikap_dibuat JurnalSikap[] @relation("KonselorJurnalSikap")
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
 }
 
 model UserAccount {
-  id             String        @id @default(cuid())
-  username       String        @unique
-  password_hash  String
-  role           Role
-  is_active      Boolean       @default(true)
-  pegawai_id     String
-  pegawai        Pegawai       @relation(fields: [pegawai_id], references: [id], onDelete: Cascade)
-  ruang_kelas_id String?       // Khusus role GURU_PJR
-  ruang_kelas    RuangKelas?   @relation(fields: [ruang_kelas_id], references: [id], onDelete: SetNull)
-  feedback_pjr   PjrFeedback[]
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  id                  String        @id @default(cuid())
+  username            String        @unique
+  password_hash       String
+  role                Role
+  is_active           Boolean       @default(true)
+  pegawai_id          String
+  pegawai             Pegawai       @relation(fields: [pegawai_id], references: [id], onDelete: Cascade)
+  ruang_kelas_id      String?       // Khusus role GURU_PJR atau GURU_BK yang merangkap PJR
+  ruang_kelas         RuangKelas?   @relation(fields: [ruang_kelas_id], references: [id], onDelete: SetNull)
+  feedback_pjr        PjrFeedback[]
+  jurnal_sikap_input  JurnalSikap[] @relation("CreatorJurnalSikap")
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
 }
 
 model Jurusan {
@@ -78,9 +87,10 @@ model Siswa {
   ruang_kelas    RuangKelas   @relation(fields: [ruang_kelas_id], references: [id])
   nama_wali      String?
   no_hp_ortu     String?
-  is_active      Boolean      @default(true)
+  is_active      Boolean       @default(true)
   jurnal         JurnalBk[]
-  created_at     DateTime     @default(now())
+  jurnal_sikap   JurnalSikap[]
+  created_at     DateTime      @default(now())
   updated_at     DateTime     @updatedAt
 
   @@index([is_active, ruang_kelas_id])
@@ -139,5 +149,34 @@ model PjrFeedback {
   user_pjr       UserAccount @relation(fields: [user_pjr_id], references: [id])
   pesan_pantauan String      @db.Text
   created_at     DateTime    @default(now())
+}
+
+model JurnalSikap {
+  id             String           @id @default(cuid())
+  tanggal        DateTime         @default(now())
+  siswa_id       String
+  siswa          Siswa            @relation(fields: [siswa_id], references: [id], onDelete: Cascade)
+  snapshot_ruang String
+  jenis          JenisJurnalSikap
+  // Field khusus BERPRESTASI
+  prestasi_dalam String?          @db.Text
+  sikap_perilaku String?          @db.Text
+  // Field khusus BERMASALAH & HOME_VISIT
+  permasalahan   String?          @db.Text
+  kendala        String?          @db.Text
+  solusi         String?          @db.Text
+  // Field umum
+  catatan        String?          @db.Text
+  tindak_lanjut  String           @db.Text
+  // Field khusus HOME_VISIT (opsional)
+  foto_drive_id  String?
+  foto_file_name String?
+  // Konselor / Guru yang dipilih & akun penginput
+  konselor_id    String
+  konselor       Pegawai          @relation("KonselorJurnalSikap", fields: [konselor_id], references: [id])
+  created_by_id  String
+  created_by     UserAccount      @relation("CreatorJurnalSikap", fields: [created_by_id], references: [id])
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
 }
 

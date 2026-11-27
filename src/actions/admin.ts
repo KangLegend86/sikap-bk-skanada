@@ -107,7 +107,8 @@ export async function createUserAccountAction(formData: FormData) {
         username,
         password_hash: passwordHash,
         role,
-        ruang_kelas_id: role === 'GURU_PJR' ? ruangKelasId : null,
+        ruang_kelas_id:
+          role === 'GURU_PJR' || role === 'GURU_BK' ? ruangKelasId : null,
       },
     });
 
@@ -115,6 +116,90 @@ export async function createUserAccountAction(formData: FormData) {
     return { success: `Akun "${username}" berhasil dibuat.` };
   } catch (e: unknown) {
     return { error: e instanceof Error ? e.message : 'Gagal membuat akun.' };
+  }
+}
+
+export async function updateUserRoleRuangAction(
+  userId: string,
+  role: Role,
+  ruangKelasId: string | null
+) {
+  try {
+    await requireAdmin();
+    if (role === 'GURU_PJR' && !ruangKelasId) {
+      return { error: 'Untuk peran Guru PJR, wajib memilih Ruang Kelas binaan.' };
+    }
+    await prisma.userAccount.update({
+      where: { id: userId },
+      data: {
+        role,
+        ruang_kelas_id:
+          role === 'GURU_PJR' || role === 'GURU_BK' ? ruangKelasId : null,
+      },
+    });
+    revalidatePath('/admin/users');
+    revalidatePath('/pjr');
+    return { success: 'Peran & ruang kelas akun berhasil diperbarui.' };
+  } catch (e: unknown) {
+    return {
+      error: e instanceof Error ? e.message : 'Gagal memperbarui akun.',
+    };
+  }
+}
+
+export async function generateMissingGuruAccountsAction() {
+  try {
+    await requireAdmin();
+    const pegawaiWithoutAccount = await prisma.pegawai.findMany({
+      where: { akun: { none: {} } },
+      select: { id: true, nama_lengkap: true },
+    });
+
+    if (pegawaiWithoutAccount.length === 0) {
+      return { success: 'Semua pegawai sudah memiliki akun login.' };
+    }
+
+    const defaultPassword = process.env.DEFAULT_GURU_PASSWORD || 'skanada2026';
+    const passwordHash = await bcrypt.hash(defaultPassword, 10);
+    let createdCount = 0;
+
+    for (const p of pegawaiWithoutAccount) {
+      const cleaned = p.nama_lengkap
+        .split(',')[0]
+        .toLowerCase()
+        .replace(/[^a-z\s]/g, '')
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .join('_');
+
+      const baseUsername = cleaned || `guru_${p.id.slice(-4)}`;
+      let candidate = baseUsername;
+      let suffix = 1;
+      while (await prisma.userAccount.findUnique({ where: { username: candidate } })) {
+        candidate = `${baseUsername}${suffix++}`;
+      }
+
+      await prisma.userAccount.create({
+        data: {
+          pegawai_id: p.id,
+          username: candidate,
+          password_hash: passwordHash,
+          role: 'GURU',
+          is_active: true,
+        },
+      });
+      createdCount++;
+    }
+
+    revalidatePath('/admin/users');
+    return {
+      success: `${createdCount} akun Guru baru berhasil dibuat (password awal: ${defaultPassword}).`,
+    };
+  } catch (e: unknown) {
+    return {
+      error: e instanceof Error ? e.message : 'Gagal generate akun guru.',
+    };
   }
 }
 

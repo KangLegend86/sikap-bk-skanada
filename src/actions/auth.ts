@@ -1,9 +1,11 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { clearSessionCookie, getSession, setSessionCookie } from '@/lib/auth';
+import { ACTIVE_MODE_COOKIE } from '@/lib/mode';
 
 export type AuthActionState = {
   error?: string;
@@ -73,11 +75,16 @@ export async function loginGuruAction(
   if (account.role === 'GURU_PJR') {
     redirect('/pjr');
   }
+  if (account.role === 'GURU') {
+    redirect('/guru');
+  }
   redirect('/');
 }
 
 export async function logoutAction() {
   await clearSessionCookie();
+  const cookieStore = await cookies();
+  cookieStore.delete(ACTIVE_MODE_COOKIE);
   redirect('/login');
 }
 

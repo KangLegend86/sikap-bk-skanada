@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth';
 
+function getHomePathForRole(role: 'ADMIN' | 'GURU_BK' | 'GURU_PJR' | 'GURU'): string {
+  if (role === 'ADMIN') return '/admin';
+  if (role === 'GURU_PJR') return '/pjr';
+  if (role === 'GURU') return '/guru';
+  return '/';
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -22,18 +29,14 @@ export async function proxy(request: NextRequest) {
   // 1. Halaman Login Publik
   if (pathname === '/admin/login') {
     if (session) {
-      if (session.role === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
-      if (session.role === 'GURU_PJR') return NextResponse.redirect(new URL('/pjr', request.url));
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL(getHomePathForRole(session.role), request.url));
     }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (pathname === '/login') {
     if (session) {
-      if (session.role === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
-      if (session.role === 'GURU_PJR') return NextResponse.redirect(new URL('/pjr', request.url));
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL(getHomePathForRole(session.role), request.url));
     }
     return NextResponse.next();
   }
@@ -44,22 +47,33 @@ export async function proxy(request: NextRequest) {
   }
 
   // 3. Proteksi Rute per Role
+  // Admin area: khusus ADMIN
   if (pathname.startsWith('/admin') && session.role !== 'ADMIN') {
-    if (session.role === 'GURU_PJR') return NextResponse.redirect(new URL('/pjr', request.url));
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL(getHomePathForRole(session.role), request.url));
   }
 
-  if (pathname.startsWith('/pjr') && session.role !== 'GURU_PJR') {
-    if (session.role === 'ADMIN') return NextResponse.redirect(new URL('/admin', request.url));
-    return NextResponse.redirect(new URL('/', request.url));
+  // PJR area: khusus GURU_PJR atau GURU_BK yang merangkap PJR
+  const canAccessPjr =
+    session.role === 'GURU_PJR' ||
+    (session.role === 'GURU_BK' && Boolean(session.ruangKelasId));
+
+  if (pathname.startsWith('/pjr') && !canAccessPjr) {
+    return NextResponse.redirect(new URL(getHomePathForRole(session.role), request.url));
   }
 
-  // Jika Guru PJR mencoba akses rute Guru BK (/ atau /jurnal atau /siswa)
+  // Mode Guru (/guru/*): semua role yang login boleh mengakses untuk mengisi Jurnal Sikap
+  if (pathname.startsWith('/guru')) {
+    return NextResponse.next();
+  }
+
+  // Rute khusus Guru BK / Admin: /, /jurnal, /jurnal-sikap, /siswa
   if (
-    session.role === 'GURU_PJR' &&
-    (pathname === '/' || pathname.startsWith('/jurnal') || pathname.startsWith('/siswa'))
+    (session.role === 'GURU_PJR' || session.role === 'GURU') &&
+    (pathname === '/' ||
+      pathname.startsWith('/jurnal') ||
+      pathname.startsWith('/siswa'))
   ) {
-    return NextResponse.redirect(new URL('/pjr', request.url));
+    return NextResponse.redirect(new URL(getHomePathForRole(session.role), request.url));
   }
 
   // Jika Admin mengakses root /, arahkan ke /admin
@@ -73,4 +87,3 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|images|icons|favicon.ico).*)'],
 };
-

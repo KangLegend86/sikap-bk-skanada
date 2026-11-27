@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
   BadgeCheck,
@@ -10,14 +11,20 @@ import {
   User,
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
+import {
+  ACTIVE_MODE_COOKIE,
+  getHomeHrefForMode,
+  resolveActiveMode,
+} from '@/lib/mode';
 import { prisma } from '@/lib/prisma';
 import { formatNamaGuru } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 
-const ROLE_LABEL: Record<'ADMIN' | 'GURU_BK' | 'GURU_PJR', string> = {
+const ROLE_LABEL: Record<'ADMIN' | 'GURU_BK' | 'GURU_PJR' | 'GURU', string> = {
   ADMIN: 'Admin / Koordinator BK',
   GURU_BK: 'Guru BK',
   GURU_PJR: 'Guru PJR',
+  GURU: 'Guru | Staf',
 };
 
 export default async function ProfilPage() {
@@ -33,12 +40,14 @@ export default async function ProfilPage() {
   });
 
   const fullName = formatNamaGuru(session.namaLengkap);
-  const backHref =
-    session.role === 'ADMIN'
-      ? '/admin'
-      : session.role === 'GURU_PJR'
-        ? '/pjr'
-        : '/';
+  const cookieStore = await cookies();
+  const activeMode = resolveActiveMode({
+    pathname: '/akun/profil',
+    savedMode: cookieStore.get(ACTIVE_MODE_COOKIE)?.value,
+    role: session.role,
+    ruangKelasId: account?.ruang_kelas_id ?? session.ruangKelasId,
+  });
+  const backHref = getHomeHrefForMode(activeMode);
 
   const detailItems = [
     {
@@ -58,12 +67,12 @@ export default async function ProfilPage() {
     },
     ...(account?.ruang_kelas?.nama_ruang || session.namaRuang
       ? [
-          {
-            label: 'Penanggung Jawab Ruang',
-            value: account?.ruang_kelas?.nama_ruang ?? session.namaRuang ?? '-',
-            Icon: Building2,
-          },
-        ]
+        {
+          label: 'Penanggung Jawab Ruang',
+          value: account?.ruang_kelas?.nama_ruang ?? session.namaRuang ?? '-',
+          Icon: Building2,
+        },
+      ]
       : []),
     {
       label: 'Jenis Kelamin',

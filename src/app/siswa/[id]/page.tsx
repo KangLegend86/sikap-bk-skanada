@@ -36,6 +36,7 @@ export default async function SiswaDetailPage({
   const session = await getSession();
   if (!session) redirect('/login');
   if (session.role === 'GURU_PJR') redirect('/pjr/siswa');
+  if (session.role === 'GURU') redirect('/guru');
 
   const { id } = await params;
 
@@ -67,6 +68,21 @@ export default async function SiswaDetailPage({
             },
           },
           _count: { select: { feedback: true } },
+        },
+      },
+      jurnal_sikap: {
+        orderBy: [{ tanggal: 'desc' }, { created_at: 'desc' }],
+        select: {
+          id: true,
+          tanggal: true,
+          snapshot_ruang: true,
+          jenis: true,
+          prestasi_dalam: true,
+          sikap_perilaku: true,
+          permasalahan: true,
+          tindak_lanjut: true,
+          foto_drive_id: true,
+          konselor: { select: { nama_lengkap: true } },
         },
       },
     },
@@ -321,6 +337,78 @@ export default async function SiswaDetailPage({
                         </span>
                       </div>
                     </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* 3. Riwayat Jurnal Penilaian Sikap */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-zinc-900">
+              Riwayat Jurnal Penilaian Sikap ({siswa.jurnal_sikap.length})
+            </h2>
+            <Link
+              href="/guru/baru"
+              className="text-xs font-semibold text-[#047857] hover:underline"
+            >
+              + Catat Sikap
+            </Link>
+          </div>
+
+          {siswa.jurnal_sikap.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-6 text-center">
+              <p className="text-xs font-medium text-zinc-500">
+                Belum ada catatan Jurnal Penilaian Sikap untuk siswa ini.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {siswa.jurnal_sikap.map((js) => {
+                const badgeCls =
+                  js.jenis === 'BERPRESTASI'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    : js.jenis === 'HOME_VISIT'
+                      ? 'border-blue-200 bg-blue-50 text-blue-700'
+                      : 'border-amber-200 bg-amber-50 text-amber-700';
+                const label =
+                  js.jenis === 'BERPRESTASI'
+                    ? 'Berprestasi'
+                    : js.jenis === 'HOME_VISIT'
+                      ? 'Home Visit'
+                      : 'Bermasalah';
+                const ringkasan =
+                  js.jenis === 'BERPRESTASI'
+                    ? js.prestasi_dalam || js.sikap_perilaku || '-'
+                    : js.permasalahan || '-';
+
+                return (
+                  <Link
+                    key={js.id}
+                    href={`/jurnal-sikap/${js.id}`}
+                    className="block rounded-xl border border-zinc-200/80 bg-white p-3.5 shadow-xs transition-colors hover:border-[#A7F3D0]"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span
+                        className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${badgeCls}`}
+                      >
+                        {label}
+                      </span>
+                      <span className="text-[11px] font-medium text-zinc-400">
+                        {formatTanggalIndo(js.tanggal)} • {js.snapshot_ruang}
+                      </span>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-[13px] text-zinc-700">
+                      {ringkasan}
+                    </p>
+                    <p className="mt-1.5 text-[11px] text-zinc-500">
+                      Konselor:{' '}
+                      <span className="font-semibold text-zinc-700">
+                        {formatNamaGuru(js.konselor.nama_lengkap)}
+                      </span>
+                    </p>
                   </Link>
                 );
               })}

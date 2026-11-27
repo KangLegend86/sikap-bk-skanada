@@ -34,6 +34,8 @@ export async function createJurnalAction(input: {
     return { error: 'Pilih minimal 1 kategori bimbingan.' };
   }
   if (!input.permasalahan.trim()) return { error: 'Permasalahan wajib diisi.' };
+  if (!input.kendala?.trim()) return { error: 'Kendala wajib diisi.' };
+  if (!input.solusi?.trim()) return { error: 'Solusi wajib diisi.' };
   if (!input.tindakLanjut.trim()) return { error: 'Tindak lanjut wajib diisi.' };
 
   // Ambil data siswa beserta ruang dan PJR aktif ruang tersebut
@@ -43,7 +45,7 @@ export async function createJurnalAction(input: {
       ruang_kelas: {
         include: {
           akun_pjr: {
-            where: { role: 'GURU_PJR', is_active: true },
+            where: { role: { in: ['GURU_PJR', 'GURU_BK'] }, is_active: true },
             include: { pegawai: true },
             take: 1,
           },
@@ -185,7 +187,21 @@ export async function submitPjrFeedbackAction(
   pesanPantauan: string
 ): Promise<JurnalActionResult> {
   const session = await getSession();
-  if (!session || session.role !== 'GURU_PJR') {
+  if (!session) {
+    return { error: 'Sesi login telah berakhir.' };
+  }
+
+  const account = await prisma.userAccount.findUnique({
+    where: { id: session.userId },
+    select: { role: true, ruang_kelas_id: true },
+  });
+
+  const canActAsPjr =
+    account &&
+    Boolean(account.ruang_kelas_id) &&
+    (account.role === 'GURU_PJR' || account.role === 'GURU_BK');
+
+  if (!canActAsPjr) {
     return { error: 'Hanya Guru PJR yang dapat mengirim laporan pantauan.' };
   }
   if (!pesanPantauan.trim()) {
@@ -201,7 +217,7 @@ export async function submitPjrFeedbackAction(
   if (
     !jurnal ||
     !jurnal.is_shared_with_pjr ||
-    jurnal.siswa.ruang_kelas_id !== session.ruangKelasId
+    jurnal.siswa.ruang_kelas_id !== account.ruang_kelas_id
   ) {
     return { error: 'Jurnal tidak ditemukan atau tidak dibagikan ke ruang Anda.' };
   }
