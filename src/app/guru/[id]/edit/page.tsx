@@ -22,6 +22,7 @@ export default async function GuruJurnalSikapEditPage({
 
   const existing = await prisma.jurnalSikap.findUnique({
     where: { id },
+    include: { foto_list: { orderBy: { urutan: 'asc' } } },
   });
   if (!existing) notFound();
 
@@ -100,12 +101,28 @@ export default async function GuruJurnalSikapEditPage({
     timeZone: 'Asia/Jakarta',
   });
 
+  const existingPhotos: { driveId: string; fileName: string | null }[] = [
+    ...existing.foto_list.map((f) => ({
+      driveId: f.drive_id,
+      fileName: f.file_name,
+    })),
+  ];
+  if (
+    existing.foto_drive_id &&
+    !existingPhotos.some((p) => p.driveId === existing.foto_drive_id)
+  ) {
+    existingPhotos.unshift({
+      driveId: existing.foto_drive_id,
+      fileName: existing.foto_file_name,
+    });
+  }
+
   return (
     <AppShell
       session={session}
       title="Edit Jurnal Sikap"
       subtitle="Perbarui catatan sikap atau bukti foto home visit"
-      backHref="/guru"
+      backHref={`/guru/${existing.id}`}
     >
       <JurnalSikapFormClient
         students={students}
@@ -129,8 +146,7 @@ export default async function GuruJurnalSikapEditPage({
           solusi: existing.solusi ?? '',
           catatan: existing.catatan ?? '',
           tindakLanjut: existing.tindak_lanjut,
-          fotoDriveId: existing.foto_drive_id,
-          fotoFileName: existing.foto_file_name,
+          existingPhotos,
         }}
         redirectAfterSave="/guru"
       />

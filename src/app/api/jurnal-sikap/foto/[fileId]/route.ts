@@ -4,7 +4,7 @@ import { getSession } from '@/lib/auth';
 const FILE_ID_REGEX = /^[a-zA-Z0-9_-]{10,120}$/;
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ fileId: string }> }
 ) {
   const session = await getSession();
@@ -16,6 +16,13 @@ export async function GET(
   if (!FILE_ID_REGEX.test(fileId)) {
     return new NextResponse('Invalid file ID', { status: 400 });
   }
+
+  const url = new URL(request.url);
+  const isDownload = url.searchParams.get('download') === '1';
+  const rawName = url.searchParams.get('name') || 'bukti-home-visit.jpg';
+  const safeName =
+    rawName.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80) ||
+    'bukti-home-visit.jpg';
 
   try {
     const driveRes = await fetch(
@@ -29,7 +36,7 @@ export async function GET(
     );
 
     if (!driveRes.ok) {
-      return new NextResponse('Foto tidak ditemukan di Google Drive', {
+      return new NextResponse('Foto tidak ditemukan', {
         status: 404,
       });
     }
@@ -37,15 +44,20 @@ export async function GET(
     const contentType = driveRes.headers.get('content-type') || 'image/jpeg';
     const buffer = await driveRes.arrayBuffer();
 
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+      'Cache-Control': 'private, max-age=3600',
+    };
+    if (isDownload) {
+      headers['Content-Disposition'] = `attachment; filename="${safeName}"`;
+    }
+
     return new NextResponse(buffer, {
       status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'private, max-age=3600',
-      },
+      headers,
     });
   } catch {
-    return new NextResponse('Gagal memuat foto dari Google Drive', {
+    return new NextResponse('Gagal memuat foto', {
       status: 502,
     });
   }

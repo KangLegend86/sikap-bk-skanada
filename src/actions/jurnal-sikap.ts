@@ -11,6 +11,13 @@ import {
   uploadHomeVisitPhoto,
 } from '@/lib/gdrive';
 
+const MAX_HOME_VISIT_PHOTOS = 5;
+
+export interface PhotoUploadItem {
+  base64Data: string;
+  mimeType: string;
+}
+
 export interface JurnalSikapInput {
   tanggal: string;
   siswaId: string;
@@ -23,10 +30,9 @@ export interface JurnalSikapInput {
   solusi?: string;
   catatan?: string;
   tindakLanjut: string;
-  // Foto opsional khusus HOME_VISIT
-  photoBase64?: string | null;
-  photoMimeType?: string | null;
-  removeExistingPhoto?: boolean;
+  // Multi-foto opsional khusus HOME_VISIT (maks 5 foto)
+  newPhotos?: PhotoUploadItem[];
+  removedDriveIds?: string[];
 }
 
 export type JurnalSikapActionResult = {
@@ -89,37 +95,49 @@ export async function createJurnalSikapAction(
     return { error: 'Data siswa tidak ditemukan.' };
   }
 
-  let fotoDriveId: string | null = null;
-  let fotoFileName: string | null = null;
+  const newPhotos =
+    input.jenis === 'HOME_VISIT'
+      ? (input.newPhotos ?? []).slice(0, MAX_HOME_VISIT_PHOTOS)
+      : [];
 
-  if (input.jenis === 'HOME_VISIT' && input.photoBase64) {
+  let uploadedPhotos: { fileId: string; fileName: string; urutan: number }[] = [];
+
+  if (newPhotos.length > 0) {
     if (!isGdriveConfigured()) {
       return {
         error:
-          'Penyimpanan Google Drive belum dikonfigurasi oleh Admin (GDRIVE_SCRIPT_URL di .env). Simpan tanpa foto terlebih dahulu atau hubungi Admin.',
+          'Penyimpanan foto belum dikonfigurasi oleh Admin. Simpan tanpa foto terlebih dahulu atau hubungi Admin.',
       };
     }
 
     try {
-      const targetName = buildHomeVisitFileName(
-        input.tanggal,
-        siswa.ruang_kelas.nama_ruang,
-        siswa.nama_lengkap
+      uploadedPhotos = await Promise.all(
+        newPhotos.map(async (photo, idx) => {
+          const targetName = buildHomeVisitFileName(
+            input.tanggal,
+            siswa.ruang_kelas.nama_ruang,
+            siswa.nama_lengkap,
+            idx + 1
+          );
+          const uploaded = await uploadHomeVisitPhoto({
+            base64Data: photo.base64Data,
+            mimeType: photo.mimeType || 'image/jpeg',
+            fileName: targetName,
+            tanggalIso: input.tanggal,
+          });
+          return {
+            fileId: uploaded.fileId,
+            fileName: uploaded.fileName,
+            urutan: idx + 1,
+          };
+        })
       );
-      const uploaded = await uploadHomeVisitPhoto({
-        base64Data: input.photoBase64,
-        mimeType: input.photoMimeType || 'image/jpeg',
-        fileName: targetName,
-        tanggalIso: input.tanggal,
-      });
-      fotoDriveId = uploaded.fileId;
-      fotoFileName = uploaded.fileName;
     } catch (err) {
       return {
         error:
           err instanceof Error
             ? err.message
-            : 'Gagal mengunggah bukti foto ke Google Drive.',
+            : 'Gagal mengunggah bukti foto. Silakan coba lagi.',
       };
     }
   }
@@ -127,6 +145,8 @@ export async function createJurnalSikapAction(
   const tanggalDate = input.tanggal
     ? new Date(`${input.tanggal}T08:00:00+07:00`)
     : new Date();
+
+  const firstPhoto = uploadedPhotos[0] ?? null;
 
   const created = await prisma.jurnalSikap.create({
     data: {
@@ -146,14 +166,26 @@ export async function createJurnalSikapAction(
         input.jenis !== 'BERPRESTASI' ? input.solusi?.trim() || null : null,
       catatan: input.catatan?.trim() || null,
       tindak_lanjut: input.tindakLanjut.trim(),
-      foto_drive_id: fotoDriveId,
-      foto_file_name: fotoFileName,
+      foto_drive_id: firstPhoto?.fileId ?? null,
+      foto_file_name: firstPhoto?.fileName ?? null,
       konselor_id: resolvedKonselorId,
       created_by_id: session.userId,
+      ...(uploadedPhotos.length > 0
+        ? {
+            foto_list: {
+              create: uploadedPhotos.map((p) => ({
+                drive_id: p.fileId,
+                file_name: p.fileName,
+                urutan: p.urutan,
+              })),
+            },
+          }
+        : {}),
     },
   });
 
   revalidatePath('/guru');
+  revalidatePath('/guru/riwayat');
   revalidatePath('/jurnal-sikap');
   revalidatePath(`/siswa/${siswa.id}`);
 
@@ -174,6 +206,7 @@ export async function updateJurnalSikapAction(
 
   const existing = await prisma.jurnalSikap.findUnique({
     where: { id },
+    include: { foto_list: { orderBy: { urutan: 'asc' } } },
   });
   if (!existing) {
     return { error: 'Data jurnal sikap tidak ditemukan.' };
@@ -191,7 +224,7 @@ export async function updateJurnalSikapAction(
   const canChooseOtherKonselor = session.role === 'ADMIN';
   const resolvedKonselorId = canChooseOtherKonselor
     ? input.konselorId
-    : session.pegawaiId;
+    : existing.konselor_id;
 
   const validationError = validateInput({
     ...input,
@@ -207,61 +240,89 @@ export async function updateJurnalSikapAction(
     return { error: 'Data siswa tidak ditemukan.' };
   }
 
-  let fotoDriveId = existing.foto_drive_id;
-  let fotoFileName = existing.foto_file_name;
+  // Kumpulkan semua foto eksisting (gabung foto_list + legacy foto_drive_id)
+  const existingPhotos: { driveId: string; fileName: string | null }[] = [
+    ...existing.foto_list.map((f) => ({
+      driveId: f.drive_id,
+      fileName: f.file_name,
+    })),
+  ];
+  if (
+    existing.foto_drive_id &&
+    !existingPhotos.some((p) => p.driveId === existing.foto_drive_id)
+  ) {
+    existingPhotos.unshift({
+      driveId: existing.foto_drive_id,
+      fileName: existing.foto_file_name,
+    });
+  }
 
-  // Jika jenis diubah dari HOME_VISIT ke jenis lain, hapus foto lama jika ada
+  let finalPhotos: { driveId: string; fileName: string | null }[] = [];
+
   if (input.jenis !== 'HOME_VISIT') {
-    if (existing.foto_drive_id) {
-      await deleteHomeVisitPhoto(existing.foto_drive_id);
-    }
-    fotoDriveId = null;
-    fotoFileName = null;
+    // Jika berganti dari HOME_VISIT ke jenis lain, hapus semua foto lama
+    await Promise.all(
+      existingPhotos.map((p) => deleteHomeVisitPhoto(p.driveId))
+    );
+    finalPhotos = [];
   } else {
-    // Jenis HOME_VISIT
-    if (input.photoBase64) {
+    const removedSet = new Set(input.removedDriveIds ?? []);
+    const toDelete = existingPhotos.filter((p) => removedSet.has(p.driveId));
+    const kept = existingPhotos.filter((p) => !removedSet.has(p.driveId));
+
+    const remainingSlots = Math.max(0, MAX_HOME_VISIT_PHOTOS - kept.length);
+    const toUpload = (input.newPhotos ?? []).slice(0, remainingSlots);
+
+    let uploadedNew: { driveId: string; fileName: string | null }[] = [];
+    if (toUpload.length > 0) {
       if (!isGdriveConfigured()) {
         return {
-          error:
-            'Penyimpanan Google Drive belum dikonfigurasi oleh Admin (GDRIVE_SCRIPT_URL di .env).',
+          error: 'Penyimpanan foto belum dikonfigurasi oleh Admin.',
         };
       }
       try {
-        const targetName = buildHomeVisitFileName(
-          input.tanggal,
-          siswa.ruang_kelas.nama_ruang,
-          siswa.nama_lengkap
+        uploadedNew = await Promise.all(
+          toUpload.map(async (photo, idx) => {
+            const targetName = buildHomeVisitFileName(
+              input.tanggal,
+              siswa.ruang_kelas.nama_ruang,
+              siswa.nama_lengkap,
+              kept.length + idx + 1
+            );
+            const uploaded = await uploadHomeVisitPhoto({
+              base64Data: photo.base64Data,
+              mimeType: photo.mimeType || 'image/jpeg',
+              fileName: targetName,
+              tanggalIso: input.tanggal,
+            });
+            return {
+              driveId: uploaded.fileId,
+              fileName: uploaded.fileName,
+            };
+          })
         );
-        const uploaded = await uploadHomeVisitPhoto({
-          base64Data: input.photoBase64,
-          mimeType: input.photoMimeType || 'image/jpeg',
-          fileName: targetName,
-          tanggalIso: input.tanggal,
-        });
-        // Hapus foto lama setelah foto baru sukses terunggah
-        if (existing.foto_drive_id) {
-          await deleteHomeVisitPhoto(existing.foto_drive_id);
-        }
-        fotoDriveId = uploaded.fileId;
-        fotoFileName = uploaded.fileName;
       } catch (err) {
         return {
           error:
             err instanceof Error
               ? err.message
-              : 'Gagal mengunggah bukti foto baru ke Google Drive.',
+              : 'Gagal mengunggah bukti foto baru.',
         };
       }
-    } else if (input.removeExistingPhoto && existing.foto_drive_id) {
-      await deleteHomeVisitPhoto(existing.foto_drive_id);
-      fotoDriveId = null;
-      fotoFileName = null;
     }
+
+    if (toDelete.length > 0) {
+      await Promise.all(toDelete.map((p) => deleteHomeVisitPhoto(p.driveId)));
+    }
+
+    finalPhotos = [...kept, ...uploadedNew];
   }
 
   const tanggalDate = input.tanggal
     ? new Date(`${input.tanggal}T08:00:00+07:00`)
     : existing.tanggal;
+
+  const firstPhoto = finalPhotos[0] ?? null;
 
   await prisma.jurnalSikap.update({
     where: { id },
@@ -282,13 +343,23 @@ export async function updateJurnalSikapAction(
         input.jenis !== 'BERPRESTASI' ? input.solusi?.trim() || null : null,
       catatan: input.catatan?.trim() || null,
       tindak_lanjut: input.tindakLanjut.trim(),
-      foto_drive_id: fotoDriveId,
-      foto_file_name: fotoFileName,
+      foto_drive_id: firstPhoto?.driveId ?? null,
+      foto_file_name: firstPhoto?.fileName ?? null,
       konselor_id: resolvedKonselorId,
+      foto_list: {
+        deleteMany: {},
+        create: finalPhotos.map((p, idx) => ({
+          drive_id: p.driveId,
+          file_name: p.fileName,
+          urutan: idx + 1,
+        })),
+      },
     },
   });
 
   revalidatePath('/guru');
+  revalidatePath('/guru/riwayat');
+  revalidatePath(`/guru/${id}`);
   revalidatePath(`/guru/${id}/edit`);
   revalidatePath('/jurnal-sikap');
   revalidatePath(`/jurnal-sikap/${id}`);
@@ -311,6 +382,7 @@ export async function deleteJurnalSikapAction(
 
   const existing = await prisma.jurnalSikap.findUnique({
     where: { id },
+    include: { foto_list: true },
   });
   if (!existing) {
     return { error: 'Data jurnal sikap tidak ditemukan.' };
@@ -325,13 +397,22 @@ export async function deleteJurnalSikapAction(
     return { error: 'Anda tidak memiliki izin menghapus catatan ini.' };
   }
 
-  if (existing.foto_drive_id) {
-    await deleteHomeVisitPhoto(existing.foto_drive_id);
+  const driveIds = new Set<string>();
+  if (existing.foto_drive_id) driveIds.add(existing.foto_drive_id);
+  for (const f of existing.foto_list) {
+    driveIds.add(f.drive_id);
+  }
+
+  if (driveIds.size > 0) {
+    await Promise.all(
+      Array.from(driveIds).map((driveId) => deleteHomeVisitPhoto(driveId))
+    );
   }
 
   await prisma.jurnalSikap.delete({ where: { id } });
 
   revalidatePath('/guru');
+  revalidatePath('/guru/riwayat');
   revalidatePath('/jurnal-sikap');
   revalidatePath(`/siswa/${existing.siswa_id}`);
 

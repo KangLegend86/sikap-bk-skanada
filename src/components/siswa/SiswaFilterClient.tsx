@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
+import { scrollDropdownIntoView } from '@/lib/utils';
 
 export type GenderFilter = '' | 'L' | 'P';
 export type BkHistoryFilter = '' | 'ADA' | 'BELUM';
@@ -87,6 +88,7 @@ export function SiswaFilterClient({
 
   useEffect(() => {
     if (!showRuangDropdown) return;
+    scrollDropdownIntoView(ruangWrapRef.current, 40);
     const handlePointerDown = (e: PointerEvent) => {
       if (ruangWrapRef.current && !ruangWrapRef.current.contains(e.target as Node)) {
         setShowRuangDropdown(false);
@@ -380,7 +382,7 @@ export function SiswaFilterClient({
 
               <div className="mt-5 space-y-5">
                 {/* Ruang Kelas (Custom Select Dropdown) */}
-                <div ref={ruangWrapRef} className="relative">
+                <div ref={ruangWrapRef} className="relative scroll-mt-3">
                   <span className="mb-2 block text-xs font-bold tracking-wide text-zinc-600 uppercase">
                     Ruang Kelas
                   </span>

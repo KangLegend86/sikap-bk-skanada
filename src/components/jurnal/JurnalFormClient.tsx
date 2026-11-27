@@ -29,13 +29,17 @@ import {
 import {
   createJurnalAction,
   createKategoriAction,
+  updateJurnalAction,
   updateKategoriAction,
 } from '@/actions/jurnal';
 import {
   getMajorBadgeClass,
   getMajorTextClass,
   getSapaan,
+  scrollDropdownIntoView,
 } from '@/lib/utils';
+import { SaveSuccessModal } from '@/components/ui/SaveSuccessModal';
+import { triggerGlobalToast } from '@/components/ui/GlobalToast';
 
 export interface StudentOption {
   id: string;
@@ -54,35 +58,59 @@ export interface KategoriOption {
   nama_kategori: string;
 }
 
+export interface InitialJurnalBkData {
+  id: string;
+  siswaId: string;
+  tanggalKonseling: string;
+  kategoriIds: string[];
+  permasalahan: string;
+  kendala: string;
+  solusi: string;
+  tindakLanjut: string;
+  catatan: string;
+  status: 'DALAM_PROSES' | 'SELESAI';
+  keteranganStatus: string;
+  isSharedWithPjr: boolean;
+}
+
 export function JurnalFormClient({
   students,
   initialCategories,
   counselorName = 'Guru BK',
   liveDate = '-',
   defaultDate = '',
+  initialData,
 }: {
   students: StudentOption[];
   initialCategories: KategoriOption[];
   counselorName?: string;
   liveDate?: string;
   defaultDate?: string;
+  initialData?: InitialJurnalBkData;
 }) {
   const router = useRouter();
+  const isEdit = Boolean(initialData);
 
   // Tanggal konseling state
   const [tanggalKonseling, setTanggalKonseling] = useState(
-    defaultDate || new Date().toISOString().slice(0, 10)
+    initialData?.tanggalKonseling || defaultDate || new Date().toISOString().slice(0, 10)
   );
 
   // Siswa state
   const [searchQuery, setSearchQuery] = useState('');
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(
+    initialData
+      ? students.find((s) => s.id === initialData.siswaId) ?? null
+      : null
+  );
   const studentWrapRef = useRef<HTMLDivElement>(null);
 
   // Kategori state
   const [categories, setCategories] = useState<KategoriOption[]>(initialCategories);
-  const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
+  const [selectedCatIds, setSelectedCatIds] = useState<string[]>(
+    initialData?.kategoriIds ?? []
+  );
   const [showCatDropdown, setShowCatDropdown] = useState(false);
   const catWrapRef = useRef<HTMLDivElement>(null);
 
@@ -92,12 +120,14 @@ export function JurnalFormClient({
   const [catInputName, setCatInputName] = useState('');
 
   // Kronologi fields
-  const [permasalahan, setPermasalahan] = useState('');
-  const [kendala, setKendala] = useState('');
-  const [solusi, setSolusi] = useState('');
-  const [tindakLanjut, setTindakLanjut] = useState('');
-  const [catatan, setCatatan] = useState('');
-  const [showCatatan, setShowCatatan] = useState(false);
+  const [permasalahan, setPermasalahan] = useState(initialData?.permasalahan ?? '');
+  const [kendala, setKendala] = useState(initialData?.kendala ?? '');
+  const [solusi, setSolusi] = useState(initialData?.solusi ?? '');
+  const [tindakLanjut, setTindakLanjut] = useState(initialData?.tindakLanjut ?? '');
+  const [catatan, setCatatan] = useState(initialData?.catatan ?? '');
+  const [showCatatan, setShowCatatan] = useState(
+    Boolean(initialData?.catatan?.trim())
+  );
 
   const autoResizeTextarea = (el: HTMLTextAreaElement) => {
     el.style.height = 'auto';
@@ -105,14 +135,26 @@ export function JurnalFormClient({
   };
 
   // Status & Privasi PJR
-  const [status, setStatus] = useState<'DALAM_PROSES' | 'SELESAI'>('DALAM_PROSES');
-  const [keteranganStatus, setKeteranganStatus] = useState('');
-  const [isSharedWithPjr, setIsSharedWithPjr] = useState(false);
+  const [status, setStatus] = useState<'DALAM_PROSES' | 'SELESAI'>(
+    initialData?.status ?? 'DALAM_PROSES'
+  );
+  const [keteranganStatus, setKeteranganStatus] = useState(
+    initialData?.keteranganStatus ?? ''
+  );
+  const [isSharedWithPjr, setIsSharedWithPjr] = useState(
+    initialData?.isSharedWithPjr ?? false
+  );
 
   // UI & Submit state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [waModalOpen, setWaModalOpen] = useState(false);
+  const [successModalData, setSuccessModalData] = useState<{
+    jurnalId: string;
+    studentName: string;
+    metaText: string;
+    badgeText: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!waModalOpen && !catModalOpen) return;
@@ -148,6 +190,18 @@ export function JurnalFormClient({
     document.addEventListener('pointerdown', handleClickOutside);
     return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (showStudentDropdown) {
+      scrollDropdownIntoView(studentWrapRef.current, 140);
+    }
+  }, [showStudentDropdown]);
+
+  useEffect(() => {
+    if (showCatDropdown) {
+      scrollDropdownIntoView(catWrapRef.current, 40);
+    }
+  }, [showCatDropdown]);
 
   function showToast(msg: string) {
     setToastMsg(msg);
@@ -210,20 +264,45 @@ export function JurnalFormClient({
     setEditingCat(null);
   }
 
+  function resetFormForNextEntry() {
+    setSelectedStudent(null);
+    setSearchQuery('');
+    setSelectedCatIds([]);
+    setPermasalahan('');
+    setKendala('');
+    setSolusi('');
+    setTindakLanjut('');
+    setCatatan('');
+    setStatus('DALAM_PROSES');
+    setKeteranganStatus('');
+    setIsSharedWithPjr(false);
+    setSuccessModalData(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedStudent) {
-      showToast('Silakan pilih identitas siswa terlebih dahulu!');
+      triggerGlobalToast('Silakan pilih identitas siswa terlebih dahulu!', 'error');
+      studentWrapRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      setShowStudentDropdown(true);
       return;
     }
     if (selectedCatIds.length === 0) {
-      showToast('Silakan pilih minimal 1 kategori bimbingan!');
+      triggerGlobalToast('Silakan pilih minimal 1 kategori bimbingan!', 'error');
+      catWrapRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
       setShowCatDropdown(true);
       return;
     }
 
     setIsSubmitting(true);
-    const res = await createJurnalAction({
+    const payload = {
       siswaId: selectedStudent.id,
       tanggalKonseling,
       kategoriIds: selectedCatIds,
@@ -235,22 +314,42 @@ export function JurnalFormClient({
       status,
       keteranganStatus,
       isSharedWithPjr,
-    });
+    };
+
+    const res =
+      isEdit && initialData
+        ? await updateJurnalAction(initialData.id, payload)
+        : await createJurnalAction(payload);
     setIsSubmitting(false);
 
     if (res.error) {
-      showToast(res.error);
+      triggerGlobalToast(res.error, 'error');
       return;
     }
 
-    showToast(
-      isSharedWithPjr
-        ? 'Jurnal disimpan & dibagikan ke akun Guru PJR'
-        : 'Jurnal rahasia BK berhasil disimpan'
-    );
-    setTimeout(() => {
-      router.push(res.jurnalId ? `/jurnal/${res.jurnalId}` : '/jurnal');
-    }, 600);
+    if (isEdit && initialData) {
+      triggerGlobalToast('Perubahan Jurnal BK berhasil disimpan');
+      router.push(`/jurnal/${initialData.id}`);
+      router.refresh();
+      return;
+    }
+
+    const catLabel = categories
+      .filter((c) => selectedCatIds.includes(c.id))
+      .map((c) => c.nama_kategori)
+      .join(', ');
+
+    setSuccessModalData({
+      jurnalId: res.jurnalId || '',
+      studentName: selectedStudent.namaLengkap,
+      metaText: `${selectedStudent.ruangNama} • ${selectedStudent.jurusanKode}${
+        catLabel ? ` | ${catLabel}` : ''
+      }`,
+      badgeText: isSharedWithPjr
+        ? 'Dibagikan ke akun Guru PJR'
+        : 'Tersimpan sebagai Privat Internal BK',
+    });
+    router.refresh();
   }
 
   function buildWhatsAppDraft(): string {
@@ -338,7 +437,7 @@ export function JurnalFormClient({
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Calendar className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                   Tanggal Konseling
                 </span>
               </div>
@@ -374,7 +473,7 @@ export function JurnalFormClient({
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <User className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                   Identitas Siswa
                 </span>
               </div>
@@ -384,7 +483,7 @@ export function JurnalFormClient({
             </div>
 
             {!selectedStudent ? (
-              <div ref={studentWrapRef} className="relative">
+              <div ref={studentWrapRef} className="relative scroll-mt-24">
                 <div className="relative flex items-center">
                   <Search className="pointer-events-none absolute left-3 h-4 w-4 text-zinc-400" />
                   <input
@@ -516,7 +615,7 @@ export function JurnalFormClient({
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Tag className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                   Kategori Bimbingan
                 </span>
               </div>
@@ -546,7 +645,7 @@ export function JurnalFormClient({
               </div>
             )}
 
-            <div ref={catWrapRef} className="relative">
+            <div ref={catWrapRef} className="relative scroll-mt-24">
               <button
                 type="button"
                 onClick={() => setShowCatDropdown(!showCatDropdown)}
@@ -641,7 +740,7 @@ export function JurnalFormClient({
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <PenLine className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                   Catatan Konseling
                 </span>
               </div>
@@ -790,7 +889,7 @@ export function JurnalFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <CheckCircle2 className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 Status Penanganan
               </span>
             </div>
@@ -862,7 +961,7 @@ export function JurnalFormClient({
                 <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                   <Shield className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                   Akses & Privasi PJR
                 </span>
               </div>
@@ -954,7 +1053,13 @@ export function JurnalFormClient({
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3.5 text-sm font-bold text-white shadow-[0_6px_16px_rgba(4,120,87,0.28)] transition-all hover:bg-emerald-800 active:scale-[0.985] disabled:opacity-60"
             >
               <Save className="h-4.5 w-4.5" />
-              <span>{isSubmitting ? 'Menyimpan...' : 'Simpan Jurnal BK'}</span>
+              <span>
+                {isSubmitting
+                  ? 'Menyimpan...'
+                  : isEdit
+                    ? 'Simpan Perubahan'
+                    : 'Simpan Jurnal BK'}
+              </span>
             </button>
 
             <button
@@ -1128,6 +1233,23 @@ export function JurnalFormClient({
           {toastMsg}
         </div>
       )}
+
+      {/* Success Modal Simpan Jurnal BK */}
+      <SaveSuccessModal
+        open={Boolean(successModalData)}
+        title="Jurnal BK Tersimpan!"
+        subtitle="Catatan layanan konseling berhasil direkam di sistem."
+        studentName={successModalData?.studentName || ''}
+        metaText={successModalData?.metaText || ''}
+        badgeText={successModalData?.badgeText}
+        detailHref={
+          successModalData?.jurnalId
+            ? `/jurnal/${successModalData.jurnalId}`
+            : '/jurnal'
+        }
+        homeHref="/"
+        onCreateAnother={resetFormForNextEntry}
+      />
     </>
   );
 }

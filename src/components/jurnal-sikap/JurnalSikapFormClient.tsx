@@ -8,7 +8,6 @@ import {
   Calendar,
   Camera,
   Check,
-  CheckCircle2,
   ChevronDown,
   Home,
   Loader2,
@@ -18,8 +17,8 @@ import {
   Save,
   Search,
   Tag,
-  Trash2,
   User,
+  X,
 } from 'lucide-react';
 import type { JenisJurnalSikap } from '@prisma/client';
 import {
@@ -27,7 +26,13 @@ import {
   updateJurnalSikapAction,
 } from '@/actions/jurnal-sikap';
 import { compressImageFile } from '@/lib/image-compress';
-import { getMajorBadgeClass, getMajorTextClass } from '@/lib/utils';
+import {
+  getMajorBadgeClass,
+  getMajorTextClass,
+  scrollDropdownIntoView,
+} from '@/lib/utils';
+import { SaveSuccessModal } from '@/components/ui/SaveSuccessModal';
+import { triggerGlobalToast } from '@/components/ui/GlobalToast';
 
 export interface SikapStudentOption {
   id: string;
@@ -57,8 +62,17 @@ export interface InitialJurnalSikapData {
   solusi: string;
   catatan: string;
   tindakLanjut: string;
-  fotoDriveId: string | null;
-  fotoFileName: string | null;
+  existingPhotos: { driveId: string; fileName: string | null }[];
+}
+
+const MAX_PHOTOS = 5;
+
+interface NewPhotoDraft {
+  id: string;
+  base64Data: string;
+  mimeType: string;
+  previewUrl: string;
+  sizeKb: number;
 }
 
 const JENIS_OPTIONS: {
@@ -179,22 +193,24 @@ export function JurnalSikapFormClient({
     initialData?.tindakLanjut || ''
   );
 
-  // Home Visit photo state
-  const [existingPhotoId, setExistingPhotoId] = useState<string | null>(
-    initialData?.fotoDriveId ?? null
-  );
-  const [removeExistingPhoto, setRemoveExistingPhoto] = useState(false);
-  const [photoBase64, setPhotoBase64] = useState<string | null>(null);
-  const [photoMimeType, setPhotoMimeType] = useState<string | null>(null);
-  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
-  const [photoSizeKb, setPhotoSizeKb] = useState<number | null>(null);
+  // Home Visit multi-photo state (maks 5 foto)
+  const [existingPhotos, setExistingPhotos] = useState<
+    { driveId: string; fileName: string | null }[]
+  >(initialData?.existingPhotos ?? []);
+  const [removedDriveIds, setRemovedDriveIds] = useState<string[]>([]);
+  const [newPhotos, setNewPhotos] = useState<NewPhotoDraft[]>([]);
   const [compressingPhoto, setCompressingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Submit state
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [successModalData, setSuccessModalData] = useState<{
+    id: string;
+    studentName: string;
+    metaText: string;
+    badgeText?: string;
+  } | null>(null);
 
   useEffect(() => {
     function handleOutside(e: PointerEvent) {
@@ -214,6 +230,18 @@ export function JurnalSikapFormClient({
     document.addEventListener('pointerdown', handleOutside);
     return () => document.removeEventListener('pointerdown', handleOutside);
   }, []);
+
+  useEffect(() => {
+    if (showStudentDropdown) {
+      scrollDropdownIntoView(studentWrapRef.current, 140);
+    }
+  }, [showStudentDropdown]);
+
+  useEffect(() => {
+    if (showKonselorDropdown) {
+      scrollDropdownIntoView(konselorWrapRef.current, 60);
+    }
+  }, [showKonselorDropdown]);
 
   const filteredStudents = useMemo(() => {
     const q = studentQuery.trim().toLowerCase();
@@ -254,46 +282,96 @@ export function JurnalSikapFormClient({
     });
   })();
 
+  const totalSelectedPhotos = existingPhotos.length + newPhotos.length;
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    const remainingSlots = MAX_PHOTOS - totalSelectedPhotos;
+    if (remainingSlots <= 0) {
+      triggerGlobalToast(`Maksimal ${MAX_PHOTOS} foto untuk satu Home Visit.`, 'error');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const toProcess = files.slice(0, remainingSlots);
+    if (files.length > remainingSlots) {
+      triggerGlobalToast(
+        `Hanya ${remainingSlots} foto tambahan yang diproses (maksimal ${MAX_PHOTOS} foto).`,
+        'info'
+      );
+    }
+
     setErrorMsg(null);
     setCompressingPhoto(true);
     try {
-      const result = await compressImageFile(file);
-      setPhotoBase64(result.base64Data);
-      setPhotoMimeType(result.mimeType);
-      setPhotoPreviewUrl(result.previewUrl);
-      setPhotoSizeKb(result.sizeKb);
-      setRemoveExistingPhoto(false);
-    } catch (err) {
-      setErrorMsg(
-        err instanceof Error ? err.message : 'Gagal memproses foto.'
+      const compressedList = await Promise.all(
+        toProcess.map(async (file, idx) => {
+          const res = await compressImageFile(file);
+          return {
+            id: `${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 6)}`,
+            base64Data: res.base64Data,
+            mimeType: res.mimeType,
+            previewUrl: res.previewUrl,
+            sizeKb: res.sizeKb,
+          };
+        })
       );
+      setNewPhotos((prev) => [...prev, ...compressedList]);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Gagal memproses foto.';
+      setErrorMsg(msg);
+      triggerGlobalToast(msg, 'error');
     } finally {
       setCompressingPhoto(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
 
-  function handleClearPhoto() {
-    setPhotoBase64(null);
-    setPhotoMimeType(null);
-    setPhotoPreviewUrl(null);
-    setPhotoSizeKb(null);
-    if (existingPhotoId) {
-      setExistingPhotoId(null);
-      setRemoveExistingPhoto(true);
-    }
+  function handleRemoveExistingPhoto(driveId: string) {
+    setExistingPhotos((prev) => prev.filter((p) => p.driveId !== driveId));
+    setRemovedDriveIds((prev) =>
+      prev.includes(driveId) ? prev : [...prev, driveId]
+    );
+  }
+
+  function handleRemoveNewPhoto(draftId: string) {
+    setNewPhotos((prev) => prev.filter((p) => p.id !== draftId));
+  }
+
+  function resetFormForNextEntry() {
+    setSelectedStudent(null);
+    setStudentQuery('');
+    setPrestasiDalam('');
+    setSikapPerilaku('');
+    setPermasalahan('');
+    setKendala('');
+    setSolusi('');
+    setCatatan('');
+    setShowCatatan(false);
+    setTindakLanjut('');
+    setExistingPhotos([]);
+    setRemovedDriveIds([]);
+    setNewPhotos([]);
+    setErrorMsg(null);
+    setSuccessModalData(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg(null);
-    setSuccessMsg(null);
 
     if (!selectedStudent) {
-      setErrorMsg('Silakan pilih siswa terlebih dahulu.');
+      const msg = 'Silakan pilih identitas siswa terlebih dahulu!';
+      setErrorMsg(msg);
+      triggerGlobalToast(msg, 'error');
+      studentWrapRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      setShowStudentDropdown(true);
       return;
     }
 
@@ -310,9 +388,11 @@ export function JurnalSikapFormClient({
       solusi,
       catatan,
       tindakLanjut,
-      photoBase64,
-      photoMimeType,
-      removeExistingPhoto,
+      newPhotos: newPhotos.map((p) => ({
+        base64Data: p.base64Data,
+        mimeType: p.mimeType,
+      })),
+      removedDriveIds,
     };
 
     const res =
@@ -324,19 +404,35 @@ export function JurnalSikapFormClient({
 
     if (res.error) {
       setErrorMsg(res.error);
+      triggerGlobalToast(res.error, 'error');
       return;
     }
 
-    setSuccessMsg(res.success || 'Berhasil disimpan!');
-    router.push(redirectAfterSave);
+    if (isEdit && initialData) {
+      triggerGlobalToast('Perubahan Jurnal Sikap berhasil disimpan');
+      router.push(`/guru/${initialData.id}`);
+      router.refresh();
+      return;
+    }
+
+    const jenisLabel =
+      jenis === 'BERPRESTASI'
+        ? 'Berprestasi'
+        : jenis === 'HOME_VISIT'
+          ? 'Home Visit'
+          : 'Bermasalah';
+
+    setSuccessModalData({
+      id: res.id || '',
+      studentName: selectedStudent.namaLengkap,
+      metaText: `${selectedStudent.ruangNama} • ${selectedStudent.jurusanKode} | ${jenisLabel}`,
+      badgeText:
+        jenis === 'HOME_VISIT' && newPhotos.length > 0
+          ? `${newPhotos.length} bukti foto Home Visit terlampir`
+          : 'Tercatat & diteruskan ke Guru BK',
+    });
     router.refresh();
   }
-
-  const activePreviewSrc =
-    photoPreviewUrl ||
-    (existingPhotoId && !removeExistingPhoto
-      ? `/api/jurnal-sikap/foto/${existingPhotoId}`
-      : null);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -359,13 +455,6 @@ export function JurnalSikapFormClient({
           </div>
         )}
 
-        {successMsg && (
-          <div className="flex items-center gap-2.5 rounded-xl border border-[#A7F3D0] bg-[#ECFDF5] px-3.5 py-3 text-xs font-medium text-[#047857]">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
         {/* TANGGAL PENILAIAN */}
         <section className={CARD_CLASS}>
           <div className="flex items-center justify-between border-b border-zinc-100 pb-2.5">
@@ -373,7 +462,7 @@ export function JurnalSikapFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <Calendar className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 Tanggal Penilaian
               </span>
             </div>
@@ -410,7 +499,7 @@ export function JurnalSikapFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <User className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 Identitas Siswa
               </span>
             </div>
@@ -420,7 +509,7 @@ export function JurnalSikapFormClient({
           </div>
 
           {!selectedStudent ? (
-            <div ref={studentWrapRef} className="relative">
+            <div ref={studentWrapRef} className="relative scroll-mt-24">
               <div className="relative flex items-center">
                 <Search className="pointer-events-none absolute left-3 h-4 w-4 text-zinc-400" />
                 <input
@@ -556,7 +645,7 @@ export function JurnalSikapFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <Tag className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 Kategori Penilaian Sikap
               </span>
             </div>
@@ -608,7 +697,7 @@ export function JurnalSikapFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <PenLine className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 {jenis === 'BERPRESTASI'
                   ? 'Catatan Prestasi & Sikap'
                   : jenis === 'HOME_VISIT'
@@ -871,9 +960,9 @@ export function JurnalSikapFormClient({
             </>
           )}
 
-          {/* Upload Bukti Foto khusus HOME_VISIT */}
+          {/* Upload Multi-Foto khusus HOME_VISIT (maks 5 foto) */}
           {jenis === 'HOME_VISIT' && (
-            <div className="flex flex-col gap-2 pt-1">
+            <div className="flex flex-col gap-2.5 pt-1">
               <div className="flex items-center justify-between gap-2">
                 <label className="flex items-center gap-2">
                   <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-blue-50 font-mono text-[10.5px] font-bold text-blue-700">
@@ -886,44 +975,85 @@ export function JurnalSikapFormClient({
                     (Opsional)
                   </span>
                 </label>
-                {photoSizeKb !== null && (
-                  <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-blue-700 border border-blue-200">
-                    ~{photoSizeKb} KB
-                  </span>
-                )}
+                <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-500">
+                  {totalSelectedPhotos}/{MAX_PHOTOS}
+                </span>
               </div>
 
               {!gdriveConfigured && (
                 <p className="rounded-[10px] border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
-                  Info: Google Drive belum diatur di <code>.env</code>. Anda tetap bisa menyimpan Home Visit tanpa foto.
+                  Info: Penyimpanan foto belum diaktifkan oleh Admin. Anda tetap bisa menyimpan Home Visit tanpa foto.
                 </p>
               )}
 
-              {activePreviewSrc ? (
-                <div className="overflow-hidden rounded-[11px] border border-zinc-200 bg-zinc-50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={activePreviewSrc}
-                    alt="Preview Bukti Home Visit"
-                    className="max-h-60 w-full object-contain bg-zinc-950/5"
-                  />
-                  <div className="flex items-center justify-between gap-2 border-t border-zinc-200/80 bg-white px-3 py-2">
+              {totalSelectedPhotos > 0 ? (
+                <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5">
+                  {existingPhotos.map((photo, idx) => (
+                    <div
+                      key={photo.driveId}
+                      className="relative aspect-square overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`/api/jurnal-sikap/foto/${photo.driveId}`}
+                        alt={photo.fileName || `Foto tersimpan ${idx + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingPhoto(photo.driveId)}
+                        aria-label="Hapus foto"
+                        className="absolute top-1.5 right-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-zinc-950/75 text-white shadow-xs transition-colors hover:bg-rose-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {newPhotos.map((photo, idx) => (
+                    <div
+                      key={photo.id}
+                      className="relative aspect-square overflow-hidden rounded-xl border border-[#A7F3D0] bg-zinc-100"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo.previewUrl}
+                        alt={`Foto baru ${idx + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute bottom-1 left-1 rounded bg-zinc-950/70 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-white">
+                        {photo.sizeKb}KB
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewPhoto(photo.id)}
+                        aria-label="Hapus foto"
+                        className="absolute top-1.5 right-1.5 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-zinc-950/75 text-white shadow-xs transition-colors hover:bg-rose-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {totalSelectedPhotos < MAX_PHOTOS && (
                     <button
                       type="button"
+                      disabled={compressingPhoto}
                       onClick={() => fileInputRef.current?.click()}
-                      className="cursor-pointer text-xs font-semibold text-[#047857] hover:underline"
+                      className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 transition-colors hover:border-[#047857] hover:bg-[#ECFDF5]/40 hover:text-[#047857] disabled:opacity-60"
                     >
-                      Ganti Foto
+                      {compressingPhoto ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-[#047857]" />
+                      ) : (
+                        <>
+                          <Plus className="h-5 w-5" />
+                          <span className="text-[10.5px] font-semibold">
+                            Tambah
+                          </span>
+                        </>
+                      )}
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleClearPhoto}
-                      className="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-rose-600 hover:underline"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Hapus Foto
-                    </button>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <button
@@ -936,7 +1066,7 @@ export function JurnalSikapFormClient({
                     <>
                       <Loader2 className="h-5 w-5 animate-spin text-[#047857]" />
                       <span className="text-xs font-semibold text-zinc-700">
-                        Mengompres foto...
+                        Memproses foto...
                       </span>
                     </>
                   ) : (
@@ -946,7 +1076,7 @@ export function JurnalSikapFormClient({
                         Pilih Foto dari Galeri atau Kamera
                       </span>
                       <span className="text-[11px] text-zinc-400">
-                        Otomatis dikompres agar upload ringan & cepat
+                        Bisa pilih hingga {MAX_PHOTOS} foto sekaligus
                       </span>
                     </>
                   )}
@@ -957,6 +1087,7 @@ export function JurnalSikapFormClient({
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -971,7 +1102,7 @@ export function JurnalSikapFormClient({
               <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[#ECFDF5] text-[#047857]">
                 <User className="h-3.5 w-3.5" />
               </span>
-              <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
+              <span className="text-xs font-bold tracking-wider text-[#17331E] uppercase">
                 Konselor / Guru Pencatat
               </span>
             </div>
@@ -991,7 +1122,7 @@ export function JurnalSikapFormClient({
               />
             </div>
           ) : (
-            <div ref={konselorWrapRef} className="relative space-y-2">
+            <div ref={konselorWrapRef} className="relative space-y-2 scroll-mt-24">
               <button
                 type="button"
                 onClick={() => setShowKonselorDropdown((prev) => !prev)}
@@ -1083,6 +1214,20 @@ export function JurnalSikapFormClient({
           </span>
         </button>
       </form>
+
+      <SaveSuccessModal
+        open={Boolean(successModalData)}
+        title="Jurnal Sikap Tersimpan!"
+        subtitle="Catatan penilaian sikap siswa berhasil dikirim ke sistem."
+        studentName={successModalData?.studentName || ''}
+        metaText={successModalData?.metaText || ''}
+        badgeText={successModalData?.badgeText}
+        detailHref={
+          successModalData?.id ? `/guru/${successModalData.id}` : redirectAfterSave
+        }
+        homeHref={redirectAfterSave}
+        onCreateAnother={resetFormForNextEntry}
+      />
     </div>
   );
 }

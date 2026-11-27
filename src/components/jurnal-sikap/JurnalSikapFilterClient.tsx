@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import type { JenisJurnalSikap } from '@prisma/client';
+import { scrollDropdownIntoView } from '@/lib/utils';
 
 export type SikapPeriodeFilter = '' | 'BULAN_INI' | 'BULAN_LALU' | '3_BULAN';
 
@@ -105,6 +106,7 @@ export function JurnalSikapFilterClient({
 
   useEffect(() => {
     if (!showRuangDropdown) return;
+    scrollDropdownIntoView(ruangWrapRef.current, 40);
     const handlePointerDown = (e: PointerEvent) => {
       if (
         ruangWrapRef.current &&
@@ -382,7 +384,7 @@ export function JurnalSikapFilterClient({
       {sheetOpen &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center">
+          <div className="fixed inset-0 z-100 flex items-end justify-center sm:items-center">
             <div
               onClick={() => setSheetOpen(false)}
               className="fixed inset-0 bg-zinc-950/45 backdrop-blur-[2px]"
@@ -464,7 +466,7 @@ export function JurnalSikapFilterClient({
                 </div>
 
                 {/* Ruang Kelas */}
-                <div ref={ruangWrapRef} className="relative">
+                <div ref={ruangWrapRef} className="relative scroll-mt-3">
                   <label className="mb-2 block text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
                     Ruang Kelas
                   </label>

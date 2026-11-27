@@ -19,6 +19,7 @@ export default async function GuruJurnalSikapDetailPage({
     include: {
       siswa: { include: { jurusan: true } },
       konselor: true,
+      foto_list: { orderBy: { urutan: 'asc' } },
     },
   });
 

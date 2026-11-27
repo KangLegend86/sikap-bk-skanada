@@ -21,6 +21,7 @@ export default async function JurnalSikapDetailPage({
     include: {
       siswa: { include: { jurusan: true } },
       konselor: true,
+      foto_list: { orderBy: { urutan: 'asc' } },
     },
   });
 

@@ -115,7 +115,7 @@ export default async function PjrDashboardPage() {
         </div>
       ) : (
         <>
-          <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
+          <div className="mb-6 rounded-2xl bg-linear-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
             <p className="text-xs font-medium tracking-wider text-emerald-200 uppercase">
               Ruang Kelas {namaRuang}
             </p>

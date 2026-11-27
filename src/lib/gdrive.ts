@@ -10,7 +10,8 @@ export function isGdriveConfigured(): boolean {
 export function buildHomeVisitFileName(
   tanggalIso: string,
   kelas: string,
-  namaSiswa: string
+  namaSiswa: string,
+  urutan?: number
 ): string {
   const datePart = tanggalIso.slice(0, 10) || new Date().toISOString().slice(0, 10);
   const kelasPart = kelas.replace(/[^a-zA-Z0-9-]/g, '').toUpperCase() || 'KELAS';
@@ -21,7 +22,8 @@ export function buildHomeVisitFileName(
       .replace(/\s+/g, '-')
       .slice(0, 32) || 'Siswa';
   const rand = crypto.randomBytes(2).toString('hex');
-  return `${datePart}_${kelasPart}_${namaPart}_${rand}.jpg`;
+  const seqPart = typeof urutan === 'number' ? `_${urutan}` : '';
+  return `${datePart}_${kelasPart}_${namaPart}${seqPart}_${rand}.jpg`;
 }
 
 export async function uploadHomeVisitPhoto(params: {

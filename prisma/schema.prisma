@@ -168,9 +168,11 @@ model JurnalSikap {
   // Field umum
   catatan        String?          @db.Text
   tindak_lanjut  String           @db.Text
-  // Field khusus HOME_VISIT (opsional)
+  // Field khusus HOME_VISIT (opsional — foto pertama tetap disimpan di sini untuk kompatibilitas,
+  // dan seluruh foto tersimpan di relasi foto_list)
   foto_drive_id  String?
   foto_file_name String?
+  foto_list      JurnalSikapFoto[]
   // Konselor / Guru yang dipilih & akun penginput
   konselor_id    String
   konselor       Pegawai          @relation("KonselorJurnalSikap", fields: [konselor_id], references: [id])
@@ -178,5 +180,15 @@ model JurnalSikap {
   created_by     UserAccount      @relation("CreatorJurnalSikap", fields: [created_by_id], references: [id])
   created_at     DateTime         @default(now())
   updated_at     DateTime         @updatedAt
+}
+
+model JurnalSikapFoto {
+  id              String      @id @default(cuid())
+  jurnal_sikap_id String
+  jurnal_sikap    JurnalSikap @relation(fields: [jurnal_sikap_id], references: [id], onDelete: Cascade)
+  drive_id        String
+  file_name       String?
+  urutan          Int         @default(0)
+  created_at      DateTime    @default(now())
 }
 

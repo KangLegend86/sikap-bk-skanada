@@ -63,3 +63,15 @@ export function formatWaNumber(phone?: string | null): string {
   return clean;
 }
 
+export function scrollDropdownIntoView(
+  el: HTMLElement | null,
+  delayMs: number = 40
+): void {
+  if (!el || typeof window === 'undefined') return;
+  window.setTimeout(() => {
+    window.requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, delayMs);
+}
+

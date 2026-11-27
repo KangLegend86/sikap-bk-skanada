@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
       subtitle="Ringkasan Konseling Sekolah • SMKS NU 2 Kedungpring"
     >
       {/* Top Banner */}
-      <div className="mb-6 rounded-2xl bg-gradient-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
+      <div className="mb-6 rounded-2xl bg-linear-to-br from-[#047857] to-[#065F46] p-5 text-white shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-medium tracking-wider text-emerald-200 uppercase">

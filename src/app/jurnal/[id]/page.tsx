@@ -10,6 +10,7 @@ import {
   LockOpen,
   MessageCircle,
   MessageSquare,
+  Pencil,
   User,
 } from 'lucide-react';
 import { getSession } from '@/lib/auth';
@@ -23,6 +24,7 @@ import {
 } from '@/lib/utils';
 import AppShell from '@/components/layout/AppShell';
 import { JurnalStatusUpdateClient } from '@/components/jurnal/JurnalStatusUpdateClient';
+import { DeleteJurnalBkButton } from '@/components/jurnal/DeleteJurnalBkButton';
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -438,6 +440,24 @@ export default async function JurnalDetailPage({
             </div>
           )}
         </section>
+
+        {/* 6. Tombol Aksi Edit & Hapus (selaras dengan Detail Jurnal Sikap & Profil Saya) */}
+        {canEdit && (
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href={`/jurnal/${jurnal.id}/edit`}
+              className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200/80 bg-white px-4 py-3 text-xs font-semibold text-zinc-700 shadow-xs transition-all hover:border-[#047857]/30 hover:text-[#047857] active:scale-[0.985]"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit Jurnal
+            </Link>
+            <DeleteJurnalBkButton
+              id={jurnal.id}
+              redirectTo="/jurnal"
+              label="Hapus Jurnal"
+            />
+          </div>
+        )}
       </div>
     </AppShell>
   );

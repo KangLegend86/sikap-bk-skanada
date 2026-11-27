@@ -6,6 +6,7 @@ import { getSession } from "@/lib/auth";
 import { ACTIVE_MODE_COOKIE, isValidAppMode } from "@/lib/mode";
 import { PersistentBottomNav } from "@/components/layout/PersistentBottomNav";
 import { TopProgressBar } from "@/components/layout/TopProgressBar";
+import { GlobalToast } from "@/components/ui/GlobalToast";
 import "./globals.css";
 
 const inter = Inter({
@@ -67,6 +68,7 @@ export default async function RootLayout({
         <Suspense fallback={null}>
           <TopProgressBar />
         </Suspense>
+        <GlobalToast />
         {children}
         <PersistentBottomNav
           role={session?.role ?? null}

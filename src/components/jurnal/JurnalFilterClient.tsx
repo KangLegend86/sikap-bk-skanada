@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react';
+import { scrollDropdownIntoView } from '@/lib/utils';
 
 export type PeriodeFilter = '' | 'BULAN_INI' | 'BULAN_LALU' | '3_BULAN';
 
@@ -95,6 +96,7 @@ export function JurnalFilterClient({
 
   useEffect(() => {
     if (!showRuangDropdown) return;
+    scrollDropdownIntoView(ruangWrapRef.current, 40);
     const handlePointerDown = (e: PointerEvent) => {
       if (ruangWrapRef.current && !ruangWrapRef.current.contains(e.target as Node)) {
         setShowRuangDropdown(false);
@@ -441,7 +443,7 @@ export function JurnalFilterClient({
                 </div>
 
                 {/* Ruang Kelas (Custom Select Dropdown — tanpa keyboard & tanpa modal native OS) */}
-                <div ref={ruangWrapRef} className="relative">
+                <div ref={ruangWrapRef} className="relative scroll-mt-3">
                   <span className="mb-2 block text-xs font-bold tracking-wide text-zinc-600 uppercase">
                     Ruang Kelas
                   </span>
